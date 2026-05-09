@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String       @id @default(uuid())
+  firstName     String
+  lastName      String
+  phone         String       @unique
+  email         String       @unique
+  passwordHash  String
+  role          String       @default("MEMBER") // MEMBER, ADMIN
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  memberships   Membership[]
+  payments      Payment[]    @relation("UserPayments")
+  verifiedPayments Payment[] @relation("AdminVerifiedPayments")
+  bookings      Booking[]
+}
+
+model Membership {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  planTier   String     // STARTER, WARRIOR, ELITE
+  status     String     @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
+  startDate  DateTime?
+  endDate    DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation("UserPayments", fields: [userId], references: [id])
+  amount         Decimal
+  paymentMethod  String        // UPI, CARD, CASH
+  screenshotUrl  String?
+  status         String        @default("PENDING_VERIFICATION") // PENDING_VERIFICATION, VERIFIED, REJECTED
+  verifiedById   String?
+  verifiedBy     User?         @relation("AdminVerifiedPayments", fields: [verifiedById], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Booking {
+  id                String        @id @default(uuid())
+  name              String?       // Optional if user is registered
+  phone             String?
+  age               Int?
+  userId            String?
+  user              User?         @relation(fields: [userId], references: [id])
+  interest          String
+  preferredDate     DateTime
+  preferredTimeSlot String
+  status            String        @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  message           String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  category    String
+  content     String
+  imageUrl    String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

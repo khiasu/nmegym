@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NME GYM — Forge Your Legacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#0a0a0a;--dark:#111111;--card:#161616;--red:#e8001d;--red2:#ff2a47;--navy:#1B3A6B;--gray:#888;--light:#f0ede8;--white:#ffffff;--border:rgba(255,255,255,0.07);--accent-glow:rgba(232,0,29,0.25);}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:10px;height:10px;background:var(--red);border-radius:50%;pointer-events:none;z-index:99999;transition:transform 0.1s;mix-blend-mode:difference;}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid var(--red);border-radius:50%;pointer-events:none;z-index:99998;transition:transform 0.15s,width 0.2s,height 0.2s;transform:translate(-50%,-50%);}
+.cursor-ring.expand{width:60px;height:60px;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--red);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px;transition:all 0.4s;}
+nav.scrolled{background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo-img{height:44px;width:auto;}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color 0.2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--red);transition:width 0.3s;}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{background:var(--red);color:var(--white)!important;padding:9px 20px;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background 0.2s!important;}
+.nav-cta::after{display:none!important;}
+.nav-cta:hover{background:var(--red2)!important;}
+.nav-member-btn{background:transparent;color:var(--white)!important;padding:8px 16px;border:1px solid rgba(255,255,255,0.25)!important;font-size:12px!important;}
+.nav-member-btn:hover{border-color:var(--red)!important;color:var(--red)!important;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:none;padding:5px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--white);transition:all 0.3s;}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--black);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px;transform:translateX(100%);transition:transform 0.4s cubic-bezier(0.77,0,0.175,1);}
+.mobile-menu.open{transform:translateX(0);}
+.mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:4px;color:var(--white);text-decoration:none;transition:color 0.2s;}
+.mobile-menu a:hover{color:var(--red);}
+.mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--white);font-size:32px;cursor:none;}
+
+/* HERO */
+.hero{position:relative;height:100svh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0a 0%,#1a0005 50%,#0a0a0a 100%);}
+.hero-bg-img{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1400&q=80') center/cover no-repeat;opacity:0.18;mix-blend-mode:luminosity;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.4;}
+.hero-number{position:absolute;right:-20px;top:50%;transform:translateY(-50%) rotate(90deg);font-family:'Bebas Neue',sans-serif;font-size:clamp(100px,18vw,220px);color:rgba(232,0,29,0.04);letter-spacing:-10px;user-select:none;white-space:nowrap;}
+.hero-content{position:relative;z-index:2;padding:0 20px;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(232,0,29,0.4);padding:6px 16px;margin-bottom:28px;opacity:0;animation:fadeUp 0.8s 0.3s forwards;}
+.hero-tag span{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite;}
+.hero-tag p{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);}
+h1.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(68px,18vw,160px);line-height:0.88;letter-spacing:2px;opacity:0;animation:fadeUp 0.9s 0.5s forwards;}
+h1.hero-title .stroke{-webkit-text-stroke:2px var(--white);color:transparent;}
+h1.hero-title .red{color:var(--red);}
+.hero-sub{font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,3vw,18px);font-weight:300;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-top:20px;opacity:0;animation:fadeUp 0.9s 0.7s forwards;}
+.hero-actions{display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap;opacity:0;animation:fadeUp 0.9s 0.9s forwards;}
+.btn-primary{background:var(--red);color:var(--white);padding:14px 32px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:none;cursor:none;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-primary:hover{background:var(--red2);transform:translateY(-2px);}
+.btn-outline{background:transparent;color:var(--white);padding:14px 32px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.25);cursor:none;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-outline:hover{border-color:var(--red);color:var(--red);}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeUp 0.9s 1.2s forwards;}
+.hero-scroll span{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--red),transparent);animation:scrollDown 1.5s ease-in-out infinite;}
+.hero-stats{position:absolute;bottom:36px;right:24px;display:flex;flex-direction:column;gap:16px;opacity:0;animation:fadeUp 0.9s 1.1s forwards;}
+.stat-item{text-align:right;}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--red);line-height:1;}
+.stat-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
+
+/* MARQUEE */
+.marquee-section{background:var(--red);padding:14px 0;overflow:hidden;}
+.marquee-track{display:flex;width:max-content;animation:marquee 18s linear infinite;}
+.marquee-item{display:flex;align-items:center;}
+.marquee-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;padding:0 24px;color:var(--white);}
+.marquee-dot{width:6px;height:6px;background:rgba(255,255,255,0.5);border-radius:50%;flex-shrink:0;}
+
+/* SECTIONS */
+section{padding:90px 20px;}
+.section-label{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.section-label::before{content:'';display:block;width:32px;height:2px;background:var(--red);}
+.section-label span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);}
+h2.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,8vw,80px);line-height:0.92;margin-bottom:8px;}
+h2.section-title .gray{color:var(--gray);}
+.max-w{max-width:1200px;margin:0 auto;}
+
+/* ABOUT */
+.about-strip{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.about-content{padding:50px 0;display:grid;grid-template-columns:1fr;gap:40px;}
+.about-text p{font-size:16px;line-height:1.8;color:rgba(255,255,255,0.65);max-width:600px;}
+.about-text .highlight{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:20px;}
+.about-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.about-img{border-radius:2px;overflow:hidden;position:relative;}
+.about-img img{width:100%;height:160px;object-fit:cover;filter:grayscale(30%);}
+.about-img-tall img{height:328px;}
+.about-features{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:40px;}
+.feature-item{background:var(--card);padding:24px;display:flex;flex-direction:column;gap:8px;}
+.feature-icon{font-size:22px;}
+.feature-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.feature-desc{font-size:13px;color:var(--gray);line-height:1.5;}
+
+/* CLASSES */
+.classes-section{background:var(--black);}
+.classes-grid{display:grid;grid-template-columns:1fr;gap:2px;margin-top:50px;}
+.class-card{position:relative;overflow:hidden;cursor:none;height:280px;}
+.class-card img{width:100%;height:100%;object-fit:cover;filter:grayscale(40%);transition:transform 0.6s,filter 0.4s;}
+.class-card:hover img{transform:scale(1.05);filter:grayscale(0%);}
+.class-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.3) 60%,transparent 100%);}
+.class-tag{position:absolute;top:16px;left:16px;background:var(--red);padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+.class-info{position:absolute;bottom:0;left:0;right:0;padding:24px;}
+.class-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px;}
+.class-meta{display:flex;gap:16px;}
+.class-meta span{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,0.6);}
+.trial-cta{margin-top:36px;background:linear-gradient(135deg,var(--card) 0%,#1f0007 100%);border:1px solid rgba(232,0,29,0.3);padding:32px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden;}
+.trial-cta::before{content:'FREE TRIAL';position:absolute;right:-10px;top:-10px;font-family:'Bebas Neue',sans-serif;font-size:80px;color:rgba(232,0,29,0.06);letter-spacing:4px;}
+.trial-cta h3{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;}
+.trial-cta p{color:var(--gray);font-size:14px;line-height:1.7;}
+
+/* PLANS */
+.plans-section{background:var(--card);}
+.plans-grid{display:grid;grid-template-columns:1fr;gap:2px;margin-top:50px;}
+.plan-card{background:var(--black);padding:32px 28px;border:1px solid var(--border);position:relative;transition:border-color 0.3s;}
+.plan-card.featured{border-color:var(--red);background:linear-gradient(135deg,#0a0a0a 0%,#1a0005 100%);}
+.plan-badge{position:absolute;top:-1px;right:28px;background:var(--red);padding:5px 14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+.plan-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--gray);}
+.plan-card.featured .plan-name{color:var(--white);}
+.plan-price{display:flex;align-items:flex-start;gap:4px;margin:16px 0;}
+.plan-currency{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:600;color:var(--red);margin-top:8px;}
+.plan-amount{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;color:var(--white);}
+.plan-period{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--gray);align-self:flex-end;padding-bottom:8px;}
+.plan-divider{height:1px;background:var(--border);margin:20px 0;}
+.plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.plan-feature{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,0.7);}
+.plan-feature .check{width:18px;height:18px;border-radius:50%;background:rgba(232,0,29,0.15);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--red);}
+.plan-feature .cross{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--gray);}
+
+/* PAYMENT */
+.payment-section{background:var(--black);}
+.payment-box{margin-top:50px;background:var(--card);border:1px solid var(--border);padding:32px 24px;display:grid;grid-template-columns:1fr;gap:40px;}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.qr-frame{width:180px;height:180px;border:2px solid var(--red);padding:12px;position:relative;}
+.qr-corner{position:absolute;width:20px;height:20px;border-color:var(--red);border-style:solid;}
+.qr-corner.tl{top:-4px;left:-4px;border-width:3px 0 0 3px;}
+.qr-corner.tr{top:-4px;right:-4px;border-width:3px 3px 0 0;}
+.qr-corner.bl{bottom:-4px;left:-4px;border-width:0 0 3px 3px;}
+.qr-corner.br{bottom:-4px;right:-4px;border-width:0 3px 3px 0;}
+.qr-img{width:100%;height:100%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;text-align:center;padding:8px;}
+.qr-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
+.payment-steps{display:flex;flex-direction:column;gap:20px;}
+.payment-step{display:flex;gap:16px;align-items:flex-start;}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--red);line-height:1;flex-shrink:0;min-width:40px;}
+.step-content h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.step-content p{font-size:13px;color:var(--gray);line-height:1.6;}
+.upload-area{border:1px dashed rgba(232,0,29,0.4);padding:24px;text-align:center;margin-top:20px;cursor:none;transition:border-color 0.2s;}
+.upload-area:hover{border-color:var(--red);background:rgba(232,0,29,0.04);}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-text{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gray);}
+
+/* BLOG */
+.blog-section{background:var(--card);}
+.blog-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:50px;}
+.blog-card{background:var(--black);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.3s;}
+.blog-card:hover{border-color:rgba(232,0,29,0.3);}
+.blog-img{height:200px;overflow:hidden;position:relative;}
+.blog-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%);transition:transform 0.5s;}
+.blog-card:hover .blog-img img{transform:scale(1.04);}
+.blog-cat{position:absolute;top:12px;left:12px;background:var(--red);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+.blog-body{padding:20px;}
+.blog-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1.3;margin-bottom:8px;}
+.blog-excerpt{font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:16px;}
+.blog-meta{display:flex;gap:16px;align-items:center;}
+.blog-meta span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);}
+.blog-read{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--red);text-decoration:none;display:flex;align-items:center;gap:4px;margin-left:auto;}
+
+/* TESTIMONIALS */
+.testimonials-section{background:var(--black);overflow:hidden;}
+.testimonials-track-wrap{margin-top:50px;overflow:hidden;position:relative;}
+.testimonials-track-wrap::before,.testimonials-track-wrap::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;}
+.testimonials-track-wrap::before{left:0;background:linear-gradient(to right,var(--black),transparent);}
+.testimonials-track-wrap::after{right:0;background:linear-gradient(to left,var(--black),transparent);}
+.testimonials-track{display:flex;gap:16px;width:max-content;animation:marqueeT 25s linear infinite;}
+.testi-card{background:var(--card);border:1px solid var(--border);padding:24px;width:300px;flex-shrink:0;}
+.testi-stars{color:var(--red);font-size:14px;margin-bottom:12px;letter-spacing:2px;}
+.testi-text{font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-bottom:16px;font-style:italic;}
+.testi-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.testi-role{font-size:12px;color:var(--gray);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid rgba(232,0,29,0.3);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-header{background:var(--red);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;}
+.modal-header h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;}
+.modal-close{background:none;border:none;color:var(--white);font-size:24px;cursor:none;}
+.modal-body{padding:28px 24px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--black);border:1px solid var(--border);color:var(--white);padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--red);}
+.form-group select option{background:var(--black);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* CONTACT */
+.contact-section{background:var(--card);}
+.contact-grid{display:grid;grid-template-columns:1fr;gap:40px;margin-top:50px;}
+.contact-info{display:flex;flex-direction:column;gap:24px;}
+.contact-item{display:flex;gap:16px;align-items:flex-start;}
+.contact-icon{width:44px;height:44px;border:1px solid rgba(232,0,29,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.contact-item h4{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:4px;}
+.contact-item p,.contact-item a{font-size:15px;color:var(--white);text-decoration:none;}
+.map-embed{border:1px solid var(--border);overflow:hidden;height:280px;position:relative;}
+.map-embed iframe{width:100%;height:100%;border:none;filter:grayscale(100%) invert(90%) contrast(90%);}
+.social-row{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.social-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--white);text-decoration:none;transition:all 0.2s;}
+.social-btn:hover{border-color:var(--red);color:var(--red);}
+.social-btn svg{width:18px;height:18px;flex-shrink:0;}
+
+/* FOOTER */
+footer{background:var(--dark);border-top:1px solid var(--border);padding:40px 20px 24px;}
+.footer-grid{display:grid;grid-template-columns:1fr;gap:28px;max-width:1200px;margin:0 auto;}
+.footer-brand .logo-wrap{margin-bottom:12px;}
+.footer-brand .logo-wrap img{height:42px;width:auto;}
+.footer-brand p{font-size:13px;color:var(--gray);line-height:1.7;max-width:280px;}
+.footer-links-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.footer-col h5{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.footer-col a{display:block;font-size:12px;color:rgba(255,255,255,0.55);text-decoration:none;margin-bottom:7px;transition:color 0.2s;line-height:1.4;}
+.footer-col a:hover{color:var(--red);}
+.footer-bottom{border-top:1px solid var(--border);margin-top:28px;padding-top:16px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;}
+.footer-bottom p{font-size:11px;color:var(--gray);}
+.footer-social{display:flex;gap:10px;margin-top:12px;}
+.footer-social a{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:border-color 0.2s;}
+.footer-social a:hover{border-color:var(--red);}
+.footer-social svg{width:16px;height:16px;}
+
+/* FLOATING WA */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:500;width:52px;height:52px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;animation:float 3s ease-in-out infinite;box-shadow:0 4px 20px rgba(37,211,102,0.4);}
+.wa-float svg{width:28px;height:28px;}
+
+/* ====== AUTH PAGE ====== */
+#page-auth{min-height:100vh;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px 40px;}
+.auth-back{position:fixed;top:20px;left:20px;background:none;border:1px solid var(--border);color:var(--white);padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:all 0.2s;}
+.auth-back:hover{border-color:var(--red);color:var(--red);}
+.auth-logo{margin-bottom:32px;}
+.auth-logo img{height:60px;}
+.auth-box{background:var(--card);border:1px solid var(--border);width:100%;max-width:420px;overflow:hidden;}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;}
+.auth-tab{padding:16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;background:var(--dark);border:none;color:var(--gray);cursor:none;transition:all 0.2s;border-bottom:2px solid transparent;}
+.auth-tab.active{background:var(--card);color:var(--white);border-bottom-color:var(--red);}
+.auth-body{padding:28px 24px;}
+.auth-body .form-group{margin-bottom:16px;}
+.auth-submit{width:100%;background:var(--red);color:var(--white);border:none;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:background 0.2s;margin-top:8px;}
+.auth-submit:hover{background:var(--red2);}
+.auth-note{text-align:center;font-size:12px;color:var(--gray);margin-top:14px;}
+.auth-note a{color:var(--red);text-decoration:none;cursor:none;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider span{font-size:11px;color:var(--gray);letter-spacing:1px;}
+.auth-wa-btn{width:100%;background:#25d366;color:var(--white);border:none;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.2s;}
+.auth-wa-btn:hover{background:#1db954;}
+.auth-wa-btn svg{width:18px;height:18px;}
+
+/* ====== ADMIN LOGIN ====== */
+#page-admin-login{min-height:100vh;background:#0d0d0d;display:flex;align-items:center;justify-content:center;padding:20px;}
+.admin-login-box{background:#131313;border:1px solid rgba(232,0,29,0.25);width:100%;max-width:380px;overflow:hidden;}
+.admin-login-header{background:var(--red);padding:20px 24px;}
+.admin-login-header h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;}
+.admin-login-header p{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;}
+.admin-login-body{padding:28px 24px;}
+.admin-login-body .form-group{margin-bottom:16px;}
+.admin-hint{background:rgba(232,0,29,0.06);border:1px solid rgba(232,0,29,0.2);padding:10px 14px;font-size:12px;color:var(--gray);margin-bottom:18px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
+.admin-hint strong{color:var(--red);}
+.admin-login-back{display:block;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;margin-top:16px;cursor:none;transition:color 0.2s;}
+.admin-login-back:hover{color:var(--red);}
+
+/* ====== ADMIN PORTAL ====== */
+#page-admin{min-height:100vh;background:#0d0d0d;display:flex;flex-direction:column;}
+.admin-top-bar{background:#111;border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.admin-top-bar .brand{display:flex;align-items:center;gap:12px;}
+.admin-top-bar .brand img{height:34px;}
+.admin-top-bar .brand span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);background:rgba(232,0,29,0.1);border:1px solid rgba(232,0,29,0.2);padding:3px 8px;}
+.admin-top-actions{display:flex;gap:10px;align-items:center;}
+.admin-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--gray);}
+.admin-logout{background:none;border:1px solid var(--border);color:var(--gray);padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;cursor:none;transition:all 0.2s;}
+.admin-logout:hover{border-color:var(--red);color:var(--red);}
+.admin-body{display:flex;flex:1;}
+.admin-sidebar{width:200px;background:#0f0f0f;border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;}
+.admin-nav-item{padding:11px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);display:flex;align-items:center;gap:10px;cursor:none;transition:all 0.2s;border-left:2px solid transparent;}
+.admin-nav-item:hover,.admin-nav-item.active{background:rgba(232,0,29,0.06);color:var(--white);border-left-color:var(--red);}
+.admin-nav-item .nav-icon{font-size:14px;width:18px;text-align:center;}
+.admin-main-content{flex:1;padding:24px;overflow:auto;}
+.admin-tab-content{display:none;}
+.admin-tab-content.active{display:block;}
+.admin-page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:6px;}
+.admin-page-sub{font-size:13px;color:var(--gray);margin-bottom:24px;}
+.admin-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;}
+.admin-stat-card{background:#1a1a1a;border:1px solid var(--border);padding:16px;}
+.admin-stat-val{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--red);line-height:1;}
+.admin-stat-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:2px;}
+.admin-stat-trend{font-size:11px;color:#00c850;margin-top:4px;}
+.admin-section-card{background:#131313;border:1px solid var(--border);padding:16px;margin-bottom:16px;}
+.admin-section-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.admin-section-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
+.admin-btn-sm{background:var(--red);color:var(--white);border:none;padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:none;transition:background 0.2s;}
+.admin-btn-sm:hover{background:var(--red2);}
+.admin-btn-sm.outline{background:transparent;border:1px solid var(--border);color:var(--gray);}
+.admin-btn-sm.outline:hover{border-color:var(--red);color:var(--red);}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px;}
+.admin-table th{text-align:left;padding:8px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;font-size:10px;color:var(--gray);border-bottom:1px solid var(--border);}
+.admin-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.03);color:rgba(255,255,255,0.75);vertical-align:middle;}
+.admin-table tr:hover td{background:rgba(255,255,255,0.02);}
+.status-badge{padding:3px 9px;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;}
+.status-active{background:rgba(0,200,80,0.1);color:#00c850;border:1px solid rgba(0,200,80,0.2);}
+.status-expired{background:rgba(232,0,29,0.1);color:var(--red);border:1px solid rgba(232,0,29,0.2);}
+.status-pending{background:rgba(255,190,0,0.1);color:#ffbe00;border:1px solid rgba(255,190,0,0.2);}
+.admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.admin-input{width:100%;background:#0d0d0d;border:1px solid var(--border);color:var(--white);padding:10px 12px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;}
+.admin-input:focus{border-color:var(--red);}
+.admin-label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.admin-form-group{margin-bottom:14px;}
+.admin-quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+.admin-quick-btn{background:#1a1a1a;border:1px solid var(--border);color:var(--gray);padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:none;text-align:left;transition:all 0.2s;display:flex;flex-direction:column;gap:4px;}
+.admin-quick-btn:hover{border-color:var(--red);color:var(--white);}
+.admin-quick-btn .qb-icon{font-size:20px;}
+.admin-revenue-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.admin-revenue-bar-label{font-size:11px;color:var(--gray);width:60px;flex-shrink:0;}
+.admin-revenue-bar-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.admin-revenue-bar-fill{height:100%;background:var(--red);border-radius:3px;}
+.admin-revenue-bar-val{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--white);width:50px;text-align:right;flex-shrink:0;}
+.admin-toggle-btn{background:none;border:none;cursor:none;color:var(--gray);font-size:16px;padding:2px 6px;transition:color 0.2s;}
+.admin-toggle-btn:hover{color:var(--red);}
+.mobile-admin-nav{display:none;overflow-x:auto;background:#0f0f0f;border-bottom:1px solid var(--border);padding:4px 8px;white-space:nowrap;}
+.mobile-admin-nav button{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:none;border:none;color:var(--gray);cursor:none;transition:color 0.2s;border-bottom:2px solid transparent;}
+.mobile-admin-nav button.active{color:var(--red);border-bottom-color:var(--red);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+@keyframes scrollDown{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes marqueeT{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(min-width:640px){
+  .about-content{grid-template-columns:1fr 1fr;}
+  .classes-grid{grid-template-columns:1fr 1fr;}
+  .plans-grid{grid-template-columns:1fr 1fr;}
+  .blog-grid{grid-template-columns:1fr 1fr;}
+  .admin-stat-grid{grid-template-columns:repeat(4,1fr);}
+  .admin-quick-actions{grid-template-columns:repeat(4,1fr);}
+}
+@media(min-width:1024px){
+  nav{padding:0 48px;height:72px;}
+  .hamburger{display:none!important;}
+  .nav-links{display:flex!important;}
+  section{padding:110px 48px;}
+  .hero-stats{display:flex;}
+  .about-img img{height:200px;}
+  .about-img-tall img{height:408px;}
+  .about-features{grid-template-columns:repeat(4,1fr);}
+  .classes-grid{grid-template-columns:1fr 1fr 1fr;}
+  .class-card{height:340px;}
+  .plans-grid{grid-template-columns:1fr 1fr 1fr;}
+  .blog-grid{grid-template-columns:1fr 1fr 1fr;}
+  .payment-box{grid-template-columns:280px 1fr;}
+  .contact-grid{grid-template-columns:1fr 1fr;}
+  .footer-grid{grid-template-columns:1.6fr 1fr;}
+  .footer-links-row{grid-template-columns:repeat(3,1fr);}
+  .testimonials-track .testi-card{width:360px;}
+}
+@media(max-width:640px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+  .hero-stats{display:none;}
+  .footer-links-row{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .footer-col h5{font-size:9px;}
+  .footer-col a{font-size:11px;}
+  .admin-sidebar{display:none;}
+  .mobile-admin-nav{display:block;}
+  .admin-main-content{padding:16px;}
+  .admin-form-grid{grid-template-columns:1fr;}
+  .admin-quick-actions{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ========== PAGE: MAIN WEBSITE ========== -->
+<div id="page-main">
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" onclick="showPage('main')" style="display:flex;align-items:center;">
+    <svg class="nav-logo-img" viewBox="0 0 380 170" xmlns="http://www.w3.org/2000/svg">
+      <text x="190" y="72" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#1B3A6B" text-anchor="middle" letter-spacing="8">NME</text>
+      <rect x="28" y="90" width="324" height="7" fill="#1B3A6B" rx="3.5"/>
+      <rect x="16" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/>
+      <rect x="30" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+      <rect x="354" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/>
+      <rect x="346" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+      <text x="190" y="158" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#CC1111" text-anchor="middle" letter-spacing="8">GYM</text>
+    </svg>
+  </a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#classes">Classes</a>
+    <a href="#plans">Plans</a>
+    <a href="#diet">Diet</a>
+    <a href="#contact">Contact</a>
+    <a href="#" class="nav-member-btn" onclick="showPage('auth')">Member Login</a>
+    <a href="#" class="nav-cta" onclick="openModal()">Book Free Trial</a>
+  </div>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#classes" onclick="closeMobile()">Classes</a>
+  <a href="#plans" onclick="closeMobile()">Plans</a>
+  <a href="#diet" onclick="closeMobile()">Nutrition</a>
+  <a href="#testimonials" onclick="closeMobile()">Reviews</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+  <a href="#" onclick="closeMobile();showPage('auth')" style="color:rgba(255,255,255,0.6);">Member Login</a>
+  <a href="#" style="color:var(--red)" onclick="closeMobile();openModal()">▶ Book Free Trial</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-img"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-number">NME</div>
+  <div class="hero-content">
+    <div class="hero-tag"><span></span><p>Now Open — Chumoukedima, Nagaland</p></div>
+    <h1 class="hero-title">FORGE<br><span class="stroke">YOUR</span><br><span class="red">LEGACY</span></h1>
+    <p class="hero-sub">No Mercy. No Excuses. Just Results.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" onclick="openModal()">Book Free Trial</a>
+      <a href="#plans" class="btn-outline">See Plans</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Members</div></div>
+    <div class="stat-item"><div class="stat-num">12+</div><div class="stat-label">Programs</div></div>
+    <div class="stat-item"><div class="stat-num">5★</div><div class="stat-label">Rated</div></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-text">STRENGTH TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">CARDIO ZONE</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">ZUMBA CLASSES</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">PERSONAL TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">NUTRITION PLANS</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">YOGA & FLEXIBILITY</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">STRENGTH TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">CARDIO ZONE</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">ZUMBA CLASSES</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">PERSONAL TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">NUTRITION PLANS</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">YOGA & FLEXIBILITY</span><div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="max-w">
+    <div class="section-label"><span>Who We Are</span></div>
+    <h2 class="section-title">NOT JUST A GYM.<br><span class="gray">A MOVEMENT.</span></h2>
+    <div class="about-content">
+      <div class="about-text reveal">
+        <p class="highlight">"We don't just build bodies here — we build discipline, character, and champions."</p>
+        <p>NME Gym was born from a single belief: everyone deserves access to elite-level training without the elite price tag. Located in the heart of Chumoukedima, Nagaland, we've built a space where beginners find their footing and athletes push their limits — side by side.</p>
+        <br>
+        <p>Our certified coaches, premium equipment, and charged atmosphere make every rep count. Whether you're chasing a physique, building strength, or just starting your fitness journey — NME is where it begins.</p>
+      </div>
+      <div class="about-img-grid reveal">
+        <div class="about-img about-img-tall"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80" alt="NME Gym interior"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="about-img"><img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80" alt="Training"></div>
+          <div class="about-img"><img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80" alt="Equipment"></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-features reveal">
+      <div class="feature-item"><div class="feature-icon">🏋️</div><div class="feature-title">Pro Equipment</div><div class="feature-desc">Top-grade machines & free weights for every muscle group.</div></div>
+      <div class="feature-item"><div class="feature-icon">👥</div><div class="feature-title">Expert Coaches</div><div class="feature-desc">Certified trainers who are invested in YOUR results.</div></div>
+      <div class="feature-item"><div class="feature-icon">🕐</div><div class="feature-title">Flexible Hours</div><div class="feature-desc">Early morning to late night — train on your schedule.</div></div>
+      <div class="feature-item"><div class="feature-icon">🔥</div><div class="feature-title">Real Results</div><div class="feature-desc">500+ members transformed. Your turn is now.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLASSES -->
+<section class="classes-section" id="classes">
+  <div class="max-w">
+    <div class="section-label"><span>What We Offer</span></div>
+    <h2 class="section-title">TRAIN LIKE<br><span class="gray">YOU MEAN IT.</span></h2>
+    <div class="classes-grid reveal">
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="Weight Training">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Most Popular</div>
+        <div class="class-info"><div class="class-name">WEIGHT TRAINING</div><div class="class-meta"><span>⏱ All Levels</span><span>🔥 High Intensity</span></div></div>
+      </div>
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80" alt="Zumba">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Fun & Energetic</div>
+        <div class="class-info"><div class="class-name">ZUMBA</div><div class="class-meta"><span>⏱ 45 min</span><span>🎵 Dance Fitness</span></div></div>
+      </div>
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=600&q=80" alt="Cardio">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Fat Burner</div>
+        <div class="class-info"><div class="class-name">CARDIO ZONE</div><div class="class-meta"><span>⏱ Anytime</span><span>💪 Endurance</span></div></div>
+      </div>
+    </div>
+    <div class="trial-cta reveal">
+      <h3>YOUR FIRST CLASS IS ON US</h3>
+      <p>Not sure where to start? Book a free trial class — no commitment, no pressure. Walk in, feel the energy, and decide for yourself.</p>
+      <a href="#" class="btn-primary" onclick="openModal()" style="align-self:flex-start;">Book Free Trial Now →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section class="plans-section" id="plans">
+  <div class="max-w">
+    <div class="section-label"><span>Membership</span></div>
+    <h2 class="section-title">PICK YOUR<br><span class="gray">WEAPON.</span></h2>
+    <div class="plans-grid reveal">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">999</span><span class="plan-period">/ month</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Gym Access (All Days)</div>
+          <div class="plan-feature"><div class="check">✓</div>Locker Facility</div>
+          <div class="plan-feature"><div class="check">✓</div>Basic Fitness Assessment</div>
+          <div class="plan-feature"><div class="cross">✗</div>Personal Trainer</div>
+          <div class="plan-feature"><div class="cross">✗</div>Group Classes</div>
+          <div class="plan-feature"><div class="cross">✗</div>Diet Consultation</div>
+        </div>
+        <a href="#" class="btn-outline" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Best Value</div>
+        <div class="plan-name">Warrior</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">2499</span><span class="plan-period">/ 3 months</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Gym Access (All Days)</div>
+          <div class="plan-feature"><div class="check">✓</div>Locker + Towel</div>
+          <div class="plan-feature"><div class="check">✓</div>Full Assessment</div>
+          <div class="plan-feature"><div class="check">✓</div>Group Classes (Zumba/Yoga)</div>
+          <div class="plan-feature"><div class="check">✓</div>Diet Plan</div>
+          <div class="plan-feature"><div class="cross">✗</div>Personal Trainer</div>
+        </div>
+        <a href="#" class="btn-primary" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Elite</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">7999</span><span class="plan-period">/ year</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Everything in Warrior</div>
+          <div class="plan-feature"><div class="check">✓</div>Personal Trainer (8 sessions)</div>
+          <div class="plan-feature"><div class="check">✓</div>Monthly Body Analysis</div>
+          <div class="plan-feature"><div class="check">✓</div>Priority Booking</div>
+          <div class="plan-feature"><div class="check">✓</div>Supplement Guidance</div>
+          <div class="plan-feature"><div class="check">✓</div>Guest Passes (2)</div>
+        </div>
+        <a href="#" class="btn-outline" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYMENT -->
+<section class="payment-section" id="payment">
+  <div class="max-w">
+    <div class="section-label"><span>Payment</span></div>
+    <h2 class="section-title">SIMPLE.<br><span class="gray">FAST. DONE.</span></h2>
+    <div class="payment-box reveal">
+      <div class="qr-wrap">
+        <div class="qr-frame">
+          <div class="qr-corner tl"></div><div class="qr-corner tr"></div><div class="qr-corner bl"></div><div class="qr-corner br"></div>
+          <div class="qr-img"><div><div style="font-size:48px;">📱</div><p style="font-size:11px;color:#666;margin-top:4px;">QR Code<br>Placeholder</p></div></div>
+        </div>
+        <div class="qr-label">Scan to Pay</div>
+        <div style="text-align:center;">
+          <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gray);">UPI · GPay · PhonePe · Paytm</p>
+          <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);margin-top:4px;">NME GYM</p>
+        </div>
+      </div>
+      <div class="payment-steps">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:8px;">HOW TO PAY</h3>
+        <div class="payment-step"><div class="step-num">01</div><div class="step-content"><h4>Scan the QR Code</h4><p>Use any UPI app — Google Pay, PhonePe, Paytm, or your bank app.</p></div></div>
+        <div class="payment-step"><div class="step-num">02</div><div class="step-content"><h4>Screenshot Your Payment</h4><p>Take a screenshot of the payment confirmation screen.</p></div></div>
+        <div class="payment-step"><div class="step-num">03</div><div class="step-content"><h4>Submit Below or WhatsApp</h4><p>Upload your screenshot here or send on WhatsApp: <strong>+91 98637 65861</strong></p></div></div>
+        <div class="upload-area" onclick="alert('File upload will be implemented in the backend.')">
+          <div class="upload-icon">📤</div>
+          <div class="upload-text">TAP TO UPLOAD PAYMENT SCREENSHOT</div>
+          <p style="font-size:11px;color:#555;margin-top:4px;">or send on WhatsApp</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIET / BLOG -->
+<section class="blog-section" id="diet">
+  <div class="max-w">
+    <div class="section-label"><span>Nutrition Hub</span></div>
+    <h2 class="section-title">FUEL THE<br><span class="gray">MACHINE.</span></h2>
+    <div class="blog-grid">
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80" alt="Meal plan"><div class="blog-cat">Diet Plan</div></div>
+        <div class="blog-body">
+          <div class="blog-title">The Beginner's High-Protein Meal Plan</div>
+          <div class="blog-excerpt">Starting your fitness journey? Here's exactly what to eat — morning to night — to build muscle and lose fat simultaneously.</div>
+          <div class="blog-meta"><span>🕐 5 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80" alt="Pre workout"><div class="blog-cat">Pre-Workout</div></div>
+        <div class="blog-body">
+          <div class="blog-title">What To Eat 2 Hours Before Training</div>
+          <div class="blog-excerpt">The food you eat before a workout can make or break your performance. Here's the ultimate pre-workout nutrition guide.</div>
+          <div class="blog-meta"><span>🕐 4 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1622484212850-eb596d769edc?w=500&q=80" alt="Weight loss"><div class="blog-cat">Fat Loss</div></div>
+        <div class="blog-body">
+          <div class="blog-title">Cutting Without Losing Muscle: The NME Way</div>
+          <div class="blog-excerpt">Losing weight doesn't mean losing strength. Our coaches break down the science of cutting for Northeast Indian body types.</div>
+          <div class="blog-meta"><span>🕐 6 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonials">
+  <div class="max-w" style="padding-bottom:0;">
+    <div class="section-label"><span>Real People</span></div>
+    <h2 class="section-title">THEY STARTED<br><span class="gray">YOU'RE NEXT.</span></h2>
+  </div>
+  <div class="testimonials-track-wrap" style="margin-top:50px;">
+    <div class="testimonials-track">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change. This gym is different."</div><div class="testi-name">Vizo Yhome</div><div class="testi-role">Lost 14 kg · 4 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both. The Zumba classes are incredible!"</div><div class="testi-name">Keviseno Chishi</div><div class="testi-role">Member · 8 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Best gym in Nagaland. No nonsense, clean equipment, and coaches who actually track your progress. Highly recommend the Elite plan."</div><div class="testi-name">Theja Sumi</div><div class="testi-role">Elite Member · 1 Year</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I was nervous starting. Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight."</div><div class="testi-name">Thinuo Sangtam</div><div class="testi-role">Strength Trainee</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The diet plans they gave me changed everything. Combined with the training, I'm in the best shape of my life at 32."</div><div class="testi-name">Atola Longkumer</div><div class="testi-role">Transformation · 6 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"NME is more than a gym — it's a community. Everyone pushes each other. The energy here is unlike anything in Nagaland."</div><div class="testi-name">Nzanthung Kikon</div><div class="testi-role">Warrior Member · 9 Months</div></div>
+      <!-- Duplicate for loop -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change."</div><div class="testi-name">Vizo Yhome</div><div class="testi-role">Lost 14 kg · 4 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both."</div><div class="testi-name">Keviseno Chishi</div><div class="testi-role">Member · 8 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Best gym in Nagaland. No nonsense, clean equipment, and coaches who actually track your progress."</div><div class="testi-name">Theja Sumi</div><div class="testi-role">Elite Member · 1 Year</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight."</div><div class="testi-name">Thinuo Sangtam</div><div class="testi-role">Strength Trainee</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The diet plans combined with training — I'm in the best shape of my life at 32."</div><div class="testi-name">Atola Longkumer</div><div class="testi-role">Transformation · 6 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"NME is more than a gym — it's a community. The energy here is unlike anything in Nagaland."</div><div class="testi-name">Nzanthung Kikon</div><div class="testi-role">Warrior Member · 9 Months</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="max-w">
+    <div class="section-label"><span>Find Us</span></div>
+    <h2 class="section-title">COME SAY<br><span class="gray">HELLO.</span></h2>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div><h4>Location</h4><p>NME Gym, Chumoukedima, Nagaland</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div><h4>WhatsApp / Call</h4><a href="https://wa.me/919863765861">+91 98637 65861</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div><h4>Email</h4><a href="mailto:nmegym@gmail.com">nmegym@gmail.com</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div><h4>Hours</h4><p>Mon–Sat: 5:30 AM – 10:00 PM<br>Sunday: 7:00 AM – 1:00 PM</p></div>
+        </div>
+        <div class="social-row">
+          <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" class="social-btn" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ig1" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig1)"/><circle cx="12" cy="12" r="4.2" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
+            Instagram
+          </a>
+          <a href="https://wa.me/919863765861" class="social-btn" target="_blank">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="map-embed reveal">
+        <iframe src="https://maps.google.com/maps?q=Chumoukedima,Nagaland,India&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid max-w">
+    <div class="footer-brand">
+      <div class="logo-wrap">
+        <svg viewBox="0 0 380 170" xmlns="http://www.w3.org/2000/svg" style="height:48px;width:auto;">
+          <text x="190" y="72" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#1B3A6B" text-anchor="middle" letter-spacing="8">NME</text>
+          <rect x="28" y="90" width="324" height="7" fill="#1B3A6B" rx="3.5"/>
+          <rect x="16" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/>
+          <rect x="30" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+          <rect x="354" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/>
+          <rect x="346" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+          <text x="190" y="158" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#CC1111" text-anchor="middle" letter-spacing="8">GYM</text>
+        </svg>
+      </div>
+      <p>No Mercy. No Excuses. Chumoukedima's most serious fitness destination.</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig2)"/><circle cx="12" cy="12" r="4.2" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
+        </a>
+        <a href="https://wa.me/919863765861" target="_blank">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+        </a>
+        <a href="mailto:nmegym@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#444"/><path d="M4 8l8 5 8-5" stroke="white" stroke-width="1.5" fill="none"/><rect x="4" y="6" width="16" height="12" rx="2" stroke="white" stroke-width="1.5" fill="none"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links-row">
+      <div class="footer-col">
+        <h5>Quick Links</h5>
+        <a href="#about">About Us</a>
+        <a href="#classes">Classes</a>
+        <a href="#plans">Membership</a>
+        <a href="#diet">Nutrition</a>
+        <a href="#" onclick="openModal()">Free Trial</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#payment">How to Pay</a>
+        <a href="#contact">Contact</a>
+        <a href="https://wa.me/919863765861">WhatsApp</a>
+        <a href="#" onclick="showPage('auth')">Member Login</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="tel:+919863765861">+91 98637 65861</a>
+        <a href="mailto:nmegym@gmail.com">nmegym@gmail.com</a>
+        <a href="https://share.google/SStiUEM2Xh5EhoU0q" target="_blank">View on Maps</a>
+        <a href="#" onclick="showPage('admin-login')" style="color:#333;font-size:10px;">Admin</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 NME GYM · Chumoukedima, Nagaland · All rights reserved.</p>
+    <p style="color:#333;">Crafted for champions.</p>
+  </div>
+</footer>
+
+<!-- FLOATING WA -->
+<a href="https://wa.me/919863765861" class="wa-float" target="_blank" title="WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="none"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+</a>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header"><h3>BOOK FREE TRIAL</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Full Name</label><input type="text" placeholder="Your name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Age</label><input type="number" placeholder="Your age"></div>
+      </div>
+      <div class="form-group"><label>Interested In</label><select><option>Weight Training</option><option>Zumba / Dance</option><option>Yoga / Flexibility</option><option>Cardio & Endurance</option><option>Personal Training</option><option>General Fitness</option></select></div>
+      <div class="form-group"><label>Preferred Date</label><input type="date"></div>
+      <div class="form-group"><label>Preferred Time Slot</label><select><option>Morning (6 AM – 9 AM)</option><option>Mid-Morning (9 AM – 12 PM)</option><option>Evening (5 PM – 8 PM)</option><option>Night (8 PM – 10 PM)</option></select></div>
+      <div class="form-group"><label>Message (Optional)</label><textarea rows="3" placeholder="Any specific goals or questions?"></textarea></div>
+      <button class="btn-primary" style="width:100%;border:none;" onclick="submitTrial()">CONFIRM BOOKING →</button>
+      <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px;">Or WhatsApp: <a href="https://wa.me/919863765861" style="color:var(--red);">+91 98637 65861</a></p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page-main -->
+
+
+<!-- ========== PAGE: MEMBER AUTH ========== -->
+<div id="page-auth" style="display:none;">
+  <button class="auth-back" onclick="showPage('main')">← Back to Site</button>
+  <div class="auth-logo">
+    <svg viewBox="0 0 380 170" xmlns="http://www.w3.org/2000/svg" style="height:64px;width:auto;">
+      <text x="190" y="72" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#1B3A6B" text-anchor="middle" letter-spacing="8">NME</text>
+      <rect x="28" y="90" width="324" height="7" fill="#1B3A6B" rx="3.5"/>
+      <rect x="16" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/><rect x="30" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+      <rect x="354" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/><rect x="346" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+      <text x="190" y="158" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#CC1111" text-anchor="middle" letter-spacing="8">GYM</text>
+    </svg>
+  </div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Member Login</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+    </div>
+    <!-- LOGIN -->
+    <div class="auth-body" id="auth-login-body">
+      <div class="form-group"><label>Phone / Email</label><input type="text" placeholder="Enter phone or email"></div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="Enter password"></div>
+      <button class="auth-submit" onclick="memberLogin()">LOGIN →</button>
+      <div class="auth-divider"><span>or</span></div>
+      <a href="https://wa.me/919863765861" target="_blank" class="auth-wa-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;"><circle cx="12" cy="12" r="12" fill="none"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+        Contact via WhatsApp
+      </a>
+      <p class="auth-note">Don't have an account? <a onclick="switchAuthTab('register')">Register here</a></p>
+    </div>
+    <!-- REGISTER -->
+    <div class="auth-body" id="auth-register-body" style="display:none;">
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" placeholder="First name"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" placeholder="Last name"></div>
+      </div>
+      <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Age</label><input type="number" placeholder="Age"></div>
+        <div class="form-group"><label>Goal</label><select style="background:var(--black);border:1px solid var(--border);color:var(--white);padding:12px 14px;width:100%;font-size:14px;outline:none;"><option>Weight Loss</option><option>Muscle Gain</option><option>General Fitness</option><option>Endurance</option></select></div>
+      </div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="Create password"></div>
+      <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="Repeat password"></div>
+      <button class="auth-submit" onclick="memberRegister()">CREATE ACCOUNT →</button>
+      <p class="auth-note">Already a member? <a onclick="switchAuthTab('login')">Login here</a></p>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:11px;color:#333;margin-top:20px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">NME GYM · Chumoukedima, Nagaland</p>
+</div>
+
+
+<!-- ========== PAGE: ADMIN LOGIN ========== -->
+<div id="page-admin-login" style="display:none;">
+  <div class="admin-login-box">
+    <div class="admin-login-header">
+      <h2>ADMIN PORTAL</h2>
+      <p>NME GYM — Restricted Access</p>
+    </div>
+    <div class="admin-login-body">
+      <div class="admin-hint">Demo credentials — Username: <strong>admin</strong> · Password: <strong>nme2025</strong></div>
+      <div class="form-group"><label style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:8px;">Username</label><input class="admin-input" type="text" id="adminUser" placeholder="admin"></div>
+      <div class="form-group" style="margin-bottom:20px;"><label style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:8px;">Password</label><input class="admin-input" type="password" id="adminPass" placeholder="••••••••"></div>
+      <button class="btn-primary" style="width:100%;border:none;" onclick="adminLogin()">ACCESS DASHBOARD →</button>
+      <a class="admin-login-back" onclick="showPage('main')">← Back to Website</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== PAGE: ADMIN PORTAL ========== -->
+<div id="page-admin" style="display:none;">
+  <div class="admin-top-bar">
+    <div class="brand">
+      <svg viewBox="0 0 380 170" xmlns="http://www.w3.org/2000/svg" style="height:34px;width:auto;">
+        <text x="190" y="72" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#1B3A6B" text-anchor="middle" letter-spacing="8">NME</text>
+        <rect x="28" y="90" width="324" height="7" fill="#1B3A6B" rx="3.5"/>
+        <rect x="16" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/><rect x="30" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+        <rect x="354" y="76" width="16" height="36" fill="#1B3A6B" rx="3"/><rect x="346" y="81" width="10" height="26" fill="#1B3A6B" rx="2"/>
+        <text x="190" y="158" font-family="'Arial Black','Impact',sans-serif" font-size="82" font-weight="900" fill="#CC1111" text-anchor="middle" letter-spacing="8">GYM</text>
+      </svg>
+      <span>ADMIN</span>
+    </div>
+    <div class="admin-top-actions">
+      <span class="admin-badge">Chumoukedima, Nagaland</span>
+      <button class="admin-logout" onclick="showPage('main')">← Exit</button>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <div class="mobile-admin-nav">
+    <button class="active" onclick="switchAdminTab('dashboard',this)">📊 Dashboard</button>
+    <button onclick="switchAdminTab('members',this)">👥 Members</button>
+    <button onclick="switchAdminTab('payments',this)">💳 Payments</button>
+    <button onclick="switchAdminTab('blog',this)">📝 Posts</button>
+    <button onclick="switchAdminTab('offers',this)">🏷️ Offers</button>
+    <button onclick="switchAdminTab('bookings',this)">📅 Bookings</button>
+    <button onclick="switchAdminTab('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <div class="admin-body">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+      <div class="admin-nav-item active" onclick="switchAdminTab('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('members',this)"><span class="nav-icon">👥</span>Members</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('payments',this)"><span class="nav-icon">💳</span>Payments</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('blog',this)"><span class="nav-icon">📝</span>Blog / Posts</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('offers',this)"><span class="nav-icon">🏷️</span>Offers</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('bookings',this)"><span class="nav-icon">📅</span>Bookings</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('settings',this)"><span class="nav-icon">⚙️</span>Settings</div>
+    </div>
+
+    <div class="admin-main-content">
+
+      <!-- DASHBOARD TAB -->
+      <div class="admin-tab-content active" id="tab-dashboard">
+        <div class="admin-page-title">DASHBOARD</div>
+        <div class="admin-page-sub">Welcome back, Admin · May 2025</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">512</div><div class="admin-stat-label">Total Members</div><div class="admin-stat-trend">↑ +18 this month</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">84</div><div class="admin-stat-label">Active (May)</div><div class="admin-stat-trend">↑ +6 vs April</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">₹1.2L</div><div class="admin-stat-label">Revenue (May)</div><div class="admin-stat-trend">↑ +12% vs last</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">14</div><div class="admin-stat-label">Trial Bookings</div><div class="admin-stat-trend">↑ +3 pending</div></div>
+        </div>
+        <div class="admin-quick-actions">
+          <button class="admin-quick-btn" onclick="switchAdminTab('members',null)"><span class="qb-icon">➕</span>Add Member</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('payments',null)"><span class="qb-icon">✅</span>Verify Payment</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('blog',null)"><span class="qb-icon">📝</span>New Post</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('offers',null)"><span class="qb-icon">🏷️</span>New Offer</button>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Revenue by Plan (May)</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Elite</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:72%"></div></div><span class="admin-revenue-bar-val">₹63,992</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Warrior</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:48%"></div></div><span class="admin-revenue-bar-val">₹42,483</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Starter</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:20%"></div></div><span class="admin-revenue-bar-val">₹17,982</span></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Recent Members</span><button class="admin-btn-sm outline" onclick="switchAdminTab('members',null)">View All</button></div>
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Vizo Yhome</td><td>Elite</td><td>Jan 2025</td><td>Jan 2026</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Keviseno Chishi</td><td>Warrior</td><td>Mar 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Theja Sumi</td><td>Starter</td><td>Apr 2025</td><td>May 2025</td><td><span class="status-badge status-expired">Expired</span></td></tr>
+              <tr><td>Thinuo Sangtam</td><td>Warrior</td><td>Feb 2025</td><td>May 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Atola Longkumer</td><td>Elite</td><td>Dec 2024</td><td>Dec 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MEMBERS TAB -->
+      <div class="admin-tab-content" id="tab-members">
+        <div class="admin-page-title">MEMBERS</div>
+        <div class="admin-page-sub">Manage all registered members</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Add New Member</span><button class="admin-btn-sm" onclick="addMember()">Save Member</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Full Name</label><input class="admin-input" id="mName" type="text" placeholder="Full name"></div>
+            <div class="admin-form-group"><label class="admin-label">Phone</label><input class="admin-input" id="mPhone" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+            <div class="admin-form-group"><label class="admin-label">Plan</label><select class="admin-input" id="mPlan"><option>Starter</option><option>Warrior</option><option>Elite</option></select></div>
+            <div class="admin-form-group"><label class="admin-label">Join Date</label><input class="admin-input" id="mDate" type="date"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">All Members</span><input class="admin-input" style="width:180px;padding:6px 10px;font-size:12px;" placeholder="Search members..." oninput="filterMembers(this.value)"></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="membersTable">
+              <thead><tr><th>Name</th><th>Phone</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="membersBody">
+                <tr><td>Vizo Yhome</td><td>+91 98001 11001</td><td>Elite</td><td>Jan 2025</td><td>Jan 2026</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Keviseno Chishi</td><td>+91 98001 22002</td><td>Warrior</td><td>Mar 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Theja Sumi</td><td>+91 98001 33003</td><td>Starter</td><td>Apr 2025</td><td>May 2025</td><td><span class="status-badge status-expired">Expired</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Thinuo Sangtam</td><td>+91 98001 44004</td><td>Warrior</td><td>Feb 2025</td><td>May 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Atola Longkumer</td><td>+91 98001 55005</td><td>Elite</td><td>Dec 2024</td><td>Dec 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Nzanthung Kikon</td><td>+91 98001 66006</td><td>Warrior</td><td>Sep 2024</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Mhalie Chakhesang</td><td>+91 98001 77007</td><td>Starter</td><td>May 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENTS TAB -->
+      <div class="admin-tab-content" id="tab-payments">
+        <div class="admin-page-title">PAYMENTS</div>
+        <div class="admin-page-sub">Verify and track all membership payments</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">₹1.2L</div><div class="admin-stat-label">May Revenue</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">6</div><div class="admin-stat-label">Pending Verify</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">48</div><div class="admin-stat-label">Paid (May)</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">3</div><div class="admin-stat-label">Overdue</div></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Pending Verification</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>Visier Meyase</td><td>₹2,499</td><td>Warrior</td><td>GPay</td><td>May 08</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+                <tr><td>Lhounii Ao</td><td>₹999</td><td>Starter</td><td>PhonePe</td><td>May 07</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+                <tr><td>Keduoli Zhimomi</td><td>₹7,999</td><td>Elite</td><td>UPI</td><td>May 06</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Verified Payments</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Vizo Yhome</td><td>₹7,999</td><td>Elite</td><td>GPay</td><td>Jan 10</td><td><span class="status-badge status-active">Verified</span></td></tr>
+                <tr><td>Atola Longkumer</td><td>₹7,999</td><td>Elite</td><td>Paytm</td><td>Dec 18</td><td><span class="status-badge status-active">Verified</span></td></tr>
+                <tr><td>Keviseno Chishi</td><td>₹2,499</td><td>Warrior</td><td>PhonePe</td><td>Mar 05</td><td><span class="status-badge status-active">Verified</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG TAB -->
+      <div class="admin-tab-content" id="tab-blog">
+        <div class="admin-page-title">BLOG / POSTS</div>
+        <div class="admin-page-sub">Manage nutrition tips and fitness articles</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">New Post</span><button class="admin-btn-sm" onclick="publishPost()">Publish</button></div>
+          <div class="admin-form-group"><label class="admin-label">Post Title</label><input class="admin-input" id="postTitle" type="text" placeholder="Article title"></div>
+          <div class="admin-form-group"><label class="admin-label">Category</label><select class="admin-input" id="postCat"><option>Diet Plan</option><option>Pre-Workout</option><option>Fat Loss</option><option>Muscle Gain</option><option>Recovery</option></select></div>
+          <div class="admin-form-group"><label class="admin-label">Content</label><textarea class="admin-input" id="postContent" rows="5" placeholder="Write your article content here..."></textarea></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Published Posts</span></div>
+          <table class="admin-table" id="postsTable">
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>The Beginner's High-Protein Meal Plan</td><td>Diet Plan</td><td>Apr 20</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>What To Eat 2 Hours Before Training</td><td>Pre-Workout</td><td>Apr 15</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>Cutting Without Losing Muscle: The NME Way</td><td>Fat Loss</td><td>Apr 08</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OFFERS TAB -->
+      <div class="admin-tab-content" id="tab-offers">
+        <div class="admin-page-title">OFFERS</div>
+        <div class="admin-page-sub">Create and manage promotional offers</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">New Offer</span><button class="admin-btn-sm" onclick="addOffer()">Add Offer</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Offer Title</label><input class="admin-input" id="offerTitle" type="text" placeholder="e.g. Summer Special"></div>
+            <div class="admin-form-group"><label class="admin-label">Discount %</label><input class="admin-input" id="offerDiscount" type="number" placeholder="e.g. 20"></div>
+            <div class="admin-form-group"><label class="admin-label">Valid From</label><input class="admin-input" id="offerFrom" type="date"></div>
+            <div class="admin-form-group"><label class="admin-label">Valid To</label><input class="admin-input" id="offerTo" type="date"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Active Offers</span></div>
+          <table class="admin-table" id="offersTable">
+            <thead><tr><th>Title</th><th>Discount</th><th>Valid Until</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Naga Summer Blast</td><td>20%</td><td>May 31</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>Student Special</td><td>15%</td><td>Jun 15</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOOKINGS TAB -->
+      <div class="admin-tab-content" id="tab-bookings">
+        <div class="admin-page-title">BOOKINGS</div>
+        <div class="admin-page-sub">Free trial and class bookings</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">14</div><div class="admin-stat-label">Total (May)</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">3</div><div class="admin-stat-label">Today</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">8</div><div class="admin-stat-label">Confirmed</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">6</div><div class="admin-stat-label">Pending</div></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Upcoming Bookings</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="bookingsTable">
+              <thead><tr><th>Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Interest</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>Zhekuie Sema</td><td>+91 98001 11222</td><td>May 10</td><td>Morning</td><td>Weight Training</td><td><span class="status-badge status-pending">Pending</span></td><td><button class="admin-btn-sm" onclick="confirmBooking(this)">Confirm</button></td></tr>
+                <tr><td>Limatula Yaden</td><td>+91 98001 33444</td><td>May 11</td><td>Evening</td><td>Zumba</td><td><span class="status-badge status-pending">Pending</span></td><td><button class="admin-btn-sm" onclick="confirmBooking(this)">Confirm</button></td></tr>
+                <tr><td>Imkong Jamir</td><td>+91 98001 55666</td><td>May 12</td><td>Morning</td><td>General Fitness</td><td><span class="status-badge status-active">Confirmed</span></td><td><button class="admin-btn-sm outline">Done</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="admin-tab-content" id="tab-settings">
+        <div class="admin-page-title">SETTINGS</div>
+        <div class="admin-page-sub">Manage gym information and admin credentials</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Gym Information</span><button class="admin-btn-sm" onclick="alert('Settings saved!')">Save Changes</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Gym Name</label><input class="admin-input" type="text" value="NME GYM"></div>
+            <div class="admin-form-group"><label class="admin-label">Phone</label><input class="admin-input" type="tel" value="+91 98637 65861"></div>
+            <div class="admin-form-group"><label class="admin-label">Email</label><input class="admin-input" type="email" value="nmegym@gmail.com"></div>
+            <div class="admin-form-group"><label class="admin-label">Location</label><input class="admin-input" type="text" value="Chumoukedima, Nagaland"></div>
+            <div class="admin-form-group"><label class="admin-label">Opening Time</label><input class="admin-input" type="time" value="05:30"></div>
+            <div class="admin-form-group"><label class="admin-label">Closing Time</label><input class="admin-input" type="time" value="22:00"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Change Admin Password</span><button class="admin-btn-sm" onclick="alert('Password updated!')">Update</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Current Password</label><input class="admin-input" type="password" placeholder="••••••••"></div>
+            <div class="admin-form-group"><label class="admin-label">New Password</label><input class="admin-input" type="password" placeholder="••••••••"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-main-content -->
+  </div><!-- /admin-body -->
+</div><!-- /page-admin -->
+
+
+<script>
+// ========== PAGE ROUTING ==========
+function showPage(p){
+  ['main','auth','admin-login','admin'].forEach(id=>{
+    const el=document.getElementById('page-'+id);
+    if(el)el.style.display='none';
+  });
+  const target=document.getElementById('page-'+p);
+  if(target)target.style.display=(p==='auth'||p==='admin-login')?'flex':'block';
+  window.scrollTo(0,0);
+}
+
+// ========== CURSOR ==========
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx-5+'px';cursor.style.top=my-5+'px';
+});
+function animateRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animateRing);
+}animateRing();
+document.querySelectorAll('a,button,.class-card,.blog-card,.plan-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>ring.classList.add('expand'));
+  el.addEventListener('mouseleave',()=>ring.classList.remove('expand'));
+});
+if('ontouchstart' in window){
+  cursor.style.display='none';ring.style.display='none';
+}
+
+// ========== NAV ==========
+const navEl=document.getElementById('nav');
+window.addEventListener('scroll',()=>{navEl.classList.toggle('scrolled',window.scrollY>60);});
+const ham=document.getElementById('hamburger');
+const mob=document.getElementById('mobileMenu');
+const mClose=document.getElementById('mobileClose');
+if(ham)ham.addEventListener('click',()=>mob.classList.add('open'));
+if(mClose)mClose.addEventListener('click',()=>mob.classList.remove('open'));
+function closeMobile(){mob.classList.remove('open');}
+
+// ========== MODAL ==========
+function openModal(){document.getElementById('bookingModal').classList.add('open');}
+function closeModal(){document.getElementById('bookingModal').classList.remove('open');}
+document.getElementById('bookingModal').addEventListener('click',e=>{if(e.target.id==='bookingModal')closeModal();});
+function submitTrial(){alert('🎉 Trial Booked!\nWe\'ll confirm via WhatsApp shortly.\nSee you at NME GYM!');closeModal();}
+
+// ========== SCROLL REVEAL ==========
+const reveals=document.querySelectorAll('.reveal');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80);});
+},{threshold:0.1});
+reveals.forEach(el=>observer.observe(el));
+
+// ========== AUTH ==========
+function switchAuthTab(tab){
+  document.getElementById('auth-login-body').style.display=tab==='login'?'block':'none';
+  document.getElementById('auth-register-body').style.display=tab==='register'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+}
+function memberLogin(){alert('Member portal coming soon!\nFor now, contact us on WhatsApp:\n+91 98637 65861');}
+function memberRegister(){alert('✅ Registration submitted!\nWe\'ll activate your account shortly.\nYou\'ll receive a WhatsApp confirmation.');}
+
+// ========== ADMIN LOGIN ==========
+function adminLogin(){
+  const u=document.getElementById('adminUser').value;
+  const p=document.getElementById('adminPass').value;
+  if(u==='admin'&&p==='nme2025'){showPage('admin');}
+  else{alert('❌ Invalid credentials.\nHint: admin / nme2025');}
+}
+
+// ========== ADMIN TABS ==========
+function switchAdminTab(tab, clickedEl){
+  document.querySelectorAll('.admin-tab-content').forEach(t=>t.classList.remove('active'));
+  const target=document.getElementById('tab-'+tab);
+  if(target)target.classList.add('active');
+  // Desktop sidebar
+  document.querySelectorAll('.admin-nav-item').forEach(i=>i.classList.remove('active'));
+  if(clickedEl&&clickedEl.classList&&clickedEl.classList.contains('admin-nav-item')){clickedEl.classList.add('active');}
+  // Mobile nav
+  document.querySelectorAll('.mobile-admin-nav button').forEach(b=>b.classList.remove('active'));
+  if(clickedEl&&clickedEl.tagName==='BUTTON'){clickedEl.classList.add('active');}
+}
+
+// ========== ADMIN ACTIONS ==========
+function addMember(){
+  const name=document.getElementById('mName').value.trim();
+  const phone=document.getElementById('mPhone').value.trim();
+  const plan=document.getElementById('mPlan').value;
+  const date=document.getElementById('mDate').value;
+  if(!name||!phone){alert('Please fill Name and Phone.');return;}
+  const tbody=document.getElementById('membersBody');
+  const row=tbody.insertRow(0);
+  row.innerHTML=`<td>${name}</td><td>${phone}</td><td>${plan}</td><td>${date||'Today'}</td><td>—</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td>`;
+  document.getElementById('mName').value='';document.getElementById('mPhone').value='';
+  alert('✅ Member added!');
+}
+function filterMembers(val){
+  document.querySelectorAll('#membersBody tr').forEach(row=>{
+    row.style.display=row.textContent.toLowerCase().includes(val.toLowerCase())?'':'none';
+  });
+}
+function verifyPayment(btn){
+  const td=btn.closest('tr').querySelector('td:nth-last-child(2)');
+  btn.closest('tr').querySelector('td:last-child').innerHTML='<span class="status-badge status-active">Verified</span>';
+  btn.remove();
+  alert('✅ Payment verified!');
+}
+function publishPost(){
+  const title=document.getElementById('postTitle').value.trim();
+  const cat=document.getElementById('postCat').value;
+  if(!title){alert('Enter a post title.');return;}
+  const tbody=document.querySelector('#postsTable tbody');
+  const row=tbody.insertRow(0);
+  const today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  row.innerHTML=`<td>${title}</td><td>${cat}</td><td>${today}</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td>`;
+  document.getElementById('postTitle').value='';document.getElementById('postContent').value='';
+  alert('✅ Post published!');
+}
+function addOffer(){
+  const title=document.getElementById('offerTitle').value.trim();
+  const disc=document.getElementById('offerDiscount').value;
+  const to=document.getElementById('offerTo').value;
+  if(!title||!disc){alert('Fill in offer title and discount.');return;}
+  const tbody=document.querySelector('#offersTable tbody');
+  const row=tbody.insertRow(0);
+  row.innerHTML=`<td>${title}</td><td>${disc}%</td><td>${to||'—'}</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td>`;
+  document.getElementById('offerTitle').value='';document.getElementById('offerDiscount').value='';
+  alert('✅ Offer created!');
+}
+function confirmBooking(btn){
+  const row=btn.closest('tr');
+  row.querySelector('.status-badge').className='status-badge status-active';
+  row.querySelector('.status-badge').textContent='Confirmed';
+  btn.textContent='Done';btn.classList.add('outline');
+}
+</script>
+</body>
+</html>

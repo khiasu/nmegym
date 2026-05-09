@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NME GYM — Forge Your Legacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" onclick="showPage('main')" style="display:flex;align-items:center;">
+    <img src="logo.png" alt="NME GYM" class="nav-logo-img">
+  </a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#classes">Classes</a>
+    <a href="#plans">Plans</a>
+    <a href="#diet">Diet</a>
+    <a href="#contact">Contact</a>
+    <a href="#" class="nav-member-btn" onclick="showPage('auth')">Member Login</a>
+    <a href="#" class="nav-cta" onclick="openModal()">Book Free Trial</a>
+  </div>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#classes" onclick="closeMobile()">Classes</a>
+  <a href="#plans" onclick="closeMobile()">Plans</a>
+  <a href="#diet" onclick="closeMobile()">Nutrition</a>
+  <a href="#testimonials" onclick="closeMobile()">Reviews</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+  <a href="#" onclick="closeMobile();showPage('auth')" style="color:rgba(255,255,255,0.6);">Member Login</a>
+  <a href="#" style="color:var(--red)" onclick="closeMobile();openModal()">▶ Book Free Trial</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-img"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-number">NME</div>
+  <div class="hero-content">
+    <div class="hero-tag"><span></span><p>Now Open — Chumoukedima, Nagaland</p></div>
+    <h1 class="hero-title">FORGE<br><span class="stroke">YOUR</span><br><span class="red">LEGACY</span></h1>
+    <p class="hero-sub">No Mercy. No Excuses. Just Results.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" onclick="openModal()">Book Free Trial</a>
+      <a href="#plans" class="btn-outline">See Plans</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Members</div></div>
+    <div class="stat-item"><div class="stat-num">12+</div><div class="stat-label">Programs</div></div>
+    <div class="stat-item"><div class="stat-num">5★</div><div class="stat-label">Rated</div></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-text">STRENGTH TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">CARDIO ZONE</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">ZUMBA CLASSES</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">PERSONAL TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">NUTRITION PLANS</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">YOGA & FLEXIBILITY</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">STRENGTH TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">CARDIO ZONE</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">ZUMBA CLASSES</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">PERSONAL TRAINING</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">NUTRITION PLANS</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span class="marquee-text">YOGA & FLEXIBILITY</span><div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="max-w">
+    <div class="section-label"><span>Who We Are</span></div>
+    <h2 class="section-title">NOT JUST A GYM.<br><span class="gray">A MOVEMENT.</span></h2>
+    <div class="about-content">
+      <div class="about-text reveal">
+        <p class="highlight">"We don't just build bodies here — we build discipline, character, and champions."</p>
+        <p>NME Gym was born from a single belief: everyone deserves access to elite-level training without the elite price tag. Located in the heart of Chumoukedima, Nagaland, we've built a space where beginners find their footing and athletes push their limits — side by side.</p>
+        <br>
+        <p>Our certified coaches, premium equipment, and charged atmosphere make every rep count. Whether you're chasing a physique, building strength, or just starting your fitness journey — NME is where it begins.</p>
+      </div>
+      <div class="about-img-grid reveal">
+        <div class="about-img about-img-tall"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80" alt="NME Gym interior"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="about-img"><img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80" alt="Training"></div>
+          <div class="about-img"><img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80" alt="Equipment"></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-features reveal">
+      <div class="feature-item"><div class="feature-icon">🏋️</div><div class="feature-title">Pro Equipment</div><div class="feature-desc">Top-grade machines & free weights for every muscle group.</div></div>
+      <div class="feature-item"><div class="feature-icon">👥</div><div class="feature-title">Expert Coaches</div><div class="feature-desc">Certified trainers who are invested in YOUR results.</div></div>
+      <div class="feature-item"><div class="feature-icon">🕐</div><div class="feature-title">Flexible Hours</div><div class="feature-desc">Early morning to late night — train on your schedule.</div></div>
+      <div class="feature-item"><div class="feature-icon">🔥</div><div class="feature-title">Real Results</div><div class="feature-desc">500+ members transformed. Your turn is now.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLASSES -->
+<section class="classes-section" id="classes">
+  <div class="max-w">
+    <div class="section-label"><span>What We Offer</span></div>
+    <h2 class="section-title">TRAIN LIKE<br><span class="gray">YOU MEAN IT.</span></h2>
+    <div class="classes-grid reveal">
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="Weight Training">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Most Popular</div>
+        <div class="class-info"><div class="class-name">WEIGHT TRAINING</div><div class="class-meta"><span>⏱ All Levels</span><span>🔥 High Intensity</span></div></div>
+      </div>
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80" alt="Zumba">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Fun & Energetic</div>
+        <div class="class-info"><div class="class-name">ZUMBA</div><div class="class-meta"><span>⏱ 45 min</span><span>🎵 Dance Fitness</span></div></div>
+      </div>
+      <div class="class-card">
+        <img src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=600&q=80" alt="Cardio">
+        <div class="class-overlay"></div>
+        <div class="class-tag">Fat Burner</div>
+        <div class="class-info"><div class="class-name">CARDIO ZONE</div><div class="class-meta"><span>⏱ Anytime</span><span>💪 Endurance</span></div></div>
+      </div>
+    </div>
+    <div class="trial-cta reveal">
+      <h3>YOUR FIRST CLASS IS ON US</h3>
+      <p>Not sure where to start? Book a free trial class — no commitment, no pressure. Walk in, feel the energy, and decide for yourself.</p>
+      <a href="#" class="btn-primary" onclick="openModal()" style="align-self:flex-start;">Book Free Trial Now →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section class="plans-section" id="plans">
+  <div class="max-w">
+    <div class="section-label"><span>Membership</span></div>
+    <h2 class="section-title">PICK YOUR<br><span class="gray">WEAPON.</span></h2>
+    <div class="plans-grid reveal">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">999</span><span class="plan-period">/ month</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Gym Access (All Days)</div>
+          <div class="plan-feature"><div class="check">✓</div>Locker Facility</div>
+          <div class="plan-feature"><div class="check">✓</div>Basic Fitness Assessment</div>
+          <div class="plan-feature"><div class="cross">✗</div>Personal Trainer</div>
+          <div class="plan-feature"><div class="cross">✗</div>Group Classes</div>
+          <div class="plan-feature"><div class="cross">✗</div>Diet Consultation</div>
+        </div>
+        <a href="#" class="btn-outline" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Best Value</div>
+        <div class="plan-name">Warrior</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">2499</span><span class="plan-period">/ 3 months</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Gym Access (All Days)</div>
+          <div class="plan-feature"><div class="check">✓</div>Locker + Towel</div>
+          <div class="plan-feature"><div class="check">✓</div>Full Assessment</div>
+          <div class="plan-feature"><div class="check">✓</div>Group Classes (Zumba/Yoga)</div>
+          <div class="plan-feature"><div class="check">✓</div>Diet Plan</div>
+          <div class="plan-feature"><div class="cross">✗</div>Personal Trainer</div>
+        </div>
+        <a href="#" class="btn-primary" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Elite</div>
+        <div class="plan-price"><span class="plan-currency">₹</span><span class="plan-amount">7999</span><span class="plan-period">/ year</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="check">✓</div>Everything in Warrior</div>
+          <div class="plan-feature"><div class="check">✓</div>Personal Trainer (8 sessions)</div>
+          <div class="plan-feature"><div class="check">✓</div>Monthly Body Analysis</div>
+          <div class="plan-feature"><div class="check">✓</div>Priority Booking</div>
+          <div class="plan-feature"><div class="check">✓</div>Supplement Guidance</div>
+          <div class="plan-feature"><div class="check">✓</div>Guest Passes (2)</div>
+        </div>
+        <a href="#" class="btn-outline" onclick="openModal()" style="display:block;text-align:center;">Get Started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- DIET / BLOG -->
+<section class="blog-section" id="diet">
+  <div class="max-w">
+    <div class="section-label"><span>Nutrition Hub</span></div>
+    <h2 class="section-title">FUEL THE<br><span class="gray">MACHINE.</span></h2>
+    <div class="blog-grid" id="blogGrid">
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80" alt="Meal plan"><div class="blog-cat">Diet Plan</div></div>
+        <div class="blog-body">
+          <div class="blog-title">The Beginner's High-Protein Meal Plan</div>
+          <div class="blog-excerpt">Starting your fitness journey? Here's exactly what to eat — morning to night — to build muscle and lose fat simultaneously.</div>
+          <div class="blog-meta"><span>🕐 5 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80" alt="Pre workout"><div class="blog-cat">Pre-Workout</div></div>
+        <div class="blog-body">
+          <div class="blog-title">What To Eat 2 Hours Before Training</div>
+          <div class="blog-excerpt">The food you eat before a workout can make or break your performance. Here's the ultimate pre-workout nutrition guide.</div>
+          <div class="blog-meta"><span>🕐 4 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+      <div class="blog-card reveal">
+        <div class="blog-img"><img src="https://images.unsplash.com/photo-1622484212850-eb596d769edc?w=500&q=80" alt="Weight loss"><div class="blog-cat">Fat Loss</div></div>
+        <div class="blog-body">
+          <div class="blog-title">Cutting Without Losing Muscle: The NME Way</div>
+          <div class="blog-excerpt">Losing weight doesn't mean losing strength. Our coaches break down the science of cutting for Northeast Indian body types.</div>
+          <div class="blog-meta"><span>🕐 6 min read</span><a href="#" class="blog-read">Read More →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonials">
+  <div class="max-w" style="padding-bottom:0;">
+    <div class="section-label"><span>Real People</span></div>
+    <h2 class="section-title">THEY STARTED<br><span class="gray">YOU'RE NEXT.</span></h2>
+  </div>
+  <div class="testimonials-track-wrap" style="margin-top:50px;">
+    <div class="testimonials-track">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change. This gym is different."</div><div class="testi-name">Vizo Yhome</div><div class="testi-role">Lost 14 kg · 4 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both. The Zumba classes are incredible!"</div><div class="testi-name">Keviseno Chishi</div><div class="testi-role">Member · 8 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Best gym in Nagaland. No nonsense, clean equipment, and coaches who actually track your progress. Highly recommend the Elite plan."</div><div class="testi-name">Theja Sumi</div><div class="testi-role">Elite Member · 1 Year</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I was nervous starting. Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight."</div><div class="testi-name">Thinuo Sangtam</div><div class="testi-role">Strength Trainee</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The diet plans they gave me changed everything. Combined with the training, I'm in the best shape of my life at 32."</div><div class="testi-name">Atola Longkumer</div><div class="testi-role">Transformation · 6 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"NME is more than a gym — it's a community. Everyone pushes each other. The energy here is unlike anything in Nagaland."</div><div class="testi-name">Nzanthung Kikon</div><div class="testi-role">Warrior Member · 9 Months</div></div>
+      <!-- Duplicate for loop -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change."</div><div class="testi-name">Vizo Yhome</div><div class="testi-role">Lost 14 kg · 4 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both."</div><div class="testi-name">Keviseno Chishi</div><div class="testi-role">Member · 8 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Best gym in Nagaland. No nonsense, clean equipment, and coaches who actually track your progress."</div><div class="testi-name">Theja Sumi</div><div class="testi-role">Elite Member · 1 Year</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight."</div><div class="testi-name">Thinuo Sangtam</div><div class="testi-role">Strength Trainee</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The diet plans combined with training — I'm in the best shape of my life at 32."</div><div class="testi-name">Atola Longkumer</div><div class="testi-role">Transformation · 6 Months</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"NME is more than a gym — it's a community. The energy here is unlike anything in Nagaland."</div><div class="testi-name">Nzanthung Kikon</div><div class="testi-role">Warrior Member · 9 Months</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="max-w">
+    <div class="section-label"><span>Find Us</span></div>
+    <h2 class="section-title">COME SAY<br><span class="gray">HELLO.</span></h2>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div><h4>Location</h4><p>NME Gym, Chumoukedima, Nagaland</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div><h4>WhatsApp / Call</h4><a href="https://wa.me/919863765861">+91 98637 65861</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div><h4>Email</h4><a href="mailto:nmegym@gmail.com">nmegym@gmail.com</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div><h4>Hours</h4><p>Mon–Sat: 5:30 AM – 10:00 PM<br>Sunday: 7:00 AM – 1:00 PM</p></div>
+        </div>
+        <div class="social-row">
+          <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" class="social-btn" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ig1" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig1)"/><circle cx="12" cy="12" r="4.2" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
+            Instagram
+          </a>
+          <a href="https://wa.me/919863765861" class="social-btn" target="_blank">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="map-embed reveal">
+        <iframe src="https://maps.google.com/maps?q=Chumoukedima,Nagaland,India&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid max-w">
+    <div class="footer-brand">
+      <div class="logo-wrap">
+        <img src="logo.png" alt="NME GYM" style="height:48px;width:auto;">
+      </div>
+      <p>No Mercy. No Excuses. Chumoukedima's most serious fitness destination.</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig2)"/><circle cx="12" cy="12" r="4.2" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
+        </a>
+        <a href="https://wa.me/919863765861" target="_blank">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+        </a>
+        <a href="mailto:nmegym@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#444"/><path d="M4 8l8 5 8-5" stroke="white" stroke-width="1.5" fill="none"/><rect x="4" y="6" width="16" height="12" rx="2" stroke="white" stroke-width="1.5" fill="none"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links-row">
+      <div class="footer-col">
+        <h5>Quick Links</h5>
+        <a href="#about">About Us</a>
+        <a href="#classes">Classes</a>
+        <a href="#plans">Membership</a>
+        <a href="#diet">Nutrition</a>
+        <a href="#" onclick="openModal()">Free Trial</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#" onclick="showPage('auth')">How to Pay</a>
+        <a href="#contact">Contact</a>
+        <a href="https://wa.me/919863765861">WhatsApp</a>
+        <a href="#" onclick="showPage('auth')">Member Login</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="tel:+919863765861">+91 98637 65861</a>
+        <a href="mailto:nmegym@gmail.com">nmegym@gmail.com</a>
+        <a href="https://share.google/SStiUEM2Xh5EhoU0q" target="_blank">View on Maps</a>
+        <a href="#" onclick="showPage('admin-login')" style="color:#333;font-size:10px;">Admin</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 NME GYM · Chumoukedima, Nagaland · All rights reserved.</p>
+    <p style="color:#333;">Crafted for champions.</p>
+  </div>
+</footer>
+
+<!-- FLOATING WA -->
+<a href="https://wa.me/919863765861" class="wa-float" target="_blank" title="WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="none"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+</a>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header"><h3>BOOK FREE TRIAL</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Full Name</label><input type="text" id="bookName" placeholder="Your name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input type="tel" id="bookPhone" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Age</label><input type="number" id="bookAge" placeholder="Your age"></div>
+      </div>
+      <div class="form-group"><label>Interested In</label><select id="bookInterest"><option>Weight Training</option><option>Zumba / Dance</option><option>Yoga / Flexibility</option><option>Cardio & Endurance</option><option>Personal Training</option><option>General Fitness</option></select></div>
+      <div class="form-group"><label>Preferred Date</label><input type="date" id="bookDate"></div>
+      <div class="form-group"><label>Preferred Time Slot</label><select id="bookSlot"><option>Morning (6 AM – 9 AM)</option><option>Mid-Morning (9 AM – 12 PM)</option><option>Evening (5 PM – 8 PM)</option><option>Night (8 PM – 10 PM)</option></select></div>
+      <div class="form-group"><label>Message (Optional)</label><textarea id="bookMessage" rows="3" placeholder="Any specific goals or questions?"></textarea></div>
+      <button class="btn-primary" style="width:100%;border:none;" onclick="submitTrial()">CONFIRM BOOKING →</button>
+      <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px;">Or WhatsApp: <a href="https://wa.me/919863765861" style="color:var(--red);">+91 98637 65861</a></p>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

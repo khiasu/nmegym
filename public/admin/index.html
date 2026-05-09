@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NME GYM — Forge Your Legacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+
+  <div class="admin-top-bar">
+    <div class="brand">
+      <img src="../logo.png" alt="NME GYM" style="height:34px;width:auto;">
+      <span>ADMIN</span>
+    </div>
+    <div class="admin-top-actions">
+      <span class="admin-badge">Chumoukedima, Nagaland</span>
+      <button class="admin-logout" onclick="logout()">← Logout</button>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <div class="mobile-admin-nav">
+    <button class="active" onclick="switchAdminTab('dashboard',this)">📊 Dashboard</button>
+    <button onclick="switchAdminTab('members',this)">👥 Members</button>
+    <button onclick="switchAdminTab('payments',this)">💳 Payments</button>
+    <button onclick="switchAdminTab('blog',this)">📝 Posts</button>
+    <button onclick="switchAdminTab('offers',this)">🏷️ Offers</button>
+    <button onclick="switchAdminTab('bookings',this)">📅 Bookings</button>
+    <button onclick="switchAdminTab('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <div class="admin-body">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+      <div class="admin-nav-item active" onclick="switchAdminTab('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('members',this)"><span class="nav-icon">👥</span>Members</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('payments',this)"><span class="nav-icon">💳</span>Payments</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('blog',this)"><span class="nav-icon">📝</span>Blog / Posts</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('offers',this)"><span class="nav-icon">🏷️</span>Offers</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('bookings',this)"><span class="nav-icon">📅</span>Bookings</div>
+      <div class="admin-nav-item" onclick="switchAdminTab('settings',this)"><span class="nav-icon">⚙️</span>Settings</div>
+    </div>
+
+    <div class="admin-main-content">
+
+      <!-- DASHBOARD TAB -->
+      <div class="admin-tab-content active" id="tab-dashboard">
+        <div class="admin-page-title">DASHBOARD</div>
+        <div class="admin-page-sub">Welcome back, Admin · May 2025</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">512</div><div class="admin-stat-label">Total Members</div><div class="admin-stat-trend">↑ +18 this month</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">84</div><div class="admin-stat-label">Active (May)</div><div class="admin-stat-trend">↑ +6 vs April</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">₹1.2L</div><div class="admin-stat-label">Revenue (May)</div><div class="admin-stat-trend">↑ +12% vs last</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">14</div><div class="admin-stat-label">Trial Bookings</div><div class="admin-stat-trend">↑ +3 pending</div></div>
+        </div>
+        <div class="admin-quick-actions">
+          <button class="admin-quick-btn" onclick="switchAdminTab('members',null)"><span class="qb-icon">➕</span>Add Member</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('payments',null)"><span class="qb-icon">✅</span>Verify Payment</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('blog',null)"><span class="qb-icon">📝</span>New Post</button>
+          <button class="admin-quick-btn" onclick="switchAdminTab('offers',null)"><span class="qb-icon">🏷️</span>New Offer</button>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Revenue by Plan (May)</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Elite</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:72%"></div></div><span class="admin-revenue-bar-val">₹63,992</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Warrior</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:48%"></div></div><span class="admin-revenue-bar-val">₹42,483</span></div>
+          <div class="admin-revenue-bar"><span class="admin-revenue-bar-label">Starter</span><div class="admin-revenue-bar-track"><div class="admin-revenue-bar-fill" style="width:20%"></div></div><span class="admin-revenue-bar-val">₹17,982</span></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Recent Members</span><button class="admin-btn-sm outline" onclick="switchAdminTab('members',null)">View All</button></div>
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th></tr></thead>
+            <tbody id="dashRecentMembers">
+              <tr><td>Vizo Yhome</td><td>Elite</td><td>Jan 2025</td><td>Jan 2026</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Keviseno Chishi</td><td>Warrior</td><td>Mar 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Theja Sumi</td><td>Starter</td><td>Apr 2025</td><td>May 2025</td><td><span class="status-badge status-expired">Expired</span></td></tr>
+              <tr><td>Thinuo Sangtam</td><td>Warrior</td><td>Feb 2025</td><td>May 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Atola Longkumer</td><td>Elite</td><td>Dec 2024</td><td>Dec 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MEMBERS TAB -->
+      <div class="admin-tab-content" id="tab-members">
+        <div class="admin-page-title">MEMBERS</div>
+        <div class="admin-page-sub">Manage all registered members</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Add New Member</span><button class="admin-btn-sm" onclick="addMember()">Save Member</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Full Name</label><input class="admin-input" id="mName" type="text" placeholder="Full name"></div>
+            <div class="admin-form-group"><label class="admin-label">Phone</label><input class="admin-input" id="mPhone" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+            <div class="admin-form-group"><label class="admin-label">Plan</label><select class="admin-input" id="mPlan"><option>Starter</option><option>Warrior</option><option>Elite</option></select></div>
+            <div class="admin-form-group"><label class="admin-label">Join Date</label><input class="admin-input" id="mDate" type="date"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">All Members</span><input class="admin-input" style="width:180px;padding:6px 10px;font-size:12px;" placeholder="Search members..." oninput="filterMembers(this.value)"></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="membersTable">
+              <thead><tr><th>Name</th><th>Phone</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="membersBody">
+                <tr><td>Vizo Yhome</td><td>+91 98001 11001</td><td>Elite</td><td>Jan 2025</td><td>Jan 2026</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Keviseno Chishi</td><td>+91 98001 22002</td><td>Warrior</td><td>Mar 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Theja Sumi</td><td>+91 98001 33003</td><td>Starter</td><td>Apr 2025</td><td>May 2025</td><td><span class="status-badge status-expired">Expired</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Thinuo Sangtam</td><td>+91 98001 44004</td><td>Warrior</td><td>Feb 2025</td><td>May 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Atola Longkumer</td><td>+91 98001 55005</td><td>Elite</td><td>Dec 2024</td><td>Dec 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Nzanthung Kikon</td><td>+91 98001 66006</td><td>Warrior</td><td>Sep 2024</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+                <tr><td>Mhalie Chakhesang</td><td>+91 98001 77007</td><td>Starter</td><td>May 2025</td><td>Jun 2025</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENTS TAB -->
+      <div class="admin-tab-content" id="tab-payments">
+        <div class="admin-page-title">PAYMENTS</div>
+        <div class="admin-page-sub">Verify and track all membership payments</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">₹1.2L</div><div class="admin-stat-label">May Revenue</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">6</div><div class="admin-stat-label">Pending Verify</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">48</div><div class="admin-stat-label">Paid (May)</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">3</div><div class="admin-stat-label">Overdue</div></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Pending Verification</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="pendingPaymentsBody">
+                <tr><td>Visier Meyase</td><td>₹2,499</td><td>Warrior</td><td>GPay</td><td>May 08</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+                <tr><td>Lhounii Ao</td><td>₹999</td><td>Starter</td><td>PhonePe</td><td>May 07</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+                <tr><td>Keduoli Zhimomi</td><td>₹7,999</td><td>Elite</td><td>UPI</td><td>May 06</td><td><button class="admin-btn-sm" onclick="verifyPayment(this)">Verify</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Verified Payments</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="verifiedPaymentsBody">
+                <tr><td>Vizo Yhome</td><td>₹7,999</td><td>Elite</td><td>GPay</td><td>Jan 10</td><td><span class="status-badge status-active">Verified</span></td></tr>
+                <tr><td>Atola Longkumer</td><td>₹7,999</td><td>Elite</td><td>Paytm</td><td>Dec 18</td><td><span class="status-badge status-active">Verified</span></td></tr>
+                <tr><td>Keviseno Chishi</td><td>₹2,499</td><td>Warrior</td><td>PhonePe</td><td>Mar 05</td><td><span class="status-badge status-active">Verified</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG TAB -->
+      <div class="admin-tab-content" id="tab-blog">
+        <div class="admin-page-title">BLOG / POSTS</div>
+        <div class="admin-page-sub">Manage nutrition tips and fitness articles</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">New Post</span><button class="admin-btn-sm" onclick="publishPost()">Publish</button></div>
+          <div class="admin-form-group"><label class="admin-label">Post Title</label><input class="admin-input" id="postTitle" type="text" placeholder="Article title"></div>
+          <div class="admin-form-group"><label class="admin-label">Category</label><select class="admin-input" id="postCat"><option>Diet Plan</option><option>Pre-Workout</option><option>Fat Loss</option><option>Muscle Gain</option><option>Recovery</option></select></div>
+          <div class="admin-form-group"><label class="admin-label">Content</label><textarea class="admin-input" id="postContent" rows="5" placeholder="Write your article content here..."></textarea></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Published Posts</span></div>
+          <table class="admin-table" id="postsTable">
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="postsBody">
+              <tr><td>The Beginner's High-Protein Meal Plan</td><td>Diet Plan</td><td>Apr 20</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>What To Eat 2 Hours Before Training</td><td>Pre-Workout</td><td>Apr 15</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>Cutting Without Losing Muscle: The NME Way</td><td>Fat Loss</td><td>Apr 08</td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OFFERS TAB -->
+      <div class="admin-tab-content" id="tab-offers">
+        <div class="admin-page-title">OFFERS</div>
+        <div class="admin-page-sub">Create and manage promotional offers</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">New Offer</span><button class="admin-btn-sm" onclick="addOffer()">Add Offer</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Offer Title</label><input class="admin-input" id="offerTitle" type="text" placeholder="e.g. Summer Special"></div>
+            <div class="admin-form-group"><label class="admin-label">Discount %</label><input class="admin-input" id="offerDiscount" type="number" placeholder="e.g. 20"></div>
+            <div class="admin-form-group"><label class="admin-label">Valid From</label><input class="admin-input" id="offerFrom" type="date"></div>
+            <div class="admin-form-group"><label class="admin-label">Valid To</label><input class="admin-input" id="offerTo" type="date"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Active Offers</span></div>
+          <table class="admin-table" id="offersTable">
+            <thead><tr><th>Title</th><th>Discount</th><th>Valid Until</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Naga Summer Blast</td><td>20%</td><td>May 31</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+              <tr><td>Student Special</td><td>15%</td><td>Jun 15</td><td><span class="status-badge status-active">Active</span></td><td><button class="admin-toggle-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOOKINGS TAB -->
+      <div class="admin-tab-content" id="tab-bookings">
+        <div class="admin-page-title">BOOKINGS</div>
+        <div class="admin-page-sub">Free trial and class bookings</div>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card"><div class="admin-stat-val">14</div><div class="admin-stat-label">Total (May)</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">3</div><div class="admin-stat-label">Today</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">8</div><div class="admin-stat-label">Confirmed</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-val">6</div><div class="admin-stat-label">Pending</div></div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Upcoming Bookings</span></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="bookingsTable">
+              <thead><tr><th>Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Interest</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="bookingsBody">
+                <tr><td>Zhekuie Sema</td><td>+91 98001 11222</td><td>May 10</td><td>Morning</td><td>Weight Training</td><td><span class="status-badge status-pending">Pending</span></td><td><button class="admin-btn-sm" onclick="confirmBooking(this)">Confirm</button></td></tr>
+                <tr><td>Limatula Yaden</td><td>+91 98001 33444</td><td>May 11</td><td>Evening</td><td>Zumba</td><td><span class="status-badge status-pending">Pending</span></td><td><button class="admin-btn-sm" onclick="confirmBooking(this)">Confirm</button></td></tr>
+                <tr><td>Imkong Jamir</td><td>+91 98001 55666</td><td>May 12</td><td>Morning</td><td>General Fitness</td><td><span class="status-badge status-active">Confirmed</span></td><td><button class="admin-btn-sm outline">Done</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="admin-tab-content" id="tab-settings">
+        <div class="admin-page-title">SETTINGS</div>
+        <div class="admin-page-sub">Manage gym information and admin credentials</div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Gym Information</span><button class="admin-btn-sm" onclick="alert('Settings saved!')">Save Changes</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Gym Name</label><input class="admin-input" type="text" value="NME GYM"></div>
+            <div class="admin-form-group"><label class="admin-label">Phone</label><input class="admin-input" type="tel" value="+91 98637 65861"></div>
+            <div class="admin-form-group"><label class="admin-label">Email</label><input class="admin-input" type="email" value="nmegym@gmail.com"></div>
+            <div class="admin-form-group"><label class="admin-label">Location</label><input class="admin-input" type="text" value="Chumoukedima, Nagaland"></div>
+            <div class="admin-form-group"><label class="admin-label">Opening Time</label><input class="admin-input" type="time" value="05:30"></div>
+            <div class="admin-form-group"><label class="admin-label">Closing Time</label><input class="admin-input" type="time" value="22:00"></div>
+          </div>
+        </div>
+        <div class="admin-section-card">
+          <div class="admin-section-card-header"><span class="admin-section-card-title">Change Admin Password</span><button class="admin-btn-sm" onclick="alert('Password updated!')">Update</button></div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group"><label class="admin-label">Current Password</label><input class="admin-input" type="password" placeholder="••••••••"></div>
+            <div class="admin-form-group"><label class="admin-label">New Password</label><input class="admin-input" type="password" placeholder="••••••••"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-main-content -->
+  </div><!-- /admin-body -->
+
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
