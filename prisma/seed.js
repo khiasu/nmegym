@@ -33,13 +33,13 @@ async function main() {
   // 2. Create Sample Members
   const memberHash = await bcrypt.hash('member123', 10);
   const sampleMembers = [
-    { firstName: 'Vizo', lastName: 'Yhome', phone: '+919800111001', email: 'vizo@email.com', plan: 'ELITE', months: 12 },
-    { firstName: 'Keviseno', lastName: 'Chishi', phone: '+919800122002', email: 'keviseno@email.com', plan: 'WARRIOR', months: 3 },
-    { firstName: 'Theja', lastName: 'Sumi', phone: '+919800133003', email: 'theja@email.com', plan: 'STARTER', months: 1 },
-    { firstName: 'Thinuo', lastName: 'Sangtam', phone: '+919800144004', email: 'thinuo@email.com', plan: 'WARRIOR', months: 3 },
-    { firstName: 'Atola', lastName: 'Longkumer', phone: '+919800155005', email: 'atola@email.com', plan: 'ELITE', months: 12 },
-    { firstName: 'Nzanthung', lastName: 'Kikon', phone: '+919800166006', email: 'nzanthung@email.com', plan: 'WARRIOR', months: 9 },
-    { firstName: 'Mhalie', lastName: 'Chakhesang', phone: '+919800177007', email: 'mhalie@email.com', plan: 'STARTER', months: 1 },
+    { firstName: 'Vizo', lastName: 'Yhome', phone: '+919800111001', email: 'vizo@email.com', plan: '1 Year', months: 12 },
+    { firstName: 'Keviseno', lastName: 'Chishi', phone: '+919800122002', email: 'keviseno@email.com', plan: '3 Months', months: 3 },
+    { firstName: 'Theja', lastName: 'Sumi', phone: '+919800133003', email: 'theja@email.com', plan: 'Monthly', months: 1 },
+    { firstName: 'Thinuo', lastName: 'Sangtam', phone: '+919800144004', email: 'thinuo@email.com', plan: '6 Months', months: 6 },
+    { firstName: 'Atola', lastName: 'Longkumer', phone: '+919800155005', email: 'atola@email.com', plan: '1 Year', months: 12 },
+    { firstName: 'Nzanthung', lastName: 'Kikon', phone: '+919800166006', email: 'nzanthung@email.com', plan: '6 Months', months: 6 },
+    { firstName: 'Mhalie', lastName: 'Chakhesang', phone: '+919800177007', email: 'mhalie@email.com', plan: 'Monthly', months: 1 },
   ];
 
   for (const m of sampleMembers) {
@@ -79,7 +79,7 @@ async function main() {
     await prisma.payment.create({
       data: {
         userId: user.id,
-        amount: m.plan === 'ELITE' ? 7999 : m.plan === 'WARRIOR' ? 2499 : 999,
+        amount: m.plan === '1 Year' ? 7999 : m.plan === '6 Months' ? 4499 : m.plan === '3 Months' ? 2499 : 999,
         paymentMethod: ['UPI', 'CASH', 'UPI'][Math.floor(Math.random() * 3)],
         status: 'VERIFIED',
         verifiedById: admin.id
@@ -133,9 +133,9 @@ async function main() {
 
   // 5. Create Pending Payments
   const pendingPayments = [
-    { name: 'Visier Meyase', phone: '+919800188008', plan: 'WARRIOR', amount: 2499, method: 'UPI' },
-    { name: 'Lhounii Ao', phone: '+919800199009', plan: 'STARTER', amount: 999, method: 'UPI' },
-    { name: 'Keduoli Zhimomi', phone: '+919800100010', plan: 'ELITE', amount: 7999, method: 'UPI' },
+    { name: 'Visier Meyase', phone: '+919800188008', plan: '3 Months', amount: 2499, method: 'UPI' },
+    { name: 'Lhounii Ao', phone: '+919800199009', plan: 'Monthly', amount: 999, method: 'UPI' },
+    { name: 'Keduoli Zhimomi', phone: '+919800100010', plan: '1 Year', amount: 7999, method: 'UPI' },
   ];
 
   for (const pp of pendingPayments) {
@@ -163,6 +163,58 @@ async function main() {
     }).catch(() => {});
   }
   console.log('✅ Pending payment records created');
+
+  // 6. Create Sample Trainers
+  const trainers = [
+    { name: 'Keneizetuo Angami', role: 'Head Coach', bio: 'Certified S&C specialist with 10+ years experience in bodybuilding.', imageUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
+    { name: 'Lhouvi-o', role: 'Strength Coach', bio: 'Expert in powerlifting and functional strength.', imageUrl: 'https://images.unsplash.com/photo-1549476464-37392f71752a?w=400&q=80' }
+  ];
+
+  for (const t of trainers) {
+    await prisma.trainer.create({ data: t }).catch(() => {});
+  }
+  console.log('✅ Trainers created');
+
+  // 7. Create Sample Facilities
+  const facilities = [
+    { name: 'Strength Area', description: 'Premium free weights and heavy-duty machines.', mediaUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80', mediaType: 'IMAGE' },
+    { name: 'Zumba Studio', description: 'Vibrant space for dance and group classes.', mediaUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80', mediaType: 'IMAGE' },
+    { name: 'Cardio Deck', description: 'Latest treadmills and rowers for endurance.', mediaUrl: 'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=800&q=80', mediaType: 'IMAGE' }
+  ];
+
+  for (const f of facilities) {
+    await prisma.facility.create({ data: f }).catch(() => {});
+  }
+  console.log('✅ Facilities created');
+
+  // 8. Create Default Plans
+  const plans = [
+    { name: 'Monthly', price: 999, period: 'month', features: 'Gym Access,Locker Facility,Basic Assessment' },
+    { name: '3 Months', price: 2499, period: 'quarter', features: 'Gym Access,Locker + Towel,Full Assessment' },
+    { name: '6 Months', price: 4499, period: 'half year', features: 'Everything in 3m,Group Classes,Diet Plan' },
+    { name: '1 Year', price: 7999, period: 'year', features: 'Everything in 6m,Personal Trainer (8 sessions),Monthly Analysis' }
+  ];
+
+  for (const p of plans) {
+    await prisma.plan.upsert({
+      where: { name: p.name },
+      update: p,
+      create: p
+    });
+  }
+  console.log('✅ Plans seeded');
+
+  // 9. Create Sample Offer
+  await prisma.offer.create({
+    data: {
+      title: 'Christmas Blast',
+      badge: 'Special',
+      discount: 20,
+      description: 'Get 20% off on all annual memberships this December!',
+      isActive: true
+    }
+  }).catch(() => {});
+  console.log('✅ Sample offer created');
 
   console.log('\n🎉 Seed complete! Server ready to launch.');
   console.log('   Admin login: admin@nmegym.in / nme2025');

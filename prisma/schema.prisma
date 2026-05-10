@@ -79,3 +79,57 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Trainer {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  imageUrl  String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Facility {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  mediaUrl    String
+  mediaType   String   @default("IMAGE") // IMAGE, VIDEO
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Plan {
+  id        String   @id @default(uuid())
+  name      String   @unique // STARTER, WARRIOR, ELITE
+  price     Int
+  period    String
+  features  String   // Comma separated
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Offer {
+  id          String   @id @default(uuid())
+  title       String
+  badge       String?
+  discount    Int?
+  promoImage  String?
+  description String?
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Settings {
+  id              Int      @id @default(1)
+  gymName         String   @default("NME GYM")
+  logoUrl         String?  @default("/newlogo.png")
+  address         String?  @default("Chumoukedima, Nagaland")
+  whatsappNumber  String?  @default("+91 98637 65861")
+  email           String?  @default("nmegym@gmail.com")
+  instagramUrl    String?  @default("https://www.instagram.com/nme_gym")
+  updatedAt       DateTime @updatedAt
+}

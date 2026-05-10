@@ -2,23 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NME GYM — Forge Your Legacy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
 
 
-  <button class="auth-back" onclick="window.location.href='/'">← Back to Site</button>
+
+  <button class="auth-back" onclick="window.location.href='/'"><span class="back-arrow">←</span> Back to Site</button>
   <div class="auth-logo">
-    <img src="logo.png" alt="NME GYM" style="height:64px;width:auto;">
+    <img src="newlogo.png" alt="NME GYM" style="height:120px;width:auto;">
   </div>
-  <div class="auth-box">
+  <div class="auth-box page-entrance">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Member Login</button>
       <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
@@ -48,7 +46,6 @@
         <div class="form-group"><label>Goal</label><select id="regGoal" style="background:var(--black);border:1px solid var(--border);color:var(--white);padding:12px 14px;width:100%;font-size:14px;outline:none;"><option>Weight Loss</option><option>Muscle Gain</option><option>General Fitness</option><option>Endurance</option></select></div>
       </div>
       <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Create password"></div>
-      <div class="form-group"><label>Confirm Password</label><input type="password" id="regConfirm" placeholder="Repeat password"></div>
       <button class="auth-submit" onclick="memberRegister()">CREATE ACCOUNT →</button>
       <p class="auth-note">Already a member? <a onclick="switchAuthTab('login')">Login here</a></p>
     </div>

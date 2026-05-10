@@ -1,32 +1,12 @@
 
 // ========== PAGE ROUTING ==========
-function showPage(p){
+function showPage(p, tab = null){
   if(p==='main') window.location.href='/';
-  else if(p==='auth') window.location.href='/auth.html';
+  else if(p==='auth') window.location.href = tab ? `/auth.html#${tab}` : '/auth.html';
   else if(p==='admin-login') window.location.href='/admin/login.html';
   else if(p==='admin') window.location.href='/admin/index.html';
 }
 
-// ========== CURSOR ==========
-const cursor=document.getElementById('cursor');
-const ring=document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX;my=e.clientY;
-  cursor.style.left=mx-5+'px';cursor.style.top=my-5+'px';
-});
-function animateRing(){
-  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
-  ring.style.left=rx+'px';ring.style.top=ry+'px';
-  requestAnimationFrame(animateRing);
-}animateRing();
-document.querySelectorAll('a,button,.class-card,.blog-card,.plan-card').forEach(el=>{
-  el.addEventListener('mouseenter',()=>ring.classList.add('expand'));
-  el.addEventListener('mouseleave',()=>ring.classList.remove('expand'));
-});
-if('ontouchstart' in window){
-  cursor.style.display='none';ring.style.display='none';
-}
 
 // ========== NAV ==========
 const navEl=document.getElementById('nav');
@@ -34,12 +14,14 @@ window.addEventListener('scroll',()=>{navEl.classList.toggle('scrolled',window.s
 const ham=document.getElementById('hamburger');
 const mob=document.getElementById('mobileMenu');
 if(ham)ham.addEventListener('click',()=>{
-  ham.classList.toggle('open');
+  const isOpen = ham.classList.toggle('open');
   mob.classList.toggle('open');
+  document.body.classList.toggle('no-scroll', isOpen);
 });
 function closeMobile(){
   if(ham) ham.classList.remove('open');
   if(mob) mob.classList.remove('open');
+  document.body.classList.remove('no-scroll');
 }
 
 // ========== MODAL ==========
@@ -87,15 +69,22 @@ async function submitTrial(){
 // ========== SCROLL REVEAL ==========
 const reveals=document.querySelectorAll('.reveal');
 const observer=new IntersectionObserver(entries=>{
-  entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80);});
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+    else e.target.classList.remove('visible');
+  });
 },{threshold:0.1});
 reveals.forEach(el=>observer.observe(el));
 
 // ========== AUTH ==========
 function switchAuthTab(tab){
-  document.getElementById('auth-login-body').style.display=tab==='login'?'block':'none';
-  document.getElementById('auth-register-body').style.display=tab==='register'?'block':'none';
-  document.getElementById('auth-payment-body').style.display=tab==='payment'?'block':'none';
+  const loginBody = document.getElementById('auth-login-body');
+  const registerBody = document.getElementById('auth-register-body');
+  const paymentBody = document.getElementById('auth-payment-body');
+  
+  if(loginBody) loginBody.style.display = tab==='login'?'block':'none';
+  if(registerBody) registerBody.style.display = tab==='register'?'block':'none';
+  if(paymentBody) paymentBody.style.display = tab==='payment'?'block':'none';
   
   if(document.getElementById('tab-login')) document.getElementById('tab-login').classList.toggle('active',tab==='login');
   if(document.getElementById('tab-register')) document.getElementById('tab-register').classList.toggle('active',tab==='register'||tab==='payment');
@@ -129,6 +118,34 @@ async function memberLogin(){
     alert('Server error. Please try again.');
   }
 }
+async function adminLogin() {
+  const phoneOrEmail = document.getElementById('adminUser').value.trim();
+  const password = document.getElementById('adminPass').value;
+  if(!phoneOrEmail || !password){ alert('Please fill in both fields.'); return; }
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ phoneOrEmail, password })
+    });
+    const data = await res.json();
+    if(res.ok){
+      if(data.user.role !== 'ADMIN'){
+        alert('Access denied. You are not an administrator.');
+        return;
+      }
+      localStorage.setItem('nme_token', data.token);
+      localStorage.setItem('nme_user', JSON.stringify(data.user));
+      window.location.href = '/admin/index.html';
+    } else {
+      alert(data.error || 'Login failed');
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Server error. Please try again.');
+  }
+}
 
 async function memberRegister(){
   const firstName = document.getElementById('regFirst').value.trim();
@@ -136,10 +153,8 @@ async function memberRegister(){
   const phone = document.getElementById('regPhone').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPass').value;
-  const confirm = document.getElementById('regConfirm').value;
   
   if(!firstName || !phone || !password) { alert('Please fill required fields.'); return; }
-  if(password !== confirm) { alert('Passwords do not match!'); return; }
 
   try {
     const res = await fetch('/api/auth/register', {
@@ -160,42 +175,83 @@ async function memberRegister(){
   }
 }
 
-// ========== BLOG LOADING ==========
-async function loadBlog() {
-  const blogGrid = document.getElementById('blogGrid');
-  if (!blogGrid) return;
+// ========== GALLERY LOADING ==========
+async function loadGallery() {
+  const trainerGrid = document.getElementById('trainerGrid');
+  if (!trainerGrid) return;
 
   try {
-    const res = await fetch('/api/public/posts');
-    const posts = await res.json();
-    if (res.ok && posts.length > 0) {
-      blogGrid.innerHTML = posts.map((p, i) => `
-        <div class="blog-card reveal" style="transition-delay: ${i * 80}ms">
-          <div class="blog-img">
-            <img src="${p.imageUrl || 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80'}" alt="${p.title}">
-            <div class="blog-cat">${p.category}</div>
-          </div>
-          <div class="blog-body">
-            <div class="blog-title">${p.title}</div>
-            <div class="blog-excerpt">${p.content.substring(0, 120)}...</div>
-            <div class="blog-meta">
-              <span>🕐 ${Math.ceil(p.content.split(' ').length / 200)} min read</span>
-              <a href="#" class="blog-read">Read More →</a>
-            </div>
+    const tRes = await fetch('/api/public/trainers');
+    const trainers = await tRes.json();
+    if (tRes.ok) {
+      trainerGrid.innerHTML = trainers.slice(0, 2).map((t, i) => `
+        <div class="trainer-card reveal" style="transition-delay: ${i * 80}ms">
+          <img src="${t.imageUrl || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80'}" alt="${t.name}" class="trainer-img">
+          <div class="trainer-info">
+            <div class="trainer-role">${t.role}</div>
+            <div class="trainer-name">${t.name}</div>
+            <div class="trainer-bio">${t.bio || ''}</div>
           </div>
         </div>
       `).join('');
-      
-      // Re-trigger reveal observer for new elements
-      const newReveals = blogGrid.querySelectorAll('.reveal');
-      newReveals.forEach(el => observer.observe(el));
     }
+    
+    // Re-trigger reveal observer
+    const newReveals = document.querySelectorAll('.reveal');
+    newReveals.forEach(el => observer.observe(el));
   } catch (e) {
-    console.error('Failed to load blog:', e);
+    console.error('Failed to load trainers:', e);
   }
+}
+
+function scrollCarousel(dir) {
+  const track = document.getElementById('facilityTrack');
+  if (track) {
+    track.scrollBy({ left: dir * 320, behavior: 'smooth' });
+  }
+}
+
+// ========== PROMO BADGE ==========
+async function loadPromo() {
+  const container = document.getElementById('promoBadge');
+  if(!container) return;
+  try {
+    const res = await fetch('/api/public/offers');
+    const offers = await res.json();
+    const active = offers.find(o => o.isActive);
+    if(active) {
+      container.innerHTML = `
+        <div class="promo-badge reveal visible">
+          <span class="pb-tag">${active.badge || 'OFFER'}</span>
+          <span class="pb-text">${active.title} — ${active.discount ? active.discount + '% OFF' : 'CLAIM NOW'}</span>
+        </div>
+      `;
+    }
+  } catch(e) { console.error('Promo load fail', e); }
 }
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded', () => {
-  loadBlog();
+  loadGallery();
+  loadPromo();
+  
+  // Handle Plan Card Glow Position
+  document.querySelectorAll('.plan-mini').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--x', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--y', (e.clientY - rect.top) + 'px');
+    });
+  });
+
+  // Handle Auth Tab from Hash
+  const handleHash = () => {
+    const hash = window.location.hash.substring(1);
+    if (hash === 'register' || hash === 'login' || hash === 'payment') {
+      setTimeout(() => switchAuthTab(hash), 150);
+    }
+  };
+
+  handleHash();
+  window.addEventListener('hashchange', handleHash);
 });

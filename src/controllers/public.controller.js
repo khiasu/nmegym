@@ -41,3 +41,32 @@ exports.getPublicPosts = async (req, res) => {
     res.status(500).json({ error: 'Failed to load posts' });
   }
 };
+
+// GET /api/public/trainers
+exports.getPublicTrainers = async (req, res) => {
+  try {
+    const trainers = await prisma.trainer.findMany({ orderBy: { name: 'asc' } });
+    res.json(trainers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load trainers' });
+  }
+};
+
+// GET /api/public/facilities
+exports.getPublicFacilities = async (req, res) => {
+  try {
+    const facilities = await prisma.facility.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(facilities);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load facilities' });
+  }
+};
+// GET /api/public/settings
+exports.getSettings = async (req, res) => {
+  try {
+    const settings = await prisma.settings.findUnique({ where: { id: 1 } });
+    res.json(settings || { gymName: 'NME GYM', logoUrl: '/newlogo.png' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load settings' });
+  }
+};
