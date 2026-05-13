@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NME GYM — Forge Your Legacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+
+
+  <button class="auth-back" onclick="window.location.href='/'"><span class="back-arrow">←</span> Back to Site</button>
+  <div class="auth-logo">
+    <img src="newlogo.png" alt="NME GYM" style="height:120px;width:auto;">
+  </div>
+  <div class="auth-box page-entrance">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Member Login</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+    </div>
+    <!-- LOGIN -->
+    <div class="auth-body" id="auth-login-body">
+      <div class="form-group"><label>Phone / Email</label><input type="text" id="loginEmail" placeholder="Enter phone or email"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password"></div>
+      <button class="auth-submit" onclick="memberLogin()">LOGIN →</button>
+      <div class="auth-divider"><span>or</span></div>
+      <a href="https://wa.me/919863765861" target="_blank" class="auth-wa-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;"><circle cx="12" cy="12" r="12" fill="none"/><path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+        Contact via WhatsApp
+      </a>
+      <p class="auth-note">Don't have an account? <a onclick="switchAuthTab('register')">Register here</a></p>
+    </div>
+    <!-- REGISTER -->
+    <div class="auth-body" id="auth-register-body" style="display:none;">
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" id="regFirst" placeholder="First name"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="regLast" placeholder="Last name"></div>
+      </div>
+      <div class="form-group"><label>Phone Number</label><input type="tel" id="regPhone" placeholder="+91 XXXXX XXXXX"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Age</label><input type="number" id="regAge" placeholder="Age"></div>
+        <div class="form-group"><label>Goal</label><select id="regGoal" style="background:var(--black);border:1px solid var(--border);color:var(--white);padding:12px 14px;width:100%;font-size:14px;outline:none;"><option>Weight Loss</option><option>Muscle Gain</option><option>General Fitness</option><option>Endurance</option></select></div>
+      </div>
+      <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Create password"></div>
+      <button class="auth-submit" onclick="memberRegister()">CREATE ACCOUNT →</button>
+      <p class="auth-note">Already a member? <a onclick="switchAuthTab('login')">Login here</a></p>
+    </div>
+
+    <!-- PAYMENT ACTIVATION -->
+    <div class="auth-body" id="auth-payment-body" style="display:none;text-align:center;">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--red);margin-bottom:10px;">ACTIVATE MEMBERSHIP</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:20px;">Your account is created! Scan the QR below to pay and activate your membership.</p>
+      
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="width:180px;height:180px;border:2px solid var(--red);padding:8px;background:var(--black);position:relative;">
+          <div style="width:100%;height:100%;background:#fff;display:flex;align-items:center;justify-content:center;color:#333;font-weight:700;">QR CODE</div>
+        </div>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;color:var(--gray);">NME GYM · UPI/GPay</p>
+      </div>
+
+      <div style="text-align:left;background:rgba(255,255,255,0.03);padding:16px;border-radius:4px;margin-bottom:20px;">
+        <p style="font-size:12px;color:var(--white);margin-bottom:8px;"><strong>1.</strong> Pay the plan amount via QR.</p>
+        <p style="font-size:12px;color:var(--white);margin-bottom:8px;"><strong>2.</strong> Screenshot the confirmation.</p>
+        <p style="font-size:12px;color:var(--white);"><strong>3.</strong> WhatsApp screenshot to <strong>+91 98637 65861</strong> with your name.</p>
+      </div>
+
+      <button class="auth-submit" onclick="switchAuthTab('login')">GO TO LOGIN →</button>
+      <p class="auth-note">Need help? <a href="https://wa.me/919863765861">Contact Support</a></p>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:11px;color:#333;margin-top:20px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">NME GYM · Chumoukedima, Nagaland</p>
+
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

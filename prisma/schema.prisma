@@ -1,0 +1,195 @@
+// NME GYM - Prisma Schema for Neon (PostgreSQL)
+// ================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// ========== NextAuth Models (Phase 2 - pre-wired) ==========
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ========== Core Business Models ==========
+
+model User {
+  id            String       @id @default(cuid())
+  firstName     String?
+  lastName      String?
+  phone         String?      @unique
+  email         String       @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  resetToken    String?      @unique
+  resetTokenExpiry DateTime?
+  image         String?
+  role          String       @default("MEMBER") // MEMBER, ADMIN
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // NextAuth relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Business relations
+  memberships   Membership[]
+  payments      Payment[]    @relation("UserPayments")
+  verifiedPayments Payment[] @relation("AdminVerifiedPayments")
+  bookings      Booking[]
+  testimonials  Testimonial[]
+}
+
+model Membership {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planTier   String     // STARTER, WARRIOR, ELITE
+  status     String     @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
+  startDate  DateTime?
+  endDate    DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  amount         Decimal  @db.Decimal(10, 2)
+  paymentMethod  String   // UPI, CARD, CASH
+  screenshotUrl  String?
+  status         String   @default("PENDING_VERIFICATION") // PENDING_VERIFICATION, VERIFIED, REJECTED
+  verifiedById   String?
+  verifiedBy     User?    @relation("AdminVerifiedPayments", fields: [verifiedById], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Booking {
+  id                String   @id @default(cuid())
+  name              String?
+  phone             String?
+  age               Int?
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  interest          String
+  preferredDate     DateTime
+  preferredTimeSlot String
+  status            String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  message           String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  category    String
+  content     String   @db.Text
+  imageUrl    String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Trainer {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  imageUrl  String?
+  bio       String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Facility {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  mediaUrl    String
+  mediaType   String   @default("IMAGE") // IMAGE, VIDEO
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Plan {
+  id        String   @id @default(cuid())
+  name      String   @unique // STARTER, WARRIOR, ELITE
+  price     Int
+  period    String
+  features  String   @db.Text // Comma separated
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Offer {
+  id          String    @id @default(cuid())
+  title       String
+  badge       String?
+  discount    Int?
+  promoImage  String?
+  description String?   @db.Text
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Settings {
+  id              Int      @id @default(1)
+  gymName         String   @default("NME GYM")
+  logoUrl         String?  @default("/newlogo.png")
+  address         String?  @default("Chumoukedima, Nagaland")
+  whatsappNumber  String?  @default("+91 98637 65861")
+  email           String?  @default("nmegym.india@gmail.com")
+  instagramUrl    String?  @default("https://www.instagram.com/nme_gym")
+  updatedAt       DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  rating    Int      @default(5)
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

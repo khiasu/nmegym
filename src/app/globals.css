@@ -1,0 +1,33 @@
+/* ================================================
+   NME GYM — Global Design System
+   Imported from the original style.css for pixel-perfect parity.
+   ================================================ */
+
+/* Import the original NME GYM stylesheet — preserves all 875 lines of
+   hand-crafted CSS including animations, responsive breakpoints, and
+   the complete design token system. This is the professional approach:
+   no visual regressions during migration. */
+@import url("../styles/nme-gym.css");
+
+/* ================================================
+   Next.js App Router Overrides
+   ================================================ */
+
+/* Reset Next.js defaults that conflict with our design system */
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ensure html and body fill the viewport */
+html, body {
+  min-height: 100%;
+}
+
+/* Fix for Next.js layout scroll behavior */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
