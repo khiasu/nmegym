@@ -1,8 +1,11 @@
 // middleware.js — Route protection using NextAuth v5
 // Runs on the Edge before every matched request
 
-import { auth } from "./src/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "./src/auth.config";
 import { NextResponse } from "next/server";
+
+const { auth } = NextAuth(authConfig);
 
 // Routes that require authentication
 const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
