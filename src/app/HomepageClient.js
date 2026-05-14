@@ -12,22 +12,35 @@ export default function HomepageClient({ children }) {
 
   // ScrollReveal observer — matches old main.js lines 70-77
   useEffect(() => {
-    const reveals = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            // Stop observing once visible to save performance
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
+    // Increase timeout to ensure all DOM elements and styles are fully loaded/applied
+    const timer = setTimeout(() => {
+      const reveals = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            entry.target.classList.toggle("visible", entry.isIntersecting);
+          });
+        },
+        { 
+          threshold: 0, 
+          rootMargin: "0px 0px -50px 0px" // Trigger slightly after it enters for better visual effect
+        }
+      );
 
-    reveals.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+      reveals.forEach((el) => observer.observe(el));
+    }, 500);
+
+    // Safety Fallback: Forcibly reveal all elements after 3 seconds in case observer fails on mobile
+    const fallbackTimer = setTimeout(() => {
+      document.querySelectorAll(".reveal:not(.visible)").forEach(el => {
+        el.classList.add("visible");
+      });
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   // Wire up booking buttons by ID — matches old main.js openModal()

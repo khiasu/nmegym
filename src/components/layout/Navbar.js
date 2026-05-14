@@ -7,11 +7,25 @@ import Link from "next/link";
 
 export default function Navbar({ onOpenBooking }) {
   const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", handleScroll);
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 60);
+      
+      if (currentScrollY > 150) {
+        // Scrolling down hides, scrolling up shows
+        setVisible(currentScrollY < lastScrollY);
+      } else {
+        setVisible(true);
+      }
+      lastScrollY = currentScrollY;
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -31,7 +45,7 @@ export default function Navbar({ onOpenBooking }) {
   return (
     <>
       {/* NAV — old index.html line 20-33 */}
-      <nav id="nav" className={scrolled ? "scrolled" : ""}>
+      <nav id="nav" className={`${scrolled ? "scrolled" : ""} ${!visible ? "nav-hidden" : ""}`}>
         <Link href="/" style={{ display: "flex", alignItems: "center" }}>
           <img src="/newlogo.png" alt="NME GYM" className="nav-logo-img" />
         </Link>
@@ -57,28 +71,44 @@ export default function Navbar({ onOpenBooking }) {
         </div>
       </nav>
 
-      {/* MOBILE MENU — old index.html line 42-55 */}
+      {/* MOBILE MENU — PREMIUM REDESIGN */}
       <div className={`mobile-menu ${mobileOpen ? "open" : ""}`} id="mobileMenu">
-        <a href="#about" onClick={closeMobile}>About</a>
-        <a href="#facilities" onClick={closeMobile}>Facilities</a>
-        <a href="#plans" onClick={closeMobile}>Plans</a>
-        <a href="#trainers" onClick={closeMobile}>Trainers</a>
-        <a href="#testimonials" onClick={closeMobile}>Reviews</a>
-        <a href="#contact" onClick={closeMobile}>Contact</a>
-        <Link
-          href="/auth/login"
-          onClick={closeMobile}
-          style={{ color: "rgba(255,255,255,0.5)", fontSize: "24px" }}
-        >
-          Member Login
-        </Link>
-        <a
-          href="#"
-          style={{ color: "var(--red)", fontSize: "26px" }}
-          onClick={(e) => { e.preventDefault(); closeMobile(); onOpenBooking?.(); }}
-        >
-          ▶ Book Free Trial
-        </a>
+        <div className="mm-bg-text">NME</div>
+        
+        <div className="mm-links">
+          {[
+            { name: "About", href: "#about" },
+            { name: "Facilities", href: "#facilities" },
+            { name: "Plans", href: "#plans" },
+            { name: "Trainers", href: "#trainers" },
+            { name: "Reviews", href: "#testimonials" },
+            { name: "Contact", href: "#contact" }
+          ].map((item, i) => (
+            <a href={item.href} key={i} onClick={closeMobile} className="mm-link">
+              <span className="mm-num">0{i + 1}</span>
+              <span className="mm-text">{item.name}</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="mm-footer">
+          <Link href="/auth/login" onClick={closeMobile} className="mm-member-link">
+            MEMBER LOGIN
+          </Link>
+          <a
+            href="#"
+            className="mm-cta"
+            onClick={(e) => { e.preventDefault(); closeMobile(); onOpenBooking?.(); }}
+          >
+            BOOK FREE TRIAL
+          </a>
+          
+          <div className="mm-socials">
+            <a href="https://instagram.com/nme_gym" target="_blank" rel="noopener noreferrer">INSTA</a>
+            <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WHATSAPP</a>
+          </div>
+        </div>
+
         <Link href="/" className="mobile-home-btn" onClick={closeMobile} title="Back to Home">
           <span className="back-arrow">←</span>
         </Link>

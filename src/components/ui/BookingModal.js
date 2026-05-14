@@ -72,8 +72,8 @@ export default function BookingModal({ isOpen, onClose }) {
               <label>Interested In</label>
               <select name="interest" required>
                 <option>Weight Training</option>
-                <option>Zumba / Dance</option>
-                <option>Yoga / Flexibility</option>
+                <option>Powerlifting</option>
+                <option>Functional Fitness</option>
                 <option>Cardio & Endurance</option>
                 <option>Personal Training</option>
                 <option>General Fitness</option>
@@ -102,7 +102,7 @@ export default function BookingModal({ isOpen, onClose }) {
             </button>
             
             <p style={{ textAlign: "center", fontSize: "12px", color: "var(--gray)", marginTop: "14px" }}>
-              Or WhatsApp: <a href="https://wa.me/919863765861" target="_blank" rel="noopener noreferrer" style={{ color: "var(--red)" }}>+91 98637 65861</a>
+              Or WhatsApp: <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer" style={{ color: "var(--red)" }}>+91 70053 10568</a>
             </p>
           </form>
         )}

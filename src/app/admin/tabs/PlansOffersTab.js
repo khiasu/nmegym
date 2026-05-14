@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function PlansOffersTab({ plans: initialPlans, offers: initialOffers }) {
+export default function PlansOffersTab({ plans: initialPlans, offers: initialOffers, requestConfirmation }) {
   const [plans, setPlans] = useState(initialPlans || []);
   const [offers, setOffers] = useState(initialOffers || []);
   const [newOffer, setNewOffer] = useState({ title: "", badge: "", discount: "", promoImage: "", description: "" });
@@ -38,8 +38,22 @@ export default function PlansOffersTab({ plans: initialPlans, offers: initialOff
     } catch (err) { alert("Error adding offer."); }
   }
 
-  async function deleteOffer(id) {
-    if (!confirm("Delete this offer?")) return;
+  function deleteOffer(id) {
+    if (!requestConfirmation) {
+      if (!confirm("Delete this offer?")) return;
+      return executeDelete(id);
+    }
+    requestConfirmation({
+      title: "DELETE PROMOTION",
+      message: "Are you sure you want to delete this promotional offer?",
+      isCritical: false,
+      onConfirm: async () => {
+        await executeDelete(id);
+      }
+    });
+  }
+
+  async function executeDelete(id) {
     try {
       const res = await fetch(`/api/admin/offers?id=${id}`, { method: "DELETE" });
       if (res.ok) setOffers(offers.filter(o => o.id !== id));
@@ -86,7 +100,7 @@ export default function PlansOffersTab({ plans: initialPlans, offers: initialOff
                       className="admin-input-sm" 
                       value={p.features} 
                       onChange={(e) => setPlans(plans.map(plan => plan.id === p.id ? { ...plan, features: e.target.value } : plan))} 
-                      style={{ width: "200px", padding: "4px", background: "#0d0d0d", color: "#fff", border: "1px solid var(--border)" }}
+                      style={{ width: "100%", minWidth: "100px", maxWidth: "200px", padding: "4px", background: "#0d0d0d", color: "#fff", border: "1px solid var(--border)" }}
                     />
                   </td>
                   <td><button className="admin-btn-sm" onClick={() => savePlan(p.id)}>Save</button></td>
@@ -130,7 +144,11 @@ export default function PlansOffersTab({ plans: initialPlans, offers: initialOff
                 <td><span className="status-badge status-active">{o.badge || '—'}</span></td>
                 <td>{o.discount ? `${o.discount}%` : '—'}</td>
                 <td>{o.isActive ? 'Active' : 'Hidden'}</td>
-                <td><button className="admin-toggle-btn" onClick={() => deleteOffer(o.id)}>🗑</button></td>
+                <td>
+                  <button className="admin-toggle-btn" onClick={() => deleteOffer(o.id)}>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

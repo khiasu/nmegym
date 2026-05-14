@@ -1,8 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import CheckoutModal from "@/components/ui/CheckoutModal";
 
 export default function Plans({ plans, onOpenBooking }) {
+  const { data: session } = useSession();
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
+
   const fallbackPlans = [
     { id: '1', name: 'Monthly', price: 800, period: 'month', badge: "STARTER" },
     { id: '2', name: '3 Months', price: 2000, period: '3 months', featured: true, badge: "POPULAR" },
@@ -55,9 +61,7 @@ export default function Plans({ plans, onOpenBooking }) {
                     <div className="pm-dur">{plan.name || plan.period}</div>
                     <div className="pm-price">₹{plan.price?.toLocaleString()}</div>
 
-                    <Link href="/auth/login">
-                      <button className="pm-btn">JOIN NOW</button>
-                    </Link>
+                    <button className="pm-btn" onClick={() => setCheckoutPlan(plan)}>JOIN NOW</button>
                   </div>
                 );
               })}
@@ -70,6 +74,13 @@ export default function Plans({ plans, onOpenBooking }) {
           </div>
         </div>
       </div>
+      
+      <CheckoutModal 
+        isOpen={!!checkoutPlan} 
+        onClose={() => setCheckoutPlan(null)} 
+        selectedPlan={checkoutPlan}
+        session={session}
+      />
     </section>
   );
 }

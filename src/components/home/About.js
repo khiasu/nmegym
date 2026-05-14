@@ -2,29 +2,37 @@
 // Matches nmegym-main/public/index.html lines 136-198 exactly
 "use client";
 
-export default function About() {
+export default function About({ settings }) {
+  const defaultText = "Welcome to NME Gym — a community-focused fitness space dedicated to helping people of all ages achieve healthier and stronger lifestyles. More than just a gym, NME Gym is a place where discipline, confidence, and motivation grow together. We are especially committed to inspiring youth to stay active and focused through fitness while also supporting senior citizens in maintaining strength, mobility, and overall wellbeing. With an affordable, friendly, and motivating environment, our mission is to make fitness accessible and sustainable for everyone.";
+  const aboutText = settings?.aboutText || defaultText;
+  
   return (
     <section className="about-strip" id="about">
       <div className="max-w">
         <div className="section-label reveal"><span>Who We Are</span></div>
         <h2 className="section-title reveal reveal-heading">NOT JUST A GYM.<br /><span className="gray">A MOVEMENT.</span></h2>
         <div className="about-content">
-          <div className="about-text reveal">
-            <p className="highlight">"We don't just build bodies here — we build discipline, character, and champions."</p>
-            <p>NME Gym was born from a single belief: everyone deserves access to elite-level training without the elite price tag. Located in the heart of Chumoukedima, Nagaland, we've built a space where beginners find their footing and athletes push their limits — side by side.</p>
-            <br />
-            <p>Our certified coaches, premium equipment, and charged atmosphere make every rep count. Whether you're chasing a physique, building strength, or just starting your fitness journey — NME is where it begins.</p>
+          <div className="about-text">
+            <p className="about-intro reveal">
+              {aboutText.split(" ").map((word, i) => (
+                <span key={i} style={{ transitionDelay: `${i * 30}ms`, display: 'inline-block', marginRight: '0.3em' }}>{word}</span>
+              ))}
+            </p>
+            <p className="about-mission reveal">
+              We are dedicated to inspiring youth through fitness and discipline while also supporting senior citizens in maintaining mobility and wellbeing. 
+              Our mission is to make fitness affordable, motivating, and accessible for everyone.
+            </p>
           </div>
           <div className="about-img-grid reveal">
             <div className="about-img about-img-tall">
-              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80" alt="NME Gym interior" />
+              <img src={settings?.aboutImage1Url || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80"} alt="NME Gym interior" />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <div className="about-img">
-                <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80" alt="Training" />
+                <img src={settings?.aboutImage2Url || "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80"} alt="Training" />
               </div>
               <div className="about-img">
-                <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80" alt="Equipment" />
+                <img src={settings?.aboutImage3Url || "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80"} alt="Equipment" />
               </div>
             </div>
           </div>

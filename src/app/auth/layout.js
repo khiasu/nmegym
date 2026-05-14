@@ -41,9 +41,10 @@ export default function AuthLayout({ children }) {
         }
 
         .auth-logo img {
-          height: 56px;
+          height: 110px;
           width: auto;
-          filter: brightness(0) invert(1);
+          filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+          margin-bottom: 10px;
         }
 
         .auth-verify-icon,

@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function TrainersTab({ initialTrainers }) {
+export default function TrainersTab({ initialTrainers, requestConfirmation, executeWithUndo }) {
   const [trainers, setTrainers] = useState(initialTrainers || []);
   const [newTrainer, setNewTrainer] = useState({ id: null, name: "", role: "", imageUrl: "", bio: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -43,11 +43,55 @@ export default function TrainersTab({ initialTrainers }) {
   }
 
   async function deleteTrainer(id) {
-    if (!confirm("Delete this trainer?")) return;
+    if (!requestConfirmation || !executeWithUndo) {
+      if (!confirm("Delete this trainer?")) return;
+      executeDelete(id);
+      return;
+    }
+
+    requestConfirmation({
+      title: "DELETE TRAINER",
+      message: "Are you sure you want to permanently remove this trainer? This action cannot be undone.",
+      isCritical: true, // Demands Admin PW
+      onConfirm: async (password) => {
+        
+        // Backup the trainer data before removing from UI
+        const trainerToRestore = trainers.find(t => t.id === id);
+        
+        executeWithUndo({
+          message: "Trainer removed. Deleting from database in 10s...",
+          revertUI: () => {
+             // Revert the UI by instantly putting the trainer back
+             setTrainers(prev => [...prev, trainerToRestore]);
+          },
+          executeFunction: async () => {
+             await executeDelete(id, password);
+          }
+        });
+        
+        // Optimistic UI Update (Hide immediately)
+        setTrainers(trainers.filter(t => t.id !== id));
+      }
+    });
+  }
+
+  async function executeDelete(id, password) {
     try {
-      const res = await fetch(`/api/admin/trainers?id=${id}`, { method: "DELETE" });
-      if (res.ok) setTrainers(trainers.filter(t => t.id !== id));
-    } catch (err) { alert("Error deleting trainer."); }
+      // In production, the backend /api/admin/trainers DELETE route should verify the password from the body
+      const res = await fetch(`/api/admin/trainers?id=${id}`, { 
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }) 
+      });
+      if (res.ok) {
+        setTrainers(trainers.filter(t => t.id !== id));
+      } else {
+        alert("Failed to delete trainer. Incorrect password or server error.");
+      }
+    } catch (err) { 
+      console.error(err);
+      alert("Error deleting trainer."); 
+    }
   }
 
   return (
@@ -69,9 +113,13 @@ export default function TrainersTab({ initialTrainers }) {
           <div className="admin-form-group">
             <label className="admin-label">Profile Image URL</label>
             <div style={{display:"flex", gap:"10px"}}>
-              <input className="admin-input" type="text" placeholder="https://..." value={newTrainer.imageUrl} onChange={e => setNewTrainer({...newTrainer, imageUrl: e.target.value})} />
-              <CldUploadWidget uploadPreset="nmegym_preset" onSuccess={(res) => setNewTrainer({ ...newTrainer, imageUrl: res.info.secure_url })}>
-                {({ open }) => (<button className="admin-btn-sm outline" onClick={() => open()}>Upload</button>)}
+              <input name="imageUrl" className="admin-input" type="text" value={newTrainer.imageUrl || ''} onChange={(e) => setNewTrainer({...newTrainer, imageUrl: e.target.value})} placeholder="https://..." readOnly />
+              <CldUploadWidget 
+                uploadPreset="nmegym_preset" 
+                options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 0.75 }}
+                onSuccess={(res) => setNewTrainer({ ...newTrainer, imageUrl: res.info.secure_url })}
+              >
+                {({ open }) => (<button type="button" onClick={() => open()} className="admin-btn-sm outline">Upload</button>)}
               </CldUploadWidget>
             </div>
           </div>
@@ -89,11 +137,15 @@ export default function TrainersTab({ initialTrainers }) {
                 <td><img src={t.imageUrl || "/newlogo.png"} style={{width: "40px", height: "40px", objectFit: "cover", borderRadius: "2px", filter: "grayscale(100%)"}} alt={t.name} /></td>
                 <td>{t.name}</td>
                 <td><span className="status-badge status-active">{t.role}</span></td>
-                <td style={{maxWidth: "200px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{t.bio || '—'}</td>
+                <td className="admin-truncate-text">{t.bio || '—'}</td>
                 <td>
                   <div style={{display: "flex", gap: "8px"}}>
-                    <button className="admin-toggle-btn" onClick={() => handleEdit(t)} title="Edit">✏️</button>
-                    <button className="admin-toggle-btn" onClick={() => deleteTrainer(t.id)} title="Delete">🗑</button>
+                    <button className="admin-toggle-btn" onClick={() => handleEdit(t)} title="Edit">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                    </button>
+                    <button className="admin-toggle-btn" onClick={() => deleteTrainer(t.id)} title="Delete">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
                   </div>
                 </td>
               </tr>

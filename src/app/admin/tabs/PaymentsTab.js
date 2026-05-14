@@ -3,12 +3,35 @@
 
 import { useState } from "react";
 
-export default function PaymentsTab({ pendingPayments: initialPending, verifiedPayments }) {
+export default function PaymentsTab({ pendingPayments: initialPending, verifiedPayments, requestConfirmation, executeWithUndo }) {
   const [pendingPayments, setPendingPayments] = useState(initialPending || []);
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState(null); // Track which payment is processing
+  const [previewImg, setPreviewImg] = useState(null); // Screenshot preview modal
 
   async function handleVerify(paymentId, status) {
-    setProcessing(true);
+    if (!requestConfirmation || !executeWithUndo) {
+      await executeVerify(paymentId, status);
+      return;
+    }
+    
+    requestConfirmation({
+      title: status === "VERIFIED" ? "VERIFY PAYMENT" : "REJECT PAYMENT",
+      message: status === "VERIFIED" 
+        ? "Confirm this payment? The member's plan will be activated and they'll receive a confirmation email."
+        : "Reject this payment? The member will need to re-submit.",
+      isCritical: status === "REJECTED",
+      onConfirm: async () => {
+        executeWithUndo({
+          message: status === "VERIFIED" ? "Payment verified." : "Payment rejected.",
+          revertUI: () => setPendingPayments(prev => prev.filter(p => p.id !== paymentId)),
+          executeFunction: async () => await executeVerify(paymentId, status)
+        });
+      }
+    });
+  }
+
+  async function executeVerify(paymentId, status) {
+    setProcessing(paymentId);
     try {
       const res = await fetch("/api/admin/verify-payment", {
         method: "POST",
@@ -17,25 +40,31 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
       });
 
       if (res.ok) {
-        setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
-        alert(`Payment verified!`);
+        const data = await res.json();
+        // Since revertUI already removed it, we just show alerts if needed
+        // but alerts might be disruptive 10s later. 
+        // We'll rely on the silent update if it succeeds, but can log it.
+        console.log(`Payment ${status}: ${data.memberId || ''}`);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || "Verification failed.");
       }
     } catch (err) {
-      alert("Action failed.");
+      alert("Action failed. Check console for details.");
+      console.error(err);
     } finally {
-      setProcessing(false);
+      setProcessing(null);
     }
   }
 
   const totalRevenue = verifiedPayments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
   const formattedRevenue = totalRevenue > 100000 ? `₹${(totalRevenue / 100000).toFixed(1)}L` : `₹${totalRevenue.toLocaleString()}`;
-
   const currentMonthName = new Date().toLocaleString('default', { month: 'short' });
 
   return (
     <div className="admin-tab-content active" id="tab-payments">
       <div className="admin-page-title">PAYMENTS</div>
-      <div className="admin-page-sub">Verify and track all membership payments</div>
+      <div className="admin-page-sub">Verify renewal payments from existing members</div>
       
       <div className="admin-stat-grid">
         <div className="admin-stat-card"><div className="admin-stat-val">{formattedRevenue}</div><div className="admin-stat-label">{currentMonthName} Revenue</div></div>
@@ -44,52 +73,103 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         <div className="admin-stat-card"><div className="admin-stat-val">0</div><div className="admin-stat-label">Overdue</div></div>
       </div>
 
+      {/* PENDING PAYMENTS */}
       <div className="admin-section-card">
-        <div className="admin-section-card-header"><span className="admin-section-card-title">Pending Verification</span></div>
+        <div className="admin-section-card-header">
+          <span className="admin-section-card-title">Pending Verification ({pendingPayments.length})</span>
+        </div>
         <div style={{overflowX: "auto"}}>
           <table className="admin-table">
             <thead>
-              <tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Action</th></tr>
+              <tr>
+                <th>Member</th>
+                <th>Contact</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Screenshot</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody>
               {pendingPayments.map(pay => {
-                const planName = pay.user?.memberships?.[0]?.planTier || "Monthly";
+                const isProcessingThis = processing === pay.id;
                 return (
                   <tr key={pay.id}>
-                    <td>{pay.user.firstName} {pay.user.lastName}</td>
-                    <td>₹{pay.amount}</td>
-                    <td>{planName}</td>
-                    <td>{pay.paymentMethod}</td>
+                    <td><strong>{pay.user?.firstName} {pay.user?.lastName}</strong></td>
+                    <td>
+                      <span style={{fontSize: "11px"}}>{pay.user?.email}</span><br />
+                      <span style={{ opacity: 0.5, fontSize: "11px" }}>{pay.user?.phone}</span>
+                    </td>
+                    <td>{pay.planName || "—"}</td>
+                    <td style={{fontWeight: "bold", color: "var(--red)"}}>₹{pay.amount}</td>
+                    <td>
+                      {pay.isFirstTimer ? (
+                        <span className="status-badge" style={{background: "rgba(0,200,255,0.1)", color: "#00c8ff", border: "1px solid #00c8ff", fontSize: "10px", padding: "3px 8px"}}>NEW</span>
+                      ) : (
+                        <span className="status-badge" style={{background: "rgba(255,255,255,0.05)", color: "#888", fontSize: "10px", padding: "3px 8px"}}>RENEWAL</span>
+                      )}
+                    </td>
+                    <td>
+                      {pay.screenshotUrl ? (
+                        <img 
+                          src={pay.screenshotUrl} 
+                          alt="Payment Screenshot" 
+                          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", border: "1px solid #333" }}
+                          onClick={() => setPreviewImg(pay.screenshotUrl)}
+                        />
+                      ) : (
+                        <span style={{color: "#666", fontSize: "11px"}}>No image</span>
+                      )}
+                    </td>
                     <td>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
                     <td>
-                      <button className="admin-btn-sm" onClick={() => handleVerify(pay.id, "VERIFIED")} disabled={processing}>Verify</button>
+                      <div style={{display: "flex", gap: "6px"}}>
+                        <button 
+                          className="admin-btn-sm" 
+                          onClick={() => handleVerify(pay.id, "VERIFIED")} 
+                          disabled={isProcessingThis}
+                          style={{background: "rgba(0,255,100,0.1)", color: "#00ff64", border: "1px solid #00ff64"}}
+                        >
+                          {isProcessingThis ? "..." : "✓ Verify"}
+                        </button>
+                        <button 
+                          className="admin-btn-sm" 
+                          onClick={() => handleVerify(pay.id, "REJECTED")} 
+                          disabled={isProcessingThis}
+                          style={{background: "rgba(255,0,0,0.1)", color: "#ff4444", border: "1px solid #ff4444"}}
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
               })}
               {pendingPayments.length === 0 && (
-                <tr><td colSpan="6" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No pending verifications.</td></tr>
+                <tr><td colSpan="8" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending verifications. All caught up! 🎉</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
+      {/* VERIFIED PAYMENTS */}
       <div className="admin-section-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Verified Payments</span></div>
         <div style={{overflowX: "auto"}}>
           <table className="admin-table">
             <thead>
-              <tr><th>Member</th><th>Amount</th><th>Plan</th><th>Method</th><th>Date</th><th>Status</th></tr>
+              <tr><th>Member</th><th>Plan</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr>
             </thead>
             <tbody>
               {verifiedPayments?.map(pay => {
-                const planName = pay.user?.memberships?.[0]?.planTier || "Monthly";
                 return (
                   <tr key={pay.id}>
-                    <td>{pay.user.firstName} {pay.user.lastName}</td>
+                    <td>{pay.user?.firstName} {pay.user?.lastName}</td>
+                    <td>{pay.planName || pay.user?.memberships?.[0]?.planTier || "Monthly"}</td>
                     <td>₹{pay.amount}</td>
-                    <td>{planName}</td>
                     <td>{pay.paymentMethod}</td>
                     <td>{new Date(pay.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
                     <td><span className="status-badge status-active">Verified</span></td>
@@ -103,6 +183,43 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
           </table>
         </div>
       </div>
+
+      {/* SCREENSHOT PREVIEW MODAL */}
+      {previewImg && (
+        <div 
+          className="modal-overlay open" 
+          onClick={() => setPreviewImg(null)}
+          style={{zIndex: 9999}}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: "600px", 
+              maxHeight: "80vh", 
+              background: "#111", 
+              borderRadius: "12px", 
+              padding: "15px",
+              position: "relative"
+            }}
+          >
+            <button 
+              onClick={() => setPreviewImg(null)} 
+              style={{ 
+                position: "absolute", top: "10px", right: "15px", 
+                background: "none", border: "none", color: "white", 
+                fontSize: "24px", cursor: "pointer", zIndex: 10 
+              }}
+            >
+              ×
+            </button>
+            <img 
+              src={previewImg} 
+              alt="Payment Screenshot" 
+              style={{ width: "100%", maxHeight: "75vh", objectFit: "contain", borderRadius: "8px" }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

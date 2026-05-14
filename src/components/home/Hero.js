@@ -2,11 +2,15 @@
 // Matches nmegym-main/public/index.html lines 57-92 exactly
 "use client";
 
-export default function Hero({ offer }) {
+export default function Hero({ offer, settings }) {
+  const bgStyle = settings?.heroBackgroundUrl 
+    ? { backgroundImage: `url('${settings.heroBackgroundUrl}')` } 
+    : {};
+
   return (
     <section className="hero">
       <div className="hero-bg"></div>
-      <div className="hero-bg-img"></div>
+      <div className="hero-bg-img" style={bgStyle}></div>
       <div className="hero-vignette"></div>
       <div className="hero-grid"></div>
       <div className="hero-number">NME</div>
@@ -15,10 +19,10 @@ export default function Hero({ offer }) {
           <span></span>
           <p>Now Open — Chumoukedima, Nagaland</p>
         </div>
-        <h1 className="hero-title">
-          FORGE<br />
-          <span className="stroke">YOUR</span><br />
-          <span className="red">LEGACY</span>
+        <h1 className="hero-title reveal reveal-heading">
+          FITNESS<br />
+          <span className="stroke">BEYOND</span><br />
+          <span className="red">LIMITS</span>
         </h1>
 
         {/* Promo badge container — old index.html line 68 */}

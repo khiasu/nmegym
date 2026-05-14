@@ -9,6 +9,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const isAdmin = callbackUrl.includes("/admin");
   const error = searchParams.get("error");
 
   const [loading, setLoading] = useState(false);
@@ -50,8 +51,10 @@ function LoginForm() {
         <img src="/newlogo.png" alt="NME GYM" />
       </div>
 
-      <h1 className="auth-title">Member Sign In</h1>
-      <p className="auth-subtitle">Enter your credentials to access your dashboard.</p>
+      <h1 className="auth-title">{isAdmin ? "Admin Access" : "Member Sign In"}</h1>
+      <p className="auth-subtitle">
+        {isAdmin ? "NME GYM Restricted Access Portal" : "Enter your credentials to access your dashboard."}
+      </p>
 
       {(formError || error) && (
         <div className="auth-error">
@@ -61,12 +64,12 @@ function LoginForm() {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-field">
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">{isAdmin ? "Admin Email / ID" : "Email Address"}</label>
           <input
             id="email"
             name="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={isAdmin ? "admin@nmegym.in" : "you@example.com"}
             required
           />
         </div>
@@ -89,16 +92,18 @@ function LoginForm() {
         </div>
 
         <button type="submit" className="auth-btn" disabled={loading}>
-          {loading ? "Signing in..." : "Sign In →"}
+          {loading ? "Verifying..." : isAdmin ? "Access Portal →" : "Sign In →"}
         </button>
       </form>
 
-      <p className="auth-note">
-        Don't have an account?{" "}
-        <Link href="/auth/register" style={{ color: "var(--red)", fontWeight: 600 }}>
-          Register Now
-        </Link>
-      </p>
+      {!isAdmin && (
+        <p className="auth-note">
+          Don't have an account?{" "}
+          <Link href="/auth/register" style={{ color: "var(--red)", fontWeight: 600 }}>
+            Register Now
+          </Link>
+        </p>
+      )}
       
       <p className="auth-note" style={{ marginTop: 10 }}>
         <Link href="/" className="gray">← Back to Home</Link>

@@ -3,14 +3,81 @@
 
 import { useState } from "react";
 
-export default function MembersTab({ members }) {
+export default function MembersTab({ members: initialMembers, requestConfirmation }) {
+  const [members, setMembers] = useState(initialMembers || []);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    planTier: "STARTER",
+    startDate: new Date().toISOString().split('T')[0]
+  });
 
-  const filteredMembers = members?.filter(m => 
+  const filteredMembers = members.filter(m => 
     `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     m.phone?.includes(search) || 
     m.email?.toLowerCase().includes(search.toLowerCase())
-  ) || [];
+  );
+
+  async function saveMember() {
+    if (!formData.firstName || !formData.email) return alert("First Name and Email are required");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        const newMember = await res.json();
+        setMembers([newMember, ...members]);
+        setFormData({ firstName: "", lastName: "", phone: "", email: "", planTier: "STARTER", startDate: new Date().toISOString().split('T')[0] });
+        alert("Member added successfully!");
+      }
+    } catch (err) {
+      alert("Failed to save member");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function deleteMember(id) {
+    if (!requestConfirmation) {
+      if (!confirm("Are you sure you want to remove this member?")) return;
+      return executeDelete(id);
+    }
+    
+    requestConfirmation({
+      title: "DELETE MEMBER",
+      message: "Are you sure you want to permanently remove this member and their access? This cannot be undone.",
+      isCritical: true,
+      onConfirm: async (password) => {
+        await executeDelete(id, password);
+      }
+    });
+  }
+
+  async function executeDelete(id, password) {
+    try {
+      const res = await fetch(`/api/admin/members?id=${id}`, { 
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }) 
+      });
+      if (res.ok) {
+        setMembers(members.filter(m => m.id !== id));
+      } else {
+        alert("Failed to delete. Incorrect password or server error.");
+      }
+    } catch (err) {
+      alert("Failed to delete");
+    }
+  }
 
   return (
     <div className="admin-tab-content active" id="tab-members">
@@ -20,19 +87,45 @@ export default function MembersTab({ members }) {
       <div className="admin-section-card">
         <div className="admin-section-card-header">
           <span className="admin-section-card-title">Add New Member</span>
-          <button className="admin-btn-sm" onClick={() => alert("Add member logic not implemented yet")}>Save Member</button>
+          <button className="admin-btn-sm" onClick={saveMember} disabled={loading}>
+            {loading ? "Saving..." : "Save Member"}
+          </button>
         </div>
         <div className="admin-form-grid">
-          <div className="admin-form-group"><label className="admin-label">Full Name</label><input className="admin-input" type="text" placeholder="Full name" /></div>
-          <div className="admin-form-group"><label className="admin-label">Phone</label><input className="admin-input" type="tel" placeholder="+91 XXXXX XXXXX" /></div>
-          <div className="admin-form-group"><label className="admin-label">Plan</label><select className="admin-input"><option>Monthly</option><option>3 Months</option><option>6 Months</option><option>1 Year</option></select></div>
-          <div className="admin-form-group"><label className="admin-label">Join Date</label><input className="admin-input" type="date" /></div>
+          <div className="admin-form-group">
+            <label className="admin-label">First Name</label>
+            <input className="admin-input" type="text" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Last Name</label>
+            <input className="admin-input" type="text" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Email</label>
+            <input className="admin-input" type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Phone</label>
+            <input className="admin-input" type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Plan Tier</label>
+            <select className="admin-input" value={formData.planTier} onChange={e => setFormData({...formData, planTier: e.target.value})}>
+              <option value="STARTER">Starter</option>
+              <option value="WARRIOR">Warrior</option>
+              <option value="ELITE">Elite</option>
+            </select>
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Start Date</label>
+            <input className="admin-input" type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
+          </div>
         </div>
       </div>
 
       <div className="admin-section-card">
         <div className="admin-section-card-header">
-          <span className="admin-section-card-title">All Members</span>
+          <span className="admin-section-card-title">All Members ({filteredMembers.length})</span>
           <input 
             className="admin-input" 
             style={{width: "180px", padding: "6px 10px", fontSize: "12px"}} 
@@ -44,19 +137,20 @@ export default function MembersTab({ members }) {
         <div style={{overflowX: "auto"}}>
           <table className="admin-table" id="membersTable">
             <thead>
-              <tr><th>Name</th><th>Phone</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Action</th></tr>
+              <tr><th>ID</th><th>Name</th><th>Contact</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
               {filteredMembers.map(m => {
                 const membership = m.memberships?.[0];
-                const plan = membership?.planTier || "Monthly";
+                const plan = membership?.planTier || "N/A";
                 const isActive = membership?.status === "ACTIVE";
-                const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-                const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : "—";
+                const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : "—";
                 return (
                   <tr key={m.id}>
-                    <td>{m.firstName} {m.lastName}</td>
-                    <td>{m.phone}</td>
+                    <td><span style={{fontFamily: 'monospace', color: 'var(--red)', fontSize: '11px'}}>{m.memberId || '—'}</span></td>
+                    <td><strong>{m.firstName} {m.lastName}</strong></td>
+                    <td><span style={{fontSize: "11px"}}>{m.email}</span><br /><span style={{ opacity: 0.5, fontSize: "11px" }}>{m.phone}</span></td>
                     <td>{plan}</td>
                     <td>{joinDate}</td>
                     <td>{expiresDate}</td>
@@ -66,14 +160,13 @@ export default function MembersTab({ members }) {
                       </span>
                     </td>
                     <td>
-                      <button className="admin-toggle-btn" onClick={() => alert("Delete not implemented yet")}>🗑</button>
+                      <button className="admin-toggle-btn" onClick={() => deleteMember(m.id)}>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
                     </td>
                   </tr>
                 );
               })}
-              {filteredMembers.length === 0 && (
-                <tr><td colSpan="7" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No members found matching "{search}"</td></tr>
-              )}
             </tbody>
           </table>
         </div>

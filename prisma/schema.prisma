@@ -50,6 +50,7 @@ model VerificationToken {
 
 model User {
   id            String       @id @default(cuid())
+  memberId      String?      @unique  // Human-readable member ID (e.g. NME-001)
   firstName     String?
   lastName      String?
   phone         String?      @unique
@@ -83,6 +84,8 @@ model Membership {
   status     String     @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
   startDate  DateTime?
   endDate    DateTime?
+  reminder5DaySent Boolean @default(false)
+  reminder1DaySent Boolean @default(false)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -92,6 +95,9 @@ model Payment {
   userId         String
   user           User     @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
   amount         Decimal  @db.Decimal(10, 2)
+  planName       String?  // Name of plan purchased (Monthly, 3 Months, etc.)
+  admissionFee   Decimal? @db.Decimal(10, 2) // Admission fee for first-timers
+  isFirstTimer   Boolean  @default(false) // Whether this is a first-time admission payment
   paymentMethod  String   // UPI, CARD, CASH
   screenshotUrl  String?
   status         String   @default("PENDING_VERIFICATION") // PENDING_VERIFICATION, VERIFIED, REJECTED
@@ -180,6 +186,14 @@ model Settings {
   whatsappNumber  String?  @default("+91 98637 65861")
   email           String?  @default("nmegym.india@gmail.com")
   instagramUrl    String?  @default("https://www.instagram.com/nme_gym")
+  upiId           String?  @default("nme@upi")
+  upiQrUrl        String?
+  aboutText       String?  @db.Text
+  openingHours    String?  @default("MON-SAT: 5:30 AM - 10:00 PM | SUN: 7:00 AM - 1:00 PM")
+  heroBackgroundUrl String?
+  aboutImage1Url    String?
+  aboutImage2Url    String?
+  aboutImage3Url    String?
   updatedAt       DateTime @updatedAt
 }
 

@@ -35,9 +35,9 @@ export default auth((req) => {
   return NextResponse.next();
 });
 
-// Match everything except static files, api/auth, and Next.js internals
+// Match everything except static files, API routes, and Next.js internals
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|public|api/auth).*)",
+    "/((?!_next/static|_next/image|favicon.ico|public|api/).*)",
   ],
 };

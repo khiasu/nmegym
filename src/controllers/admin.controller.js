@@ -1,0 +1,401 @@
+const prisma = require('../lib/prisma');
+
+// GET /api/admin/dashboard - Dashboard stats
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const totalMembers = await prisma.user.count({ where: { role: 'MEMBER' } });
+    const activeMemberships = await prisma.membership.count({ where: { status: 'ACTIVE' } });
+    const pendingBookings = await prisma.booking.count({ where: { status: 'PENDING' } });
+    const pendingPayments = await prisma.payment.count({ where: { status: 'PENDING_VERIFICATION' } });
+
+    // Revenue this month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const payments = await prisma.payment.findMany({
+      where: { status: 'VERIFIED', createdAt: { gte: startOfMonth } }
+    });
+    const monthlyRevenue = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+
+    // Recent members
+    const recentMembers = await prisma.user.findMany({
+      where: { role: 'MEMBER' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: { memberships: { orderBy: { createdAt: 'desc' }, take: 1 } }
+    });
+
+    res.json({
+      totalMembers,
+      activeMemberships,
+      pendingBookings,
+      pendingPayments,
+      monthlyRevenue,
+      recentMembers: recentMembers.map(m => ({
+        id: m.id,
+        name: `${m.firstName} ${m.lastName}`,
+        plan: m.memberships[0]?.planTier || '—',
+        joined: m.createdAt,
+        expires: m.memberships[0]?.endDate || null,
+        status: m.memberships[0]?.status || 'NONE'
+      }))
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: 'Failed to load dashboard stats' });
+  }
+};
+
+// GET /api/admin/members - All members
+exports.getMembers = async (req, res) => {
+  try {
+    const search = req.query.search || '';
+    const members = await prisma.user.findMany({
+      where: {
+        role: 'MEMBER',
+        ...(search ? {
+          OR: [
+            { firstName: { contains: search } },
+            { lastName: { contains: search } },
+            { phone: { contains: search } }
+          ]
+        } : {})
+      },
+      include: { memberships: { orderBy: { createdAt: 'desc' }, take: 1 } },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(members.map(m => ({
+      id: m.id,
+      name: `${m.firstName} ${m.lastName}`,
+      phone: m.phone,
+      plan: m.memberships[0]?.planTier || '—',
+      joined: m.createdAt,
+      expires: m.memberships[0]?.endDate || null,
+      status: m.memberships[0]?.status || 'NONE'
+    })));
+  } catch (error) {
+    console.error('Get members error:', error);
+    res.status(500).json({ error: 'Failed to load members' });
+  }
+};
+
+// POST /api/admin/members - Add member (admin adds directly)
+const bcrypt = require('bcryptjs');
+exports.addMember = async (req, res) => {
+  try {
+    const { name, phone, plan, joinDate } = req.body;
+    if (!name || !phone) return res.status(400).json({ error: 'Name and phone are required' });
+
+    const parts = name.trim().split(' ');
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(' ') || '';
+
+    // Check if member exists
+    const existing = await prisma.user.findFirst({ where: { phone } });
+    if (existing) return res.status(400).json({ error: 'Member with this phone already exists' });
+
+    // Create user with a default password
+    const passwordHash = await bcrypt.hash('nme2025', 10);
+    const user = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        phone,
+        email: `${phone.replace(/[^0-9]/g, '')}@nmegym.local`,
+        passwordHash,
+        role: 'MEMBER'
+      }
+    });
+
+    // Create membership
+    const start = joinDate ? new Date(joinDate) : new Date();
+    let months = 1;
+    if (plan === '3 Months') months = 3;
+    if (plan === '6 Months') months = 6;
+    if (plan === '1 Year') months = 12;
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + months);
+
+    await prisma.membership.create({
+      data: {
+        userId: user.id,
+        planTier: plan || 'Monthly',
+        status: 'ACTIVE',
+        startDate: start,
+        endDate: end
+      }
+    });
+
+    res.status(201).json({ message: 'Member added', userId: user.id });
+  } catch (error) {
+    console.error('Add member error:', error);
+    res.status(500).json({ error: 'Failed to add member' });
+  }
+};
+
+// DELETE /api/admin/members/:id
+exports.deleteMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.membership.deleteMany({ where: { userId: id } });
+    await prisma.payment.deleteMany({ where: { userId: id } });
+    await prisma.booking.deleteMany({ where: { userId: id } });
+    await prisma.user.delete({ where: { id } });
+    res.json({ message: 'Member deleted' });
+  } catch (error) {
+    console.error('Delete member error:', error);
+    res.status(500).json({ error: 'Failed to delete member' });
+  }
+};
+
+// GET /api/admin/payments
+exports.getPayments = async (req, res) => {
+  try {
+    const payments = await prisma.payment.findMany({
+      include: { user: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(payments.map(p => ({
+      id: p.id,
+      member: `${p.user.firstName} ${p.user.lastName}`,
+      amount: Number(p.amount),
+      plan: p.paymentMethod,
+      method: p.paymentMethod,
+      date: p.createdAt,
+      status: p.status
+    })));
+  } catch (error) {
+    console.error('Get payments error:', error);
+    res.status(500).json({ error: 'Failed to load payments' });
+  }
+};
+
+// PUT /api/admin/payments/:id/verify
+exports.verifyPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.payment.update({
+      where: { id },
+      data: { status: 'VERIFIED', verifiedById: req.user.userId }
+    });
+    res.json({ message: 'Payment verified' });
+  } catch (error) {
+    console.error('Verify payment error:', error);
+    res.status(500).json({ error: 'Failed to verify payment' });
+  }
+};
+
+// GET /api/admin/bookings
+exports.getBookings = async (req, res) => {
+  try {
+    const bookings = await prisma.booking.findMany({
+      include: { user: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(bookings.map(b => ({
+      id: b.id,
+      name: b.name || (b.user ? `${b.user.firstName} ${b.user.lastName}` : 'Unknown'),
+      phone: b.phone || b.user?.phone || '',
+      date: b.preferredDate,
+      time: b.preferredTimeSlot,
+      interest: b.interest,
+      status: b.status
+    })));
+  } catch (error) {
+    console.error('Get bookings error:', error);
+    res.status(500).json({ error: 'Failed to load bookings' });
+  }
+};
+
+// PUT /api/admin/bookings/:id/confirm
+exports.confirmBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.booking.update({
+      where: { id },
+      data: { status: 'CONFIRMED' }
+    });
+    res.json({ message: 'Booking confirmed' });
+  } catch (error) {
+    console.error('Confirm booking error:', error);
+    res.status(500).json({ error: 'Failed to confirm booking' });
+  }
+};
+
+// GET /api/admin/posts
+exports.getPosts = async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({ orderBy: { publishedAt: 'desc' } });
+    res.json(posts);
+  } catch (error) {
+    console.error('Get posts error:', error);
+    res.status(500).json({ error: 'Failed to load posts' });
+  }
+};
+
+// POST /api/admin/posts
+exports.createPost = async (req, res) => {
+  try {
+    const { title, category, content } = req.body;
+    if (!title) return res.status(400).json({ error: 'Title is required' });
+
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const post = await prisma.post.create({
+      data: { title, slug: `${slug}-${Date.now()}`, category: category || 'General', content: content || '' }
+    });
+    res.status(201).json(post);
+  } catch (error) {
+    console.error('Create post error:', error);
+    res.status(500).json({ error: 'Failed to create post' });
+  }
+};
+
+// DELETE /api/admin/posts/:id
+exports.deletePost = async (req, res) => {
+  try {
+    await prisma.post.delete({ where: { id: req.params.id } });
+    res.json({ message: 'Post deleted' });
+  } catch (error) {
+    console.error('Delete post error:', error);
+    res.status(500).json({ error: 'Failed to delete post' });
+  }
+};
+
+// --- TRAINERS ---
+exports.getTrainers = async (req, res) => {
+  try {
+    const trainers = await prisma.trainer.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(trainers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load trainers' });
+  }
+};
+
+exports.addTrainer = async (req, res) => {
+  try {
+    const { name, role, bio, imageUrl } = req.body;
+    const trainer = await prisma.trainer.create({ data: { name, role, bio, imageUrl } });
+    res.status(201).json(trainer);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add trainer' });
+  }
+};
+
+exports.deleteTrainer = async (req, res) => {
+  try {
+    await prisma.trainer.delete({ where: { id: req.params.id } });
+    res.json({ message: 'Trainer deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete trainer' });
+  }
+};
+
+// --- FACILITIES ---
+exports.getFacilities = async (req, res) => {
+  try {
+    const facilities = await prisma.facility.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(facilities);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load facilities' });
+  }
+};
+
+exports.addFacility = async (req, res) => {
+  try {
+    const { name, description, mediaUrl, mediaType } = req.body;
+    const facility = await prisma.facility.create({ data: { name, description, mediaUrl, mediaType } });
+    res.status(201).json(facility);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add facility' });
+  }
+};
+
+exports.deleteFacility = async (req, res) => {
+  try {
+    await prisma.facility.delete({ where: { id: req.params.id } });
+    res.json({ message: 'Facility deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete facility' });
+  }
+};
+
+// --- PLANS ---
+exports.getPlans = async (req, res) => {
+  try {
+    const plans = await prisma.plan.findMany();
+    res.json(plans);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load plans' });
+  }
+};
+
+exports.updatePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price, period, features } = req.body;
+    const plan = await prisma.plan.update({
+      where: { id },
+      data: { price: parseInt(price), period, features }
+    });
+    res.json(plan);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update plan' });
+  }
+};
+
+// --- OFFERS ---
+exports.getOffers = async (req, res) => {
+  try {
+    const offers = await prisma.offer.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(offers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load offers' });
+  }
+};
+
+exports.addOffer = async (req, res) => {
+  try {
+    const { title, badge, discount, promoImage, description, isActive } = req.body;
+    const offer = await prisma.offer.create({
+      data: { title, badge, discount: discount ? parseInt(discount) : null, promoImage, description, isActive: isActive ?? true }
+    });
+    res.status(201).json(offer);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add offer' });
+  }
+};
+
+exports.deleteOffer = async (req, res) => {
+  try {
+    await prisma.offer.delete({ where: { id: req.params.id } });
+    res.json({ message: 'Offer deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete offer' });
+  }
+};
+
+// GET /api/admin/settings
+exports.getSettings = async (req, res) => {
+  try {
+    const settings = await prisma.settings.findUnique({ where: { id: 1 } });
+    res.json(settings || { gymName: 'NME GYM', logoUrl: '/newlogo.png' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load settings' });
+  }
+};
+
+// PUT /api/admin/settings
+exports.updateSettings = async (req, res) => {
+  try {
+    const { gymName, logoUrl, address, whatsappNumber, email, instagramUrl } = req.body;
+    const settings = await prisma.settings.upsert({
+      where: { id: 1 },
+      update: { gymName, logoUrl, address, whatsappNumber, email, instagramUrl },
+      create: { id: 1, gymName, logoUrl, address, whatsappNumber, email, instagramUrl }
+    });
+    res.json(settings);
+  } catch (error) {
+    console.error('Update settings error:', error);
+    res.status(500).json({ error: 'Failed to save settings' });
+  }
+};

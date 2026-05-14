@@ -57,15 +57,19 @@ export default function TestimonialModal({ isOpen, onClose }) {
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>YOUR EXPERIENCE</label>
+                <label>YOUR EXPERIENCE (Max 150 characters)</label>
                 <textarea
                   required
                   rows="4"
-                  placeholder="Tell us how NME Gym changed your life..."
+                  maxLength="150"
+                  placeholder="Tell us how NME Gym changed your life... (Keep it short & punchy)"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   style={{ width: '100%', background: 'var(--black)', border: '1px solid var(--border)', color: 'white', padding: '12px' }}
                 />
+                <div style={{ textAlign: "right", fontSize: "10px", color: "var(--gray)", marginTop: "4px" }}>
+                  {content.length}/150
+                </div>
               </div>
               <div className="form-group">
                 <label>RATING</label>

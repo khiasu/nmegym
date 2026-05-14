@@ -4,22 +4,29 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import AdminClient from "./AdminClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const session = await auth();
 
-  // Protect route: Only ADMIN can access
-  if (!session || session.user.role !== "ADMIN") {
+  // Protect route: Redirect to login if not authenticated
+  if (!session) {
+    return redirect("/auth/login?callbackUrl=/admin");
+  }
+
+  // Redirect to home if not an ADMIN
+  if (session.user.role !== "ADMIN") {
     redirect("/");
   }
 
   // Fetch all management data in parallel
   const [
-    pendingPayments, settings, trainers, plans, offers,
+    allPendingPayments, settings, trainers, plans, offers,
     members, verifiedPayments, facilities, bookings
   ] = await Promise.all([
     prisma.payment.findMany({
       where: { status: "PENDING_VERIFICATION" },
-      include: { user: { select: { firstName: true, lastName: true, email: true, phone: true, memberships: true } } },
+      include: { user: { select: { firstName: true, lastName: true, email: true, phone: true, memberId: true, memberships: true } } },
       orderBy: { createdAt: "desc" },
     }),
     prisma.settings.findFirst(),
@@ -33,23 +40,35 @@ export default async function AdminPage() {
     }),
     prisma.payment.findMany({
       where: { status: "VERIFIED" },
-      include: { user: { select: { firstName: true, lastName: true, memberships: true } } },
+      include: { user: { select: { firstName: true, lastName: true, memberId: true, memberships: true } } },
       orderBy: { updatedAt: "desc" },
     }),
     prisma.facility.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.booking.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
+  // Split pending payments: new registrations vs existing member renewals
+  const newRegistrations = allPendingPayments.filter(p => p.isFirstTimer);
+  const pendingRenewals = allPendingPayments.filter(p => !p.isFirstTimer);
+
+  // Serialize Decimal fields for Client Components
+  const serialize = (payments) => payments.map(p => ({
+    ...p,
+    amount: Number(p.amount),
+    admissionFee: p.admissionFee ? Number(p.admissionFee) : 0,
+  }));
+
   return (
     <div className="admin-container">
       <AdminClient 
-        pendingPayments={pendingPayments} 
+        newRegistrations={serialize(newRegistrations)}
+        pendingPayments={serialize(pendingRenewals)}
+        verifiedPayments={serialize(verifiedPayments)}
         settings={settings}
         trainers={trainers}
         plans={plans}
         offers={offers}
         members={members}
-        verifiedPayments={verifiedPayments}
         facilities={facilities}
         bookings={bookings}
       />

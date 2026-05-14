@@ -29,12 +29,22 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
+  // Serialize Decimal fields for client component
+  const serializedUser = {
+    ...user,
+    payments: user.payments.map(p => ({
+      ...p,
+      amount: Number(p.amount),
+      admissionFee: p.admissionFee ? Number(p.admissionFee) : 0,
+    })),
+  };
+
   // Fetch available plans for renewal
-  const plans = await prisma.plan.findMany();
+  const plans = await prisma.plan.findMany({ orderBy: { price: "asc" } });
 
   return (
     <div className="dashboard-container">
-      <DashboardClient user={user} plans={plans} />
+      <DashboardClient user={serializedUser} plans={plans} />
     </div>
   );
 }

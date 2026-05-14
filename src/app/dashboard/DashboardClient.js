@@ -11,8 +11,62 @@ export default function DashboardClient({ user, plans }) {
   const [uploading, setUploading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [screenshotUrl, setScreenshotUrl] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Password change state
+  const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwMessage, setPwMessage] = useState({ text: "", type: "" });
+
+  async function handlePasswordChange(e) {
+    e.preventDefault();
+    setPwMessage({ text: "", type: "" });
+
+    if (pwForm.new !== pwForm.confirm) {
+      setPwMessage({ text: "New passwords do not match.", type: "error" });
+      return;
+    }
+    if (pwForm.new.length < 6) {
+      setPwMessage({ text: "Password must be at least 6 characters.", type: "error" });
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      const res = await fetch("/api/user/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.new }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPwMessage({ text: "Password updated successfully!", type: "success" });
+        setPwForm({ current: "", new: "", confirm: "" });
+      } else {
+        setPwMessage({ text: data.error || "Failed to update password.", type: "error" });
+      }
+    } catch {
+      setPwMessage({ text: "Network error. Please try again.", type: "error" });
+    } finally {
+      setPwLoading(false);
+    }
+  }
 
   const currentMembership = user.memberships[0];
+  const memberId = user.memberId || user.id.slice(-6).toUpperCase();
+
+  // UPI details
+  const upiId = "coolarentiger-3@oksbi";
+  const upiName = "NMEGym";
+
+  // Calculate payment amount (existing members don't pay admission fee)
+  const paymentAmount = selectedPlan ? selectedPlan.price : 0;
+  const upiUri = selectedPlan
+    ? `upi://pay?pa=${upiId}&pn=${upiName}&am=${paymentAmount}&cu=INR`
+    : "";
+  const qrCodeUrl = selectedPlan
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`
+    : "";
 
   async function handlePaymentSubmit(e) {
     e.preventDefault();
@@ -23,22 +77,35 @@ export default function DashboardClient({ user, plans }) {
 
     setUploading(true);
     try {
-      const res = await fetch("/api/payments", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          planId: selectedPlan.id,
-          amount: selectedPlan.price,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          planName: selectedPlan.name,
+          planPrice: selectedPlan.price,
+          admissionFee: 0, // Existing members don't pay admission
+          totalAmount: paymentAmount,
           screenshotUrl,
-          paymentMethod: "UPI",
+          isFirstTimer: false,
+          userId: user.id,
         }),
       });
 
       if (res.ok) {
-        alert("Payment submitted successfully! Admin will verify it shortly.");
-        window.location.reload();
+        setPaymentSuccess(true);
+        setScreenshotUrl("");
+        setSelectedPlan(null);
+        setTimeout(() => {
+          setPaymentSuccess(false);
+          window.location.reload();
+        }, 4000);
       } else {
-        alert("Failed to submit payment.");
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to submit payment.");
       }
     } catch (err) {
       alert("Error submitting payment.");
@@ -46,6 +113,14 @@ export default function DashboardClient({ user, plans }) {
       setUploading(false);
     }
   }
+
+  // Calculate membership expiry info
+  const isExpired = currentMembership?.endDate
+    ? new Date(currentMembership.endDate) < new Date()
+    : true;
+  const daysLeft = currentMembership?.endDate
+    ? Math.max(0, Math.ceil((new Date(currentMembership.endDate) - new Date()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   return (
     <div className="db-layout">
@@ -58,9 +133,11 @@ export default function DashboardClient({ user, plans }) {
           <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>Overview</button>
           <button className={activeTab === "membership" ? "active" : ""} onClick={() => setActiveTab("membership")}>My Membership</button>
           <button className={activeTab === "payments" ? "active" : ""} onClick={() => setActiveTab("payments")}>Payments</button>
+          <button className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>Settings</button>
           <button className={activeTab === "feedback" ? "active" : ""} onClick={() => setActiveTab("feedback")}>Feedback</button>
         </nav>
         <div className="db-footer">
+          <Link href="/" style={{display: "block", textAlign: "center", marginBottom: 10, color: "#666", fontSize: 13, textDecoration: "none"}}>← Back to Home</Link>
           <button onClick={() => signOut()} className="btn-logout">Sign Out</button>
         </div>
       </aside>
@@ -69,85 +146,145 @@ export default function DashboardClient({ user, plans }) {
       <main className="db-main">
         <header className="db-header">
           <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
-          <p className="gray">Member ID: {user.id.slice(-6).toUpperCase()}</p>
+          <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
         </header>
 
         <section className="db-content">
           {activeTab === "overview" && (
             <div className="db-grid">
-              {/* Membership Card */}
+              {/* Membership Status Card */}
               <div className="db-card highlight">
                 <h3>Current Status</h3>
-                <div className="status-badge" data-status={currentMembership?.status || "NONE"}>
-                  {currentMembership?.status || "NO ACTIVE PLAN"}
+                <div className="status-badge" data-status={
+                  currentMembership?.status === "ACTIVE" && !isExpired ? "ACTIVE" :
+                  currentMembership?.status === "ACTIVE" && isExpired ? "EXPIRED" : "NONE"
+                }>
+                  {currentMembership?.status === "ACTIVE" && !isExpired ? "ACTIVE" :
+                   currentMembership ? "EXPIRED" : "NO ACTIVE PLAN"}
                 </div>
                 {currentMembership && (
-                  <p className="db-info">
-                    Plan: <strong>{currentMembership.planTier}</strong><br />
-                    Expires: <strong>{currentMembership.endDate ? new Date(currentMembership.endDate).toLocaleDateString() : "N/A"}</strong>
-                  </p>
+                  <div className="db-info">
+                    <p>Plan: <strong>{currentMembership.planTier}</strong></p>
+                    <p>Expires: <strong>{currentMembership.endDate ? new Date(currentMembership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}</strong></p>
+                    {!isExpired && daysLeft <= 7 && (
+                      <p style={{color: "#ffc800", marginTop: 10, fontSize: 13}}>⚠️ Expiring in {daysLeft} day{daysLeft !== 1 ? "s" : ""}</p>
+                    )}
+                  </div>
                 )}
-                {!currentMembership && (
-                  <button className="btn-primary" style={{ marginTop: 20 }} onClick={() => setActiveTab("membership")}>Join Now</button>
-                )}
+                <button className="btn-primary" style={{ marginTop: 20 }} onClick={() => setActiveTab("membership")}>
+                  {currentMembership && !isExpired ? "RENEW PLAN" : "JOIN NOW"}
+                </button>
               </div>
 
               {/* Quick Actions */}
               <div className="db-card">
                 <h3>Quick Actions</h3>
                 <div className="db-actions">
-                  <button className="btn-outline" onClick={() => setActiveTab("membership")}>Renew Plan</button>
+                  <button className="btn-outline" onClick={() => setActiveTab("membership")}>
+                    {currentMembership && !isExpired ? "Renew Plan" : "Select Plan"}
+                  </button>
+                  <button className="btn-outline" onClick={() => setActiveTab("payments")}>View Payments</button>
                   <button className="btn-outline" onClick={() => setActiveTab("feedback")}>Send Feedback</button>
                 </div>
               </div>
+
+              {/* Pending Payments */}
+              {user.payments?.some(p => p.status === "PENDING_VERIFICATION") && (
+                <div className="db-card" style={{gridColumn: "span 2", borderLeft: "3px solid #ffc800"}}>
+                  <h3 style={{color: "#ffc800"}}>⏳ Pending Verification</h3>
+                  <p style={{color: "#888", fontSize: 14}}>
+                    You have {user.payments.filter(p => p.status === "PENDING_VERIFICATION").length} payment(s) awaiting admin verification. 
+                    You'll receive an email once verified.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === "membership" && (
             <div className="db-card full">
               <h3>Membership & Renewal</h3>
-              <p className="gray">Choose a plan and pay via UPI. Upload your screenshot below.</p>
+              
+              {paymentSuccess ? (
+                <div style={{textAlign: "center", padding: "40px 0"}}>
+                  <div style={{color: "#00ff64", fontSize: "48px", marginBottom: "10px"}}>✓</div>
+                  <h4 style={{fontSize: "24px", color: "white", marginBottom: "10px"}}>PAYMENT SUBMITTED</h4>
+                  <p style={{color: "#888", fontSize: "14px"}}>
+                    Your payment is pending verification by our team.<br/>
+                    You'll receive a confirmation email once approved.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="gray">Choose a plan and pay via UPI. Upload your screenshot below.</p>
 
-              <div className="plans-selection">
-                {plans.map(plan => (
-                  <div 
-                    key={plan.id} 
-                    className={`plan-option ${selectedPlan?.id === plan.id ? "selected" : ""}`}
-                    onClick={() => setSelectedPlan(plan)}
-                  >
-                    <div className="po-name">{plan.name}</div>
-                    <div className="po-price">₹{plan.price}</div>
+                  <div className="plans-selection">
+                    {plans.map(plan => (
+                      <div 
+                        key={plan.id} 
+                        className={`plan-option ${selectedPlan?.id === plan.id ? "selected" : ""}`}
+                        onClick={() => { setSelectedPlan(plan); setScreenshotUrl(""); }}
+                      >
+                        <div className="po-name">{plan.name}</div>
+                        <div className="po-price">₹{plan.price}</div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {selectedPlan && (
-                <div className="payment-upload-area">
-                  <div className="upi-details">
-                    <p>Pay <strong>₹{selectedPlan.price}</strong> to:</p>
-                    <div className="upi-id">nmegym@upi</div>
-                  </div>
+                  {selectedPlan && (
+                    <div className="payment-upload-area">
+                      {/* Price Summary */}
+                      <div style={{background: "rgba(255,255,255,0.03)", padding: "15px 20px", borderRadius: "8px", marginBottom: "25px", textAlign: "left"}}>
+                        <div style={{display: "flex", justifyContent: "space-between", marginBottom: "8px"}}>
+                          <span style={{color: "#888"}}>Plan: {selectedPlan.name}</span>
+                          <span style={{fontWeight: "bold"}}>₹{selectedPlan.price}</span>
+                        </div>
+                        <div style={{display: "flex", justifyContent: "space-between", borderTop: "1px solid #222", paddingTop: "10px"}}>
+                          <span style={{fontWeight: "bold"}}>TOTAL TO PAY</span>
+                          <span style={{color: "#e8001d", fontWeight: "bold", fontSize: "20px"}}>₹{paymentAmount}</span>
+                        </div>
+                      </div>
 
-                  {!screenshotUrl ? (
-                    <CldUploadWidget 
-                      uploadPreset="nmegym_preset"
-                      onSuccess={(result) => setScreenshotUrl(result.info.secure_url)}
-                    >
-                      {({ open }) => (
-                        <button className="btn-upload" onClick={() => open()}>
-                          Upload Payment Screenshot
-                        </button>
+                      {/* QR Code */}
+                      <div style={{ textAlign: "center", marginBottom: "25px", padding: "20px", background: "rgba(232, 0, 29, 0.05)", border: "1px dashed rgba(232,0,29,0.3)", borderRadius: "8px" }}>
+                        <p style={{ fontSize: "12px", color: "#888", marginBottom: "15px", textTransform: "uppercase", letterSpacing: "1px" }}>SCAN TO PAY VIA ANY UPI APP</p>
+                        <img src={qrCodeUrl} alt="UPI QR Code" style={{ width: "150px", height: "150px", borderRadius: "10px", background: "white", padding: "10px", display: "inline-block" }} />
+                        <p style={{ fontSize: "14px", fontWeight: "bold", marginTop: "15px", fontFamily: "monospace", color: "white" }}>{upiId}</p>
+                      </div>
+
+                      {/* Upload */}
+                      {!screenshotUrl ? (
+                        <CldUploadWidget 
+                          uploadPreset="nmegym_preset"
+                          onSuccess={(result) => setScreenshotUrl(result.info.secure_url)}
+                        >
+                          {({ open }) => (
+                            <button className="btn-upload" onClick={() => open()} style={{width: "100%", padding: "15px", background: "transparent", border: "1px solid #333", color: "white", borderRadius: "6px", cursor: "pointer", fontSize: "14px"}}>
+                              + Upload Payment Screenshot
+                            </button>
+                          )}
+                        </CldUploadWidget>
+                      ) : (
+                        <div style={{textAlign: "center"}}>
+                          <div style={{position: "relative", display: "inline-block", marginBottom: "20px"}}>
+                            <img src={screenshotUrl} alt="Screenshot" style={{width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", border: "2px solid #00ff64"}} />
+                            <button 
+                              type="button" 
+                              onClick={() => setScreenshotUrl("")} 
+                              style={{ position: "absolute", top: -8, right: -8, background: "#e8001d", color: "white", border: "none", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", fontSize: "14px" }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <p style={{color: "#00ff64", marginBottom: "15px"}}>✓ Screenshot uploaded</p>
+                          <button className="btn-primary" onClick={handlePaymentSubmit} disabled={uploading} style={{width: "100%", padding: "15px"}}>
+                            {uploading ? "SUBMITTING..." : `CONFIRM PAYMENT — ₹${paymentAmount}`}
+                          </button>
+                        </div>
                       )}
-                    </CldUploadWidget>
-                  ) : (
-                    <div className="screenshot-preview">
-                      <p className="green">✓ Screenshot Uploaded</p>
-                      <button className="btn-primary" onClick={handlePaymentSubmit} disabled={uploading}>
-                        {uploading ? "Submitting..." : `Confirm Payment for ${selectedPlan.name} →`}
-                      </button>
                     </div>
                   )}
-                </div>
+                </>
               )}
             </div>
           )}
@@ -159,6 +296,7 @@ export default function DashboardClient({ user, plans }) {
                 <thead>
                   <tr>
                     <th>Date</th>
+                    <th>Plan</th>
                     <th>Amount</th>
                     <th>Method</th>
                     <th>Status</th>
@@ -167,19 +305,53 @@ export default function DashboardClient({ user, plans }) {
                 <tbody>
                   {user.payments.map(pay => (
                     <tr key={pay.id}>
-                      <td>{new Date(pay.createdAt).toLocaleDateString()}</td>
-                      <td>₹{pay.amount}</td>
+                      <td>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                      <td>{pay.planName || "—"}</td>
+                      <td>₹{Number(pay.amount)}</td>
                       <td>{pay.paymentMethod}</td>
                       <td>
-                        <span className={`tag-${pay.status.toLowerCase()}`}>{pay.status.replace("_", " ")}</span>
+                        <span className={`tag-${pay.status.toLowerCase().replace(/_/g, '-')}`}>
+                          {pay.status === "PENDING_VERIFICATION" ? "⏳ Pending" : 
+                           pay.status === "VERIFIED" ? "✓ Verified" : 
+                           "✕ Rejected"}
+                        </span>
                       </td>
                     </tr>
                   ))}
                   {user.payments.length === 0 && (
-                    <tr><td colSpan="4" style={{ textAlign: "center", padding: 40 }}>No payments found.</td></tr>
+                    <tr><td colSpan="5" style={{ textAlign: "center", padding: 40, color: "#666" }}>No payments found. Select a plan to get started.</td></tr>
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="db-card full">
+              <h3>Account Settings</h3>
+              <div style={{maxWidth: "400px"}}>
+                <h4 style={{fontSize: "14px", color: "#888", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px"}}>Change Password</h4>
+                <form onSubmit={handlePasswordChange} className="db-form">
+                  <div style={{marginBottom: "15px"}}>
+                    <label style={{display: "block", color: "#666", fontSize: "12px", marginBottom: "6px", textTransform: "uppercase"}}>Current Password</label>
+                    <input type="password" required value={pwForm.current} onChange={e => setPwForm({...pwForm, current: e.target.value})} style={{width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px"}} />
+                  </div>
+                  <div style={{marginBottom: "15px"}}>
+                    <label style={{display: "block", color: "#666", fontSize: "12px", marginBottom: "6px", textTransform: "uppercase"}}>New Password</label>
+                    <input type="password" required value={pwForm.new} onChange={e => setPwForm({...pwForm, new: e.target.value})} style={{width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px"}} />
+                  </div>
+                  <div style={{marginBottom: "20px"}}>
+                    <label style={{display: "block", color: "#666", fontSize: "12px", marginBottom: "6px", textTransform: "uppercase"}}>Confirm New Password</label>
+                    <input type="password" required value={pwForm.confirm} onChange={e => setPwForm({...pwForm, confirm: e.target.value})} style={{width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px"}} />
+                  </div>
+                  {pwMessage.text && (
+                    <p style={{color: pwMessage.type === "success" ? "#00ff64" : "#ff4444", fontSize: "13px", marginBottom: "15px"}}>{pwMessage.text}</p>
+                  )}
+                  <button type="submit" className="btn-primary" disabled={pwLoading} style={{width: "100%"}}>
+                    {pwLoading ? "UPDATING..." : "UPDATE PASSWORD"}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
 
@@ -212,6 +384,7 @@ export default function DashboardClient({ user, plans }) {
         .db-card h3 { margin-bottom: 20px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; margin-bottom: 15px; }
         .status-badge[data-status="ACTIVE"] { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid #00ff64; }
+        .status-badge[data-status="EXPIRED"] { background: rgba(255,200,0,0.1); color: #ffc800; border: 1px solid #ffc800; }
         .status-badge[data-status="PENDING"] { background: rgba(255,200,0,0.1); color: #ffc800; border: 1px solid #ffc800; }
         .status-badge[data-status="NONE"] { background: #222; color: #888; }
         
@@ -222,22 +395,38 @@ export default function DashboardClient({ user, plans }) {
         .po-name { font-weight: 700; margin-bottom: 5px; }
         .po-price { color: var(--red); font-size: 20px; font-weight: 900; }
 
-        .payment-upload-area { margin-top: 30px; padding-top: 30px; border-top: 1px solid #222; text-align: center; }
-        .upi-details { margin-bottom: 20px; }
-        .upi-id { font-size: 24px; font-weight: 900; color: white; margin-top: 5px; letter-spacing: 1px; }
-        .btn-upload { background: white; color: black; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 700; cursor: pointer; }
-        
+        .payment-upload-area { margin-top: 30px; padding-top: 30px; border-top: 1px solid #222; }
+
         .db-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .db-table th { text-align: left; color: #666; font-size: 12px; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #222; }
         .db-table td { padding: 15px; border-bottom: 1px solid #111; font-size: 14px; }
         
-        .tag-pending_verification { color: #ffc800; }
+        .tag-pending-verification, .tag-pending_verification { color: #ffc800; }
         .tag-verified { color: #00ff64; }
         .tag-rejected { color: var(--red); }
         
         .db-form textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 15px; border-radius: 8px; font-family: inherit; }
-        .btn-logout { background: none; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; }
+        .btn-logout { background: none; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; }
         .btn-logout:hover { color: var(--red); border-color: var(--red); }
+        .db-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-outline { background: transparent; border: 1px solid #333; color: #ccc; padding: 12px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-align: left; }
+        .btn-outline:hover { border-color: var(--red); color: white; }
+        .db-info p { margin: 5px 0; color: #888; font-size: 14px; }
+
+        @media (max-width: 768px) {
+          .db-layout { flex-direction: column; }
+          .db-sidebar { width: 100%; padding: 20px; flex-direction: row; align-items: center; }
+          .db-brand { margin-bottom: 0; margin-right: auto; }
+          .db-brand img { height: 30px; margin-bottom: 0; }
+          .db-nav { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+          .db-nav button { padding: 8px 12px; font-size: 13px; }
+          .db-footer { display: none; }
+          .db-main { padding: 20px; }
+          .db-header h1 { font-size: 28px; }
+          .db-grid { grid-template-columns: 1fr; }
+          .db-card.full { grid-column: span 1; }
+          .plans-selection { grid-template-columns: repeat(2, 1fr); }
+        }
       `}</style>
     </div>
   );
