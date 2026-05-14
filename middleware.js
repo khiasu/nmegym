@@ -1,11 +1,6 @@
-// middleware.js — Route protection using NextAuth v5
-// Runs on the Edge before every matched request
-
-import NextAuth from "next-auth";
-import { authConfig } from "./src/auth.config";
+// middleware.js — Route protection using extremely lightweight next-auth/jwt
 import { NextResponse } from "next/server";
-
-const { auth } = NextAuth(authConfig);
+import { getToken } from "next-auth/jwt";
 
 // Routes that require authentication
 const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
@@ -13,9 +8,14 @@ const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
 // Routes that require ADMIN role
 const ADMIN_PREFIXES = ["/admin"];
 
-export default auth((req) => {
+export async function middleware(req) {
   const { pathname } = req.nextUrl;
-  const session = req.auth;
+  
+  // Use getToken instead of NextAuth() to avoid Vercel Edge 1MB limit
+  const session = await getToken({ 
+    req, 
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET 
+  });
 
   // Not logged in — trying to access a protected route
   if (!session) {
@@ -28,7 +28,7 @@ export default auth((req) => {
   }
 
   // Logged in but not admin — trying to access admin routes
-  if (session && session.user?.role !== "ADMIN") {
+  if (session && session.role !== "ADMIN") {
     const isAdmin = ADMIN_PREFIXES.some((p) => pathname.startsWith(p));
     if (isAdmin) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -36,7 +36,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 // Match everything except static files, API routes, and Next.js internals
 export const config = {
