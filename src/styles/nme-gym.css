@@ -134,9 +134,7 @@ nav.nav-hidden:hover .hamburger {
   gap: 7px;
   cursor: pointer;
   z-index: 2001;
-  position: absolute;
-  right: 32px; /* Symmetrical with top */
-  top: 32px;
+  position: relative; /* Changed from absolute for flex alignment */
   width: 26px;
   height: 26px;
   background: none;
@@ -1083,7 +1081,15 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   .footer-grid{grid-template-columns:1.6fr 1fr;}
   .testimonials-track .testi-card{width:360px;}
 }
-@media(max-width:640px){
+@media(max-width:768px){
+  nav {
+    height: auto !important;
+    padding: 30px !important; /* Consistent top/left/right spacing */
+  }
+  .nav-logo-img {
+    height: 95px !important; /* Larger logo on mobile */
+    max-width: 240px !important;
+  }
   .nav-links{display:none;}
   .hamburger{display:flex;}
   .hero-stats{display:flex; flex-direction:column; bottom:30px; left:20px; gap:16px; text-align:left; transform:none;}
@@ -2631,8 +2637,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
 
   .nav-logo-img {
-    height: 80px !important; /* Smaller logo on mobile */
-    max-width: 220px !important;
+    height: 95px !important;
+    max-width: 240px !important;
     object-fit: contain;
   }
 
@@ -2659,8 +2665,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
 
   .nav-logo-img {
-    height: 80px !important; /* Mobile friendly size */
-    max-width: 220px !important;
+    height: 95px !important;
+    max-width: 240px !important;
     object-fit: contain;
   }
 }
