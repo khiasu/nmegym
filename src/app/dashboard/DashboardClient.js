@@ -404,21 +404,11 @@ export default function DashboardClient({ user, plans }) {
               {/* Mobile Card List View */}
               <div className="db-mobile-list">
                 {user.payments.map(pay => (
-                  <div key={pay.id} className="payment-card">
-                    <div className="pc-row">
-                      <span className="pc-label">Date</span>
-                      <span className="pc-value">{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                    </div>
-                    <div className="pc-row">
-                      <span className="pc-label">Plan</span>
-                      <span className="pc-value">{pay.planName || "—"}</span>
-                    </div>
-                    <div className="pc-row">
-                      <span className="pc-label">Amount</span>
-                      <span className="pc-value red" style={{fontWeight: 700}}>₹{Number(pay.amount)}</span>
-                    </div>
-                    <div className="pc-row">
-                      <span className="pc-label">Status</span>
+                  <div key={pay.id} className="payment-card" style={{ textAlign: 'center', padding: '25px 15px' }}>
+                    <div className="pc-value" style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                    <div className="pc-value" style={{ fontSize: '18px', fontWeight: '700', color: 'white', marginBottom: '8px', fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '1px' }}>{pay.planName || "MEMBERSHIP"}</div>
+                    <div className="pc-value red" style={{ fontSize: '24px', fontWeight: '800', marginBottom: '15px' }}>₹{Number(pay.amount)}</div>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <span className={`tag-${pay.status.toLowerCase().replace(/_/g, '-')}`}>
                         {pay.status === "PENDING_VERIFICATION" ? "⏳ Pending" : 
                          pay.status === "VERIFIED" ? "✓ Verified" : 
@@ -596,12 +586,14 @@ export default function DashboardClient({ user, plans }) {
 
         @media (max-width: 1024px) {
           .db-table-desktop { display: none; }
-          .db-mobile-list { display: block; }
+          .db-mobile-list { display: block; width: 100%; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
-          .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 100%; box-sizing: border-box; }
-          .db-card .btn-primary { width: 100%; margin-top: 15px; }
-          .db-card.full { grid-column: span 1; text-align: left; align-items: flex-start; }
+          .db-card { width: 100% !important; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+          .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
+          .db-card .btn-primary { width: 100%; max-width: 300px; margin-top: 20px; }
+          .db-card.full { grid-column: span 1; text-align: center; align-items: center; }
           .plans-selection { grid-template-columns: 1fr; }
+          .payment-card { width: 100% !important; box-sizing: border-box; }
         }
       `}</style>
     </div>
