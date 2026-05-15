@@ -193,6 +193,48 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
         </div>
       </div>
 
+      {/* GYM POLICIES & LEGAL */}
+      <div className="elite-card">
+        <div className="admin-section-card-header">
+          <span className="admin-section-card-title">Gym Policies & Legal</span>
+          <button className="admin-btn-sm" onClick={handleSaveSettings} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+        </div>
+        <div className="admin-form-group" style={{marginTop: "20px"}}>
+          <label className="admin-label">Terms and Conditions</label>
+          <textarea 
+            className="admin-input" 
+            style={{height:"150px", width:"100%"}} 
+            value={settings.termsAndConditions || ""} 
+            onChange={(e) => setSettings({...settings, termsAndConditions: e.target.value})} 
+            placeholder="Official gym rules and member responsibilities..."
+            maxLength={3000}
+          ></textarea>
+          <p style={{fontSize:"11px", color:"rgba(255,255,255,0.3)", marginTop:"5px"}}>Max 3000 characters. These will appear on the /legal page.</p>
+        </div>
+        <div className="admin-form-group" style={{marginTop: "20px"}}>
+          <label className="admin-label">Privacy & Data Policy</label>
+          <textarea 
+            className="admin-input" 
+            style={{height:"150px", width:"100%"}} 
+            value={settings.privacyPolicy || ""} 
+            onChange={(e) => setSettings({...settings, privacyPolicy: e.target.value})} 
+            placeholder="Data collection and security protocols..."
+            maxLength={3000}
+          ></textarea>
+        </div>
+        <div className="admin-form-group" style={{marginTop: "20px"}}>
+          <label className="admin-label">Refund Policy</label>
+          <textarea 
+            className="admin-input" 
+            style={{height:"120px", width:"100%"}} 
+            value={settings.refundPolicy || ""} 
+            onChange={(e) => setSettings({...settings, refundPolicy: e.target.value})} 
+            placeholder="Cancellation and refund rules..."
+            maxLength={2000}
+          ></textarea>
+        </div>
+      </div>
+
       {/* SECURITY */}
       <div className="elite-card">
         <div className="admin-section-card-header">

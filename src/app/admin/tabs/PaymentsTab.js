@@ -41,10 +41,18 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
 
       if (res.ok) {
         const data = await res.json();
-        // Since revertUI already removed it, we just show alerts if needed
-        // but alerts might be disruptive 10s later. 
-        // We'll rely on the silent update if it succeeds, but can log it.
         console.log(`Payment ${status}: ${data.memberId || ''}`);
+        if (status === "VERIFIED" && data.userPhone) {
+          const loginUrl = `${window.location.origin}/auth/login`;
+          const text = data.isNewMember
+            ? `Welcome to NME GYM, ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan is verified and your membership is ACTIVE.\n\n*Your Login Credentials:*\nMember ID: ${data.memberId}\nInitial Password: ${data.initialPassword}\n\nPlease login here to access your dashboard: ${loginUrl}`
+            : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
+          
+          const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+          if (window.confirm("Payment verified successfully! Would you like to send the confirmation via WhatsApp to the member now?")) {
+            window.open(waUrl, "_blank");
+          }
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(errData.error || "Verification failed.");

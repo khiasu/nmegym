@@ -183,7 +183,7 @@ model Settings {
   gymName         String   @default("NME GYM")
   logoUrl         String?  @default("/newlogo.png")
   address         String?  @default("Chumoukedima, Nagaland")
-  whatsappNumber  String?  @default("+91 98637 65861")
+  whatsappNumber  String?  @default("+91 70053 10568")
   email           String?  @default("nmegym.india@gmail.com")
   instagramUrl    String?  @default("https://www.instagram.com/nme_gym")
   upiId           String?  @default("nme@upi")
@@ -194,6 +194,9 @@ model Settings {
   aboutImage1Url    String?
   aboutImage2Url    String?
   aboutImage3Url    String?
+  termsAndConditions String? @db.Text
+  privacyPolicy      String? @db.Text
+  refundPolicy       String? @db.Text
   updatedAt       DateTime @updatedAt
 }
 

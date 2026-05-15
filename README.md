@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NME GYM Management Platform
 
-## Getting Started
+A custom-built membership and facility management system for NME GYM, built with a high-performance Next.js 16 architecture. The platform handles member registration, renewal, payment verification, and automated notification workflows.
 
-First, run the development server:
+## Technical Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+*   **Framework:** Next.js 16 (App Router)
+*   **Database:** PostgreSQL (Neon) with Prisma 7 ORM
+*   **Authentication:** NextAuth.js
+*   **Media Management:** Cloudinary SDK
+*   **Email Engine:** Resend API
+*   **Styling:** Vanilla CSS3 with a focus on immersive dark-themed UI and mobile responsiveness
+
+## Project Structure
+
+```text
+/
+├── prisma/
+│   ├── schema.prisma         # Database models & relationships
+│   └── seed.js               # Initial database seeding script
+├── public/
+│   └── newlogo.png           # Brand identity assets
+└── src/
+    ├── app/                  # Next.js App Router
+    │   ├── admin/            # Admin Panel & Verification logic
+    │   │   └── tabs/         # Specialized management modules
+    │   ├── api/              # Secure Backend API Endpoints
+    │   │   ├── admin/        # Admin-only operations
+    │   │   ├── auth/         # Authentication & Password flows
+    │   │   └── checkout/     # Payment & Enrollment processing
+    │   ├── auth/             # Login, Register & Recovery pages
+    │   └── dashboard/        # Member-exclusive dashboard interface
+    ├── components/           # UI Component Library
+    │   ├── home/             # Homepage-specific sections (Trainers, Plans, etc.)
+    │   ├── layout/           # Shared global elements (Navbar, Footer)
+    │   └── ui/               # Reusable primitives (Modals, Toasts, Loaders)
+    ├── lib/                  # Core Utilities & Shared Logic
+    │   ├── mail.js           # Resend Email integration
+    │   ├── prisma.js         # Database client singleton
+    │   └── data.js           # Global data fetching helpers
+    └── styles/               # Design System
+        └── nme-gym.css       # Master stylesheet & Design tokens
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Core Functionalities
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Member Management
+*   **Onboarding:** New members can register, select plans, and upload payment proof.
+*   **Dashboard:** Personalized member area showing membership status, expiry countdowns, and payment history.
+*   **Renewals:** Existing members can renew their plans directly from their dashboard.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin Operations
+*   **Payment Verification:** A dedicated dashboard for administrators to review payment screenshots and approve or reject membership requests.
+*   **Credential Generation:** Automated generation of Member IDs and temporary passwords upon registration approval.
+*   **Trainer Management:** Full administrative control over trainer profiles and visibility on the frontend.
 
-## Learn More
+### Automated Workflows
+*   **Email Notifications:** Automated welcome emails (with login credentials) and payment status updates sent via Resend.
+*   **WhatsApp Integration:** A fallback notification system allowing administrators to send welcome details and payment confirmations directly to a member's WhatsApp.
+*   **User Notifications:** Real-time feedback for members after submitting payments, including a direct link to notify the admin via WhatsApp.
 
-To learn more about Next.js, take a look at the following resources:
+## Development Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
+*   Node.js (LTS version)
+*   PostgreSQL database (Neon.tech recommended)
+*   Cloudinary account for media storage
+*   Resend API key for email delivery
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
+1. Clone the repository
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
+3. Configure your environment variables (see `.env.example`)
+4. Synchronize the database schema:
+    ```bash
+    npx prisma db push
+    ```
+5. Start the development server:
+    ```bash
+    npm run dev
+    ```
 
-## Deploy on Vercel
+## Environment Variables
+The following keys are required in your `.env` file:
+*   `DATABASE_URL`: PostgreSQL connection string
+*   `DIRECT_URL`: Direct connection string for Prisma migrations
+*   `NEXTAUTH_SECRET`: Secret key for session encryption
+*   `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name
+*   `CLOUDINARY_API_KEY` & `CLOUDINARY_API_SECRET`: Cloudinary credentials
+*   `RESEND_API_KEY`: API key for email notifications
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+The platform is optimized for deployment on Vercel. Ensure that all environment variables are correctly configured in the Vercel dashboard and the PostgreSQL database is accessible from the production environment.

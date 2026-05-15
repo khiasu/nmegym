@@ -77,15 +77,16 @@ export default function Contact() {
             </div>
             <div className="footer-col">
               <h5>Support</h5>
-              <a href="https://wa.me/919863765861" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
               <a href="mailto:nmegym.india@gmail.com">Email Us</a>
               <Link href="/auth/login">Member Login</Link>
+              <Link href="/legal">Legal Policy</Link>
             </div>
             <div className="footer-col">
               <h5>Follow</h5>
               <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a href="https://wa.me/919863765861" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-              <a href="https://share.google/SStiUEM2Xh5EhoU0q" target="_blank" rel="noopener noreferrer">View on Maps</a>
+              <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a href="https://share.google/Pgt9hKvgz2yph10Pb" target="_blank" rel="noopener noreferrer">View on Maps</a>
             </div>
           </div>
         </div>

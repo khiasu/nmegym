@@ -29,6 +29,9 @@ export async function POST(request) {
         aboutImage1Url: data.aboutImage1Url,
         aboutImage2Url: data.aboutImage2Url,
         aboutImage3Url: data.aboutImage3Url,
+        termsAndConditions: data.termsAndConditions,
+        privacyPolicy: data.privacyPolicy,
+        refundPolicy: data.refundPolicy,
       },
       create: {
         id: 1,
@@ -46,6 +49,9 @@ export async function POST(request) {
         aboutImage1Url: data.aboutImage1Url,
         aboutImage2Url: data.aboutImage2Url,
         aboutImage3Url: data.aboutImage3Url,
+        termsAndConditions: data.termsAndConditions,
+        privacyPolicy: data.privacyPolicy,
+        refundPolicy: data.refundPolicy,
       },
     });
 

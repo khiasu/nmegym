@@ -157,6 +157,11 @@ export async function POST(request) {
         success: true,
         memberId,
         isNewMember: !!initialPassword,
+        initialPassword,
+        userPhone: user.phone,
+        userName: user.firstName,
+        planName: payment.planName,
+        amount: payment.amount
       });
     }
 

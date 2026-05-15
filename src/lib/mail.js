@@ -35,7 +35,9 @@ export async function sendWelcomeEmail(email, name, memberId, password) {
             <p style="color: #888; font-size: 14px;">Please log in to your dashboard to manage your plan and change your password.</p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXTAUTH_URL}/auth/login" style="display: inline-block; background: #e8001d; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; font-weight: bold; letter-spacing: 1px;">LOGIN TO DASHBOARD →</a>
+              <a href="${process.env.NEXTAUTH_URL}/auth/login" style="display: inline-block; background: #e8001d; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">LOGIN TO DASHBOARD →</a>
+              <br/>
+              <a href="${process.env.NEXTAUTH_URL}/auth/forgot-password" style="display: inline-block; color: #888; text-decoration: underline; font-size: 12px; margin-top: 10px;">Or Reset Your Password Here</a>
             </div>
             
             <hr style="border: none; border-top: 1px solid #222; margin: 25px 0;" />
@@ -98,6 +100,42 @@ export async function sendAdminNotificationEmail({ memberName, email, phone, pla
     });
   } catch (error) {
     console.error("Failed to send admin notification email:", error);
+  }
+}
+
+/**
+ * Send pending notification email to user when they submit a payment
+ */
+export async function sendUserPendingNotificationEmail(email, name, planName) {
+  try {
+    await resend.emails.send({
+      from: 'NME GYM <onboarding@resend.dev>',
+      to: email,
+      subject: 'Registration Received — Waiting for Admin Confirmation',
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: auto; padding: 0; background: #0a0a0a; border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; letter-spacing: 2px;">REGISTRATION RECEIVED</h1>
+            <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 13px;">We are reviewing your payment</p>
+          </div>
+          
+          <div style="padding: 30px;">
+            <h2 style="color: #e8001d; margin: 0 0 15px;">Hi ${name},</h2>
+            <p style="color: #ccc; line-height: 1.6;">We have successfully received your payment submission for the <strong>${planName}</strong> plan.</p>
+            
+            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ffc800;">
+              <p style="color: #ccc; font-size: 14px; margin: 0;">Our team will verify your payment shortly. Once verified, you will receive another email containing your Member ID and login credentials.</p>
+            </div>
+            
+            <p style="font-size: 12px; color: #666; text-align: center; margin-top: 30px;">
+              If you have any questions, contact us on WhatsApp at +91 98637 65861
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send user pending notification email:", error);
   }
 }
 

@@ -17,21 +17,21 @@ export default function Trainers({ trainers }) {
     name: t.name,
     role: t.role,
     bio: t.bio,
-    img: t.imageUrl || "/images/trainers/temp_trainer.png",
+    img: t.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop",
     quote: "Discipline is the bridge between goals and accomplishment."
   })) : [
     {
       name: "Keneizetuo Angami",
       role: "Head Coach",
       bio: "Certified S&C specialist with 10+ years experience in bodybuilding. Transforming lives through structured training programs and nutritional guidance.",
-      img: "/images/trainers/temp_trainer.png",
+      img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop",
       quote: "Discipline is the bridge between goals and accomplishment.",
     },
     {
       name: "Moarenba Jamir",
       role: "Strength Coach",
       bio: "Specializing in powerlifting, functional fitness, and athletic conditioning for all levels. Dedicated to pushing every member past their limits.",
-      img: "/images/trainers/temp_trainer.png",
+      img: "https://images.unsplash.com/photo-1541534741688-6078c65b5a33?q=80&w=1000&auto=format&fit=crop",
       quote: "Be stronger than your excuses.",
     },
   ];

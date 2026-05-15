@@ -116,7 +116,19 @@ export default function JoinPage() {
             )}
           </div>
 
-          <button type="submit" className="auth-btn" disabled={loading}>
+          <div className="auth-field" style={{ flexDirection: "row", alignItems: "flex-start", gap: 10, marginTop: 10 }}>
+            <input 
+              type="checkbox" 
+              id="terms" 
+              required 
+              style={{ width: "auto", marginTop: 4, cursor: "pointer" }}
+            />
+            <label htmlFor="terms" style={{ fontSize: 13, color: "#888", cursor: "pointer", userSelect: "none" }}>
+              I agree to the <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Terms and Conditions</Link> and <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Refund Policy</Link> of NME GYM.
+            </label>
+          </div>
+
+          <button type="submit" className="auth-btn" disabled={loading} style={{ marginTop: 20 }}>
             {loading ? "Submitting..." : "Submit Join Request →"}
           </button>
         </form>

@@ -99,10 +99,6 @@ export default function DashboardClient({ user, plans }) {
         setPaymentSuccess(true);
         setScreenshotUrl("");
         setSelectedPlan(null);
-        setTimeout(() => {
-          setPaymentSuccess(false);
-          window.location.reload();
-        }, 4000);
       } else {
         const data = await res.json().catch(() => ({}));
         alert(data.error || "Failed to submit payment.");
@@ -209,10 +205,41 @@ export default function DashboardClient({ user, plans }) {
                 <div style={{textAlign: "center", padding: "40px 0"}}>
                   <div style={{color: "#00ff64", fontSize: "48px", marginBottom: "10px"}}>✓</div>
                   <h4 style={{fontSize: "24px", color: "white", marginBottom: "10px"}}>PAYMENT SUBMITTED</h4>
-                  <p style={{color: "#888", fontSize: "14px"}}>
+                  <p style={{color: "#888", fontSize: "14px", marginBottom: "20px"}}>
                     Your payment is pending verification by our team.<br/>
                     You'll receive a confirmation email once approved.
                   </p>
+                  
+                  <a 
+                    href={`https://wa.me/917005310568?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${paymentAmount} for the ${selectedPlan.name} plan (Renewal).\n\n*My Details:*\nName: ${user.firstName} ${user.lastName}\nEmail: ${user.email}\nPhone: ${user.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      background: '#25D366',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      marginTop: '10px',
+                      boxShadow: '0 4px 15px rgba(37,211,102,0.3)',
+                    }}
+                  >
+                    💬 Notify Admin via WhatsApp
+                  </a>
+                  <p style={{ fontSize: '11px', color: '#666', marginTop: '15px', marginBottom: '20px' }}>
+                    Clicking the button above will open WhatsApp with your details pre-filled.
+                  </p>
+                  
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="btn-outline" 
+                    style={{marginTop: "20px", display: "inline-block"}}
+                  >
+                    Return to Dashboard
+                  </button>
                 </div>
               ) : (
                 <>

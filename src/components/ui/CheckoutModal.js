@@ -57,11 +57,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
       }
 
       setSuccess(true);
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-        setScreenshotUrl("");
-      }, 4000);
+      setScreenshotUrl("");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -82,9 +78,36 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
               <div style={{ color: 'var(--red)', fontSize: '48px', marginBottom: '10px' }}>✓</div>
               <h4 style={{ fontFamily: 'Bebas Neue', fontSize: '28px' }}>PAYMENT SUBMITTED</h4>
-              <p style={{ color: 'var(--gray)', fontSize: '14px', marginTop: '10px' }}>
+              <p style={{ color: 'var(--gray)', fontSize: '14px', marginTop: '10px', marginBottom: '20px' }}>
                 Your payment is pending verification by our team. <br/>
                 {isFirstTimer && "Once verified, your login credentials will be emailed to you."}
+              </p>
+              
+              <a 
+                href={`https://wa.me/919863765861?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  background: '#25D366',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                  marginTop: '10px',
+                  boxShadow: '0 4px 15px rgba(37,211,102,0.3)',
+                }}
+                onClick={(e) => {
+                  // Don't auto-close if they click the WhatsApp button
+                  e.stopPropagation();
+                }}
+              >
+                💬 Notify Admin via WhatsApp
+              </a>
+              <p style={{ fontSize: '11px', color: '#666', marginTop: '15px' }}>
+                Clicking the button above will open WhatsApp with your details pre-filled.
               </p>
             </div>
           ) : (

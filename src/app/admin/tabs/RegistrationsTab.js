@@ -48,6 +48,17 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
       if (res.ok) {
         const data = await res.json();
         console.log(`Registration ${status}: ${data.memberId || ''}`);
+        if (status === "VERIFIED" && data.userPhone) {
+          const loginUrl = `${window.location.origin}/auth/login`;
+          const text = data.isNewMember
+            ? `Welcome to NME GYM, ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan is verified and your membership is ACTIVE.\n\n*Your Login Credentials:*\nMember ID: ${data.memberId}\nInitial Password: ${data.initialPassword}\n\nPlease login here to access your dashboard: ${loginUrl}`
+            : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
+          
+          const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+          if (window.confirm("Registration verified successfully! Would you like to send the welcome details via WhatsApp to the member now?")) {
+            window.open(waUrl, "_blank");
+          }
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(errData.error || "Action failed.");
@@ -81,29 +92,38 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
       </div>
 
       {/* INFO BANNER */}
-      <div style={{
-        background: "rgba(0,200,255,0.05)", 
-        border: "1px solid rgba(0,200,255,0.2)", 
-        borderRadius: "8px", 
-        padding: "15px 20px", 
-        marginBottom: "20px",
-        display: "flex",
-        alignItems: "center",
-        gap: "10px"
+      <div className="admin-section-card" style={{
+        borderColor: "rgba(232,0,29,0.3)", 
+        background: "linear-gradient(90deg, rgba(232,0,29,0.05) 0%, transparent 100%)",
+        display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px"
       }}>
-        <span style={{fontSize: "20px"}}>💡</span>
-        <span style={{color: "#aaa", fontSize: "13px"}}>
-          When you approve a registration, the system will automatically generate a <strong style={{color: "white"}}>Member ID</strong> and <strong style={{color: "white"}}>initial password</strong>, 
-          then send a welcome email with login credentials to the new member.
-        </span>
+        <div style={{
+          background: "rgba(232,0,29,0.1)", color: "var(--red)", 
+          width: "40px", height: "40px", borderRadius: "8px", 
+          display: "flex", alignItems: "center", justifyContent: "center", 
+          fontSize: "18px", flexShrink: 0
+        }}>
+          💡
+        </div>
+        <p style={{color: "#ccc", fontSize: "13px", lineHeight: "1.5", margin: 0}}>
+          When you approve a registration, the system automatically generates a <strong style={{color: "white"}}>Member ID</strong> and <strong style={{color: "white"}}>initial password</strong>, sending a welcome email with login credentials directly to the new member.
+        </p>
       </div>
 
       {/* REGISTRATION CARDS */}
       {registrations.length === 0 ? (
-        <div className="admin-section-card" style={{textAlign: "center", padding: "60px 30px"}}>
-          <div style={{fontSize: "48px", marginBottom: "15px", opacity: 0.3}}>🎉</div>
-          <p style={{color: "#888", fontSize: "16px"}}>No pending registrations</p>
-          <p style={{color: "#555", fontSize: "13px"}}>New member sign-ups will appear here for your approval.</p>
+        <div className="admin-section-card" style={{textAlign: "center", padding: "60px 20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+          <div style={{
+            background: "rgba(255,255,255,0.02)", width: "80px", height: "80px", 
+            borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "32px", marginBottom: "20px", border: "1px solid rgba(255,255,255,0.05)"
+          }}>
+            📋
+          </div>
+          <h3 style={{color: "white", fontSize: "18px", marginBottom: "8px", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "1px", textTransform: "uppercase"}}>No Pending Registrations</h3>
+          <p style={{color: "#888", fontSize: "14px", maxWidth: "300px", margin: "0 auto", lineHeight: "1.5"}}>
+            New member sign-ups and their payment proofs will appear here for your review and approval.
+          </p>
         </div>
       ) : (
         <div style={{display: "flex", flexDirection: "column", gap: "15px"}}>

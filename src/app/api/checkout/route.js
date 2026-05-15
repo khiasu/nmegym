@@ -84,20 +84,25 @@ export async function POST(request) {
       },
     });
 
-    // Send notification email to admin
+    // Send notification emails
     try {
-      await sendAdminNotificationEmail({
-        memberName: `${firstName} ${lastName}`,
-        email,
-        phone,
-        planName,
-        totalAmount,
-        isFirstTimer,
-        paymentId: payment.id,
-      });
+      await Promise.allSettled([
+        sendAdminNotificationEmail({
+          memberName: `${firstName} ${lastName}`,
+          email,
+          phone,
+          planName,
+          totalAmount,
+          isFirstTimer,
+          paymentId: payment.id,
+        }),
+        import("@/lib/mail").then(({ sendUserPendingNotificationEmail }) => 
+          sendUserPendingNotificationEmail(email, firstName, planName)
+        )
+      ]);
     } catch (emailErr) {
       // Don't fail the checkout if email fails
-      console.error("Admin notification email failed:", emailErr);
+      console.error("Notification emails failed:", emailErr);
     }
 
     return NextResponse.json(
