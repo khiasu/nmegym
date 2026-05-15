@@ -571,13 +571,13 @@ export default function DashboardClient({ user, plans }) {
           object-fit: contain;
           margin-top: 0px;
         }
-        .db-header-text h1 { font-family: 'Bebas Neue', sans-serif; font-size: 20px !important; margin: 0 !important; color: white; line-height: 1.1; letter-spacing: 1px; }
-        .db-header-text p { font-size: 10px !important; margin: 0 !important; color: #888; }
+        .db-header-text h1 { font-family: 'Bebas Neue', sans-serif; font-size: 18px !important; margin: 0 !important; color: white; line-height: 1; letter-spacing: 1px; text-transform: uppercase; }
+        .db-header-text p { font-size: 11px !important; margin: 0 !important; color: #888; text-transform: uppercase; }
         
         .db-header-hidden { transform: translateY(-100%); }
         .db-header-scrolled { background: none; backdrop-filter: none; }
 
-        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: -15px; }
+        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: 0px; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
         .db-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .db-nav button { 
@@ -600,9 +600,8 @@ export default function DashboardClient({ user, plans }) {
           color: white; 
           border-left-color: var(--red);
         }
-        .db-header { margin-bottom: 40px; }
+        .db-header { margin-bottom: 20px; }
         .db-mobile-logo { display: none; }
-        .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
         .db-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .db-card { background: #111; border: 1px solid #222; padding: 30px; border-radius: 12px; }
