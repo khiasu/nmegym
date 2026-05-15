@@ -1,106 +1,129 @@
-# NME GYM — Technical Documentation
+# NME GYM — Full Technical Documentation
 
 A premium, high-performance web platform for NME GYM. This project is built with a focus on cinematic aesthetics, robust administrative control, and automated member management.
 
 ---
 
-## 🚀 Tech Stack
-*   **Framework:** Next.js 15+ (App Router)
+## 🚀 Tech Stack & Infrastructure
+*   **Framework:** Next.js 15+ (App Router, Server Actions where applicable)
 *   **Language:** JavaScript (ES6+)
-*   **Database:** Neon PostgreSQL (Serverless)
-*   **ORM:** Prisma 7.x
-*   **Authentication:** NextAuth.js
+*   **Database:** Neon PostgreSQL (Serverless, hosted on AWS region `aws-ap-southeast-1`)
+*   **ORM:** Prisma 7.x (Client-side generation for type-safety)
+*   **Authentication:** NextAuth.js (JWT Strategy)
 *   **Media Hosting:** Cloudinary (CDN for images & payment screenshots)
-*   **Email:** Nodemailer (Transaction emails)
-*   **Styling:** Vanilla CSS (Global Design System in `nme-gym.css`)
+*   **Email:** Nodemailer (Transaction emails via Gmail SMTP)
+*   **Styling:** Vanilla CSS (Modular design tokens in `nme-gym.css`)
 
 ---
 
-## 📂 Project Structure
+## 📂 Deep Directory Structure
 ```bash
 ├── prisma/
-│   └── schema.prisma        # Database models (User, Payment, Settings, Plan, Trainer)
-├── public/                  # Static assets (logo, icons)
-├── src/
-│   ├── app/                 # Next.js App Router (Pages & API Routes)
-│   │   ├── admin/           # Admin Portal (Tabs: Registrations, Payments, Settings)
-│   │   ├── api/             # Backend API (Auth, Admin operations, Checkout)
-│   │   ├── auth/            # Authentication (Login, Register, Reset Password)
-│   │   ├── dashboard/       # Member Dashboard (Renewal, Plan status)
-│   │   └── legal/           # Dynamic Legal Pages (Terms, Privacy, Refund)
-│   ├── components/
-│   │   ├── home/            # Interactive Home sections (Trainers, Contact, etc.)
-│   │   ├── providers/       # Context Providers (Auth, Sessions)
-│   │   └── ui/              # Reusable UI components (Modals, Inputs)
-│   ├── lib/                 # Shared utilities (Database client, Mailer, Data fetching)
-│   └── styles/
-│       └── nme-gym.css      # Core Design System (1000+ lines of custom CSS)
+│   └── schema.prisma        # Database models & relationships
+├── public/                  # Static assets & brand identity
+└── src/
+    ├── app/                 # Next.js App Router
+    │   ├── admin/           # Admin Portal (Secure)
+    │   │   ├── client/      # Admin UI wrappers & tab logic
+    │   │   └── tabs/        # Individual Admin Tabs (Registrations, Payments, Settings)
+    │   ├── api/             # RESTful API Endpoints
+    │   │   ├── admin/       # Protected Admin actions (Verify, Delete, Settings)
+    │   │   ├── auth/        # NextAuth configuration & callbacks
+    │   │   └── checkout/    # Plan selection & payment upload logic
+    │   ├── auth/            # Client-side Auth pages (Login, Register, Reset)
+    │   ├── dashboard/       # Member-only portal (Renewal, Status)
+    │   └── legal/           # Dynamic policy rendering engine
+    ├── components/
+    │   ├── home/            # Interactive Hero, Trainers, Contact sections
+    │   ├── providers/       # Auth & Theme context providers
+    │   └── ui/              # Reusable components (Modals, UploadArea, Notifications)
+    ├── lib/                 # Backend Utilities
+    │   ├── db.js            # Prisma Singleton Client
+    │   ├── mail.js          # SMTP Email Logic
+    │   └── data.js          # Shared Server-side Data Fetching
+    └── styles/
+        └── nme-gym.css      # 1000+ line bespoke design system
 ```
 
 ---
 
-## 🛠️ Key Features for Developers
+## 🏗️ Core System Logic
 
-### 1. Dynamic Settings System
-The site uses a singleton `Settings` model in Prisma. Fields like `whatsappNumber`, `upiId`, and `termsAndConditions` are admin-editable via the Admin Portal. The public site fetches these values in real-time.
+### 1. Dynamic Admin Settings (Singleton Pattern)
+The site uses a singleton `Settings` model. All global variables (WhatsApp number, UPI ID, Address, Hero Image, etc.) are stored here.
+*   **Implementation:** The admin portal uses an `upsert` logic in `/api/admin/settings`.
+*   **Formatting Engine:** The `legal/page.js` component includes a custom parser that converts "Bold: Text" lines from the database into formatted headers automatically.
 
-### 2. Manual Payment Verification
-The system does not use a 3rd-party payment gateway to avoid transaction fees. Instead:
-1.  User selects a plan and views the Admin UPI QR code.
-2.  User uploads a screenshot of the payment (uploaded to Cloudinary).
-3.  Admin verifies the screenshot in the portal.
-4.  Upon verification, the system generates credentials and sends a "Welcome Email."
+### 2. Manual Payment Verification Workflow
+This system bypasses payment gateways to save costs:
+1.  **Selection:** User picks a plan (Admission fee added if new).
+2.  **Payment:** User pays via UPI and uploads a screenshot.
+3.  **Cloudinary:** The screenshot is uploaded to Cloudinary using an unsigned preset.
+4.  **Pending State:** A `User` record is created with `status: PENDING`.
+5.  **Admin Action:** Admin reviews the screenshot in `PaymentsTab.js`.
+6.  **Activation:** Upon "Approve," the system:
+    - Updates status to `ACTIVE`.
+    - Calculates `startDate` (now) and `endDate` (based on plan duration).
+    - Generates a 6-digit `memberId` (e.g., NME-101).
+    - Triggers `welcomeEmail` with login credentials.
 
-### 3. Automated Plan Expiry
-Plans are tracked via `startDate` and `endDate`. The dashboard dynamically calculates remaining days and restricts access (showing a "Renew" prompt) if the plan has expired.
+### 3. Admin Interaction Patterns
+*   **Request Confirmation:** Critical actions (deleting users, resetting passwords) use a custom `requestConfirmation` modal.
+*   **Undo Pattern:** Success actions (verifying payments) use an `executeWithUndo` pattern, allowing the admin to revert a mistake within a 5-second window.
 
----
-
-## ⚙️ Environment Variables
-Create a `.env` file in the root directory:
-```env
-DATABASE_URL=         # Neon PostgreSQL connection string
-NEXTAUTH_URL=         # Your production or local URL
-NEXTAUTH_SECRET=      # Random string for auth encryption
-CLOUDINARY_CLOUD_NAME= # Cloudinary credentials
-CLOUDINARY_UPLOAD_PRESET=
-EMAIL_USER=           # Gmail/SMTP credentials for Nodemailer
-EMAIL_PASS=
-```
-
----
-
-## 💻 Local Development
-1.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-2.  **Generate Prisma client:**
-    ```bash
-    npx prisma generate
-    ```
-3.  **Run migrations:**
-    ```bash
-    npx prisma db push
-    ```
-4.  **Start dev server:**
-    ```bash
-    npm run dev
-    ```
+### 4. Authentication & Security
+*   **NextAuth:** Configured with `strategy: 'jwt'`.
+*   **Middleware:** Protected routes (`/admin/**`, `/dashboard/**`) are secured via server-side checks.
+*   **Role-Based:** Admin access is restricted to users with `role: ADMIN`.
 
 ---
 
-## 🚢 Deployment
-The project is optimized for **Vercel**.
-*   **Database Migrations:** Ensure `npx prisma db push` is part of your build command or run manually after schema changes.
-*   **Image Handling:** Ensure Cloudinary unsigned upload presets are correctly configured to match the frontend `UploadArea` logic.
+## 📡 API Endpoints
+
+### Public
+*   `POST /api/auth/register`: Initial user registration and payment metadata capture.
+*   `POST /api/checkout`: Renewal payment submissions.
+
+### Admin (Protected)
+*   `GET /api/admin/users`: Fetch all members with filtering.
+*   `POST /api/admin/verify-payment`: Approves/Rejects a payment and activates membership.
+*   `PUT /api/admin/settings`: Updates global gym configuration.
+*   `DELETE /api/admin/users/[id]`: Securely removes a user and their history.
 
 ---
 
-## 📜 Maintenance Notes
-*   **CSS:** Avoid adding Tailwind unless requested. The design system is highly specific and relies on the custom class names in `nme-gym.css`.
-*   **Settings Tab:** Any new global configuration should be added to the `Settings` model in `schema.prisma` and integrated into the `SettingsTab.js` UI.
-*   **Domain:** The domain `nmegym.in` requires annual renewal via the domain registrar.
+## 🛠️ Database Schema (Prisma)
+*   **User:** Core identity, roles, and membership status.
+*   **Plan:** Pricing tiers (Monthly, Quarterly, etc.).
+*   **Payment:** Ledger of all transactions, linked to users and Cloudinary URLs.
+*   **Settings:** Global site configuration.
+*   **Trainer:** Dynamic coaching profiles.
 
 ---
-**Developer Note:** This project was built for high performance and low operational costs. Stick to the "Free Tier" philosophy for database and image hosting unless the member count exceeds 5,000 active users.
+
+## ⚙️ Maintenance & Future-Proofing
+
+### Local Setup
+1.  `npm install`
+2.  `npx prisma generate`
+3.  `npx prisma db push` (Syncs schema with Neon)
+4.  `npm run dev`
+
+### Domain Renewal
+*   Domain: **nmegym.in**
+*   Registrar: [User to fill]
+*   Renewal Frequency: Annual. **Critical:** If the domain expires, all API routes and authentication will fail.
+
+### Scaling
+*   **Cloudinary:** If storage hits limits, cleanup old payment screenshots (`status: VERIFIED`).
+*   **Database:** The free tier of Neon is sufficient for ~5,000 members. Beyond this, upgrade to the "Autoscale" tier.
+
+---
+
+## 🎨 Styling Guidelines
+*   **Design Token System:** All colors are defined as CSS variables at the top of `nme-gym.css`.
+*   **Animations:** Uses a mix of `reveal` observers (custom JS) and CSS keyframes for cinematic transitions.
+*   **Responsiveness:** Grid-based layouts with specific breakpoints at `1024px`, `768px`, and `480px`.
+
+---
+**Lead Developer Note:** The primary design goal was "Zero Operational Cost." Do not introduce paid dependencies (Stripe, Twilio, etc.) without consulting the client.
