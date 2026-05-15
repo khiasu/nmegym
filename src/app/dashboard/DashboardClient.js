@@ -522,18 +522,18 @@ export default function DashboardClient({ user, plans }) {
           .db-mobile-logo { 
             display: block !important; 
             position: fixed !important;
-            top: 30px !important;
-            left: 30px !important;
+            top: 20px !important;
+            left: 20px !important;
             z-index: 3000 !important;
           }
-          .db-header-text { flex: 1; margin-left: 100px; } /* Push text to clear the fixed logo */
+          .db-header-text { flex: 1; margin-left: 90px; } /* Slightly reduced margin to match 20px offset */
           .db-header-text h1 { font-size: 24px !important; margin: 0 !important; line-height: 1.2; }
           .db-header-text p { font-size: 11px !important; margin: 2px 0 0 0 !important; }
           .dashboard-toggle { 
             display: flex !important; 
             position: fixed !important;
-            top: 30px !important;
-            right: 30px !important;
+            top: 20px !important;
+            right: 20px !important;
             z-index: 3000 !important;
           }
           
