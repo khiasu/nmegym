@@ -1,7 +1,7 @@
 // src/app/dashboard/DashboardClient.js — Member Dashboard (Client Component)
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
