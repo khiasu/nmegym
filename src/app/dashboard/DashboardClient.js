@@ -519,8 +519,14 @@ export default function DashboardClient({ user, plans }) {
             border-bottom: 1px solid #222;
           }
           .db-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; text-align: left; }
-          .db-mobile-logo { display: block !important; }
-          .db-header-text { flex: 1; }
+          .db-mobile-logo { 
+            display: block !important; 
+            position: fixed !important;
+            top: 30px !important;
+            left: 30px !important;
+            z-index: 3000 !important;
+          }
+          .db-header-text { flex: 1; margin-left: 100px; } /* Push text to clear the fixed logo */
           .db-header-text h1 { font-size: 24px !important; margin: 0 !important; line-height: 1.2; }
           .db-header-text p { font-size: 11px !important; margin: 2px 0 0 0 !important; }
           .dashboard-toggle { 

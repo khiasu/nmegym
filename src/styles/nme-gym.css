@@ -1084,14 +1084,14 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 @media(max-width:768px){
   nav {
     height: auto !important;
-    padding: 40px 30px !important; /* Slightly more top space */
+    padding: 30px !important; /* Perfectly symmetrical 30px padding */
     display: flex !important;
-    align-items: flex-start !important; 
+    align-items: center !important; 
     justify-content: space-between !important;
   }
   .nav-logo-img {
-    height: 100px !important; /* Reduced slightly from 130px */
-    max-width: 260px !important;
+    height: 80px !important; /* Refined to 80px as requested */
+    max-width: 240px !important;
     object-fit: contain;
   }
   .nav-links{display:none;}
@@ -2808,7 +2808,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
   
   .nav-logo-img {
-    height: 90px !important; /* Reduced from 110px */
+    height: 80px !important; 
     max-width: 240px !important;
   }
 
