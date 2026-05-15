@@ -1091,7 +1091,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
   .nav-logo-img {
     height: 80px !important; 
-    margin-top: -15px; /* Nudging even higher UP as requested */
+    margin-top: -20px; /* Nudging even higher UP as requested */
     margin-left: -5px; 
     max-width: 240px !important;
     object-fit: contain;
