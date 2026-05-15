@@ -69,8 +69,8 @@ export default function Testimonials() {
             SHARE YOUR EXPERIENCE
           </button>
         ) : (
-          <Link href="/auth/login" className="testi-login-link">
-            Log in to share your story
+          <Link href="/auth/login" className="btn-primary">
+            LOG IN TO SHARE YOUR STORY
           </Link>
         )}
       </div>
