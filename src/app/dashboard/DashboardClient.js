@@ -486,7 +486,7 @@ export default function DashboardClient({ user, plans }) {
                   <button className="btn-primary" onClick={() => setTestiSuccess(false)} style={{ marginTop: "20px" }}>SUBMIT ANOTHER</button>
                 </div>
               ) : (
-                <form className="db-form" style={{ marginTop: 25, maxWidth: "600px" }} onSubmit={async (e) => {
+                <form className="db-form testi-form-container" style={{ marginTop: 25 }} onSubmit={async (e) => {
                   e.preventDefault();
                   setTestiLoading(true);
                   try {
@@ -507,11 +507,10 @@ export default function DashboardClient({ user, plans }) {
                     <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", textTransform: "uppercase" }}>Your Experience</label>
                     <textarea 
                       placeholder="Tell us about your transformation, the environment, or the trainers..." 
-                      rows="6" 
+                      rows="10" 
                       required
                       value={testiContent}
                       onChange={e => setTestiContent(e.target.value)}
-                      style={{ width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "15px", borderRadius: "8px", fontFamily: "inherit" }}
                     ></textarea>
                   </div>
                   <div style={{ marginBottom: "25px" }}>
@@ -637,7 +636,9 @@ export default function DashboardClient({ user, plans }) {
         .tag-verified { color: #00ff64; }
         .tag-rejected { color: var(--red); }
         
-        .db-form textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 15px; border-radius: 8px; font-family: inherit; }
+        .testi-form-container { width: 100%; max-width: 800px; margin: 0 auto; text-align: left; }
+        .db-form textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 25px; border-radius: 12px; font-family: inherit; font-size: 16px; line-height: 1.6; resize: vertical; }
+        .db-form textarea:focus { border-color: var(--red); outline: none; }
         .btn-logout { background: none; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; }
         .btn-logout:hover { color: var(--red); border-color: var(--red); }
         .db-info p { margin: 5px 0; color: #888; font-size: 14px; }
