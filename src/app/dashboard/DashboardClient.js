@@ -192,7 +192,7 @@ export default function DashboardClient({ user, plans }) {
         <header className="db-header">
           <div className="db-header-top">
             <Link href="/" className="db-mobile-logo">
-              <img src="/newlogo.png" alt="NME GYM" style={{ height: '30px' }} />
+              <img src="/newlogo.png" alt="NME GYM" style={{ height: '70px', objectFit: 'contain' }} />
             </Link>
             <div className="db-header-text">
               <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
@@ -499,27 +499,6 @@ export default function DashboardClient({ user, plans }) {
         .db-form textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 15px; border-radius: 8px; font-family: inherit; }
         .btn-logout { background: none; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; }
         .btn-logout:hover { color: var(--red); border-color: var(--red); }
-        .db-actions { display: flex; flex-direction: column; gap: 12px; }
-        .btn-outline { 
-          background: rgba(255,255,255,0.02); 
-          border: 1px solid #222; 
-          color: #aaa; 
-          padding: 16px 20px; 
-          border-radius: 8px; 
-          cursor: pointer; 
-          font-family: 'Barlow Condensed', sans-serif;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-weight: 700;
-          transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
-          text-align: left; 
-        }
-        .btn-outline:hover { 
-          background: rgba(232,0,29,0.05);
-          border-color: var(--red); 
-          color: white; 
-          transform: translateX(5px);
-        }
         .db-info p { margin: 5px 0; color: #888; font-size: 14px; }
 
         @media (max-width: 768px) {
