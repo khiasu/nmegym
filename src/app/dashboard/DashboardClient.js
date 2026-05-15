@@ -12,6 +12,8 @@ export default function DashboardClient({ user, plans }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [screenshotUrl, setScreenshotUrl] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [lastPayment, setLastPayment] = useState({ amount: 0, planName: "" });
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Password change state
   const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
@@ -96,6 +98,7 @@ export default function DashboardClient({ user, plans }) {
       });
 
       if (res.ok) {
+        setLastPayment({ amount: paymentAmount, planName: selectedPlan.name });
         setPaymentSuccess(true);
         setScreenshotUrl("");
         setSelectedPlan(null);
@@ -121,16 +124,16 @@ export default function DashboardClient({ user, plans }) {
   return (
     <div className="db-layout">
       {/* Sidebar */}
-      <aside className="db-sidebar">
+      <aside className={`db-sidebar ${mobileOpen ? "open" : ""}`}>
         <div className="db-brand">
           <img src="/newlogo.png" alt="NME GYM" />
         </div>
         <nav className="db-nav">
-          <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>Overview</button>
-          <button className={activeTab === "membership" ? "active" : ""} onClick={() => setActiveTab("membership")}>My Membership</button>
-          <button className={activeTab === "payments" ? "active" : ""} onClick={() => setActiveTab("payments")}>Payments</button>
-          <button className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>Settings</button>
-          <button className={activeTab === "feedback" ? "active" : ""} onClick={() => setActiveTab("feedback")}>Feedback</button>
+          <button className={activeTab === "overview" ? "active" : ""} onClick={() => { setActiveTab("overview"); setMobileOpen(false); }}>Overview</button>
+          <button className={activeTab === "membership" ? "active" : ""} onClick={() => { setActiveTab("membership"); setMobileOpen(false); }}>My Membership</button>
+          <button className={activeTab === "payments" ? "active" : ""} onClick={() => { setActiveTab("payments"); setMobileOpen(false); }}>Payments</button>
+          <button className={activeTab === "settings" ? "active" : ""} onClick={() => { setActiveTab("settings"); setMobileOpen(false); }}>Settings</button>
+          <button className={activeTab === "feedback" ? "active" : ""} onClick={() => { setActiveTab("feedback"); setMobileOpen(false); }}>Feedback</button>
         </nav>
         <div className="db-footer">
           <Link href="/" style={{display: "block", textAlign: "center", marginBottom: 10, color: "#666", fontSize: 13, textDecoration: "none"}}>← Back to Home</Link>
@@ -141,7 +144,17 @@ export default function DashboardClient({ user, plans }) {
       {/* Main Content */}
       <main className="db-main">
         <header className="db-header">
-          <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+          <div className="db-header-top">
+            <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+            <div 
+              className={`hamburger dashboard-toggle ${mobileOpen ? "open" : ""}`} 
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
           <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
         </header>
 
@@ -172,17 +185,6 @@ export default function DashboardClient({ user, plans }) {
                 </button>
               </div>
 
-              {/* Quick Actions */}
-              <div className="db-card">
-                <h3>Quick Actions</h3>
-                <div className="db-actions">
-                  <button className="btn-outline" onClick={() => setActiveTab("membership")}>
-                    {currentMembership && !isExpired ? "Renew Plan" : "Select Plan"}
-                  </button>
-                  <button className="btn-outline" onClick={() => setActiveTab("payments")}>View Payments</button>
-                  <button className="btn-outline" onClick={() => setActiveTab("feedback")}>Send Feedback</button>
-                </div>
-              </div>
 
               {/* Pending Payments */}
               {user.payments?.some(p => p.status === "PENDING_VERIFICATION") && (
@@ -211,7 +213,7 @@ export default function DashboardClient({ user, plans }) {
                   </p>
                   
                   <a 
-                    href={`https://wa.me/917005310568?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${paymentAmount} for the ${selectedPlan.name} plan (Renewal).\n\n*My Details:*\nName: ${user.firstName} ${user.lastName}\nEmail: ${user.email}\nPhone: ${user.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                    href={`https://wa.me/917005310568?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${lastPayment.amount} for the ${lastPayment.planName} plan (Renewal).\n\n*My Details:*\nName: ${user.firstName} ${user.lastName}\nEmail: ${user.email}\nPhone: ${user.phone}\n\nPlease verify my payment. Thank you!`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -479,48 +481,53 @@ export default function DashboardClient({ user, plans }) {
         @media (max-width: 768px) {
           .db-layout { flex-direction: column; }
           .db-sidebar { 
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%; 
-            padding: 15px 20px; 
-            flex-direction: row; 
+            height: 100vh;
+            padding: 40px; 
+            flex-direction: column; 
             align-items: center; 
+            justify-content: center;
+            z-index: 2000;
+            background: rgba(5,5,5,0.98);
+            backdrop-filter: blur(20px);
+            border: none;
+            display: none;
+            opacity: 0;
+            transition: all 0.4s ease;
+          }
+          .db-sidebar.open {
+            display: flex;
+            opacity: 1;
+          }
+          .db-header { 
             position: sticky;
             top: 0;
-            z-index: 1000;
-            background: rgba(10,10,10,0.9);
+            background: rgba(5,5,5,0.8);
             backdrop-filter: blur(20px);
+            z-index: 1000;
+            margin: -20px -20px 30px -20px;
+            padding: 20px;
             border-bottom: 1px solid #222;
           }
-          .db-brand { margin-bottom: 0; margin-right: 20px; }
-          .db-brand img { height: 24px; margin-bottom: 0; }
+          .db-header-top { display: flex; justify-content: space-between; align-items: center; }
+          .dashboard-toggle { display: flex !important; }
           .db-nav { 
-            flex-direction: row; 
-            flex-wrap: nowrap; 
-            gap: 20px; 
-            overflow-x: auto;
-            padding-bottom: 4px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            flex-direction: column;
+            width: 100%;
+            text-align: center;
+            gap: 25px;
+            margin: 40px 0;
           }
-          .db-nav::-webkit-scrollbar { display: none; }
           .db-nav button { 
-            padding: 8px 0; 
-            font-size: 11px; 
-            font-family: 'Barlow Condensed', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            white-space: nowrap;
-            border-radius: 0;
-            border-bottom: 2px solid transparent;
+            padding: 15px;
+            font-size: 24px;
+            text-align: center;
+            border: none !important;
           }
-          .db-nav button:hover, .db-nav button.active { 
-            background: none; 
-            color: white; 
-            border-bottom-color: var(--red); 
-          }
-          .db-footer { display: none; }
-          .db-main { padding: 30px 20px; }
-          .db-header h1 { font-size: 32px; }
+          .db-footer { display: block; border-top: 1px solid #222; padding-top: 20px; width: 100%; }
           .db-grid { grid-template-columns: 1fr; gap: 20px; }
           .db-card.full { grid-column: span 1; }
           .plans-selection { grid-template-columns: 1fr; }
