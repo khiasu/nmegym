@@ -383,7 +383,7 @@ export default function DashboardClient({ user, plans }) {
           )}
 
           {activeTab === "payments" && (
-            <div className="db-card full">
+            <div className="db-card full db-payments-card">
               <h3>Payment History</h3>
               {/* Desktop Table View */}
               <div className="db-table-desktop" style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -600,9 +600,10 @@ export default function DashboardClient({ user, plans }) {
         }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
         .db-content { max-width: 1600px; margin: 0 auto; }
-        .db-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
+        .db-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; max-width: 1100px; margin: 0 auto; }
         .db-card { background: #111; border: 1px solid #222; padding: 50px; border-radius: 16px; }
         .db-card.full { grid-column: span 2; }
+        .db-card.full:not(.db-payments-card) { max-width: 1100px; margin: 0 auto; }
         .db-card h3 { margin-bottom: 20px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; margin-bottom: 15px; }
         .status-badge[data-status="ACTIVE"] { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid #00ff64; }
@@ -659,11 +660,11 @@ export default function DashboardClient({ user, plans }) {
           .db-content { max-width: 100%; padding: 0; }
           .db-logo-img { height: 60px !important; }
           .db-main { padding: 80px 20px 40px 20px; }
-          .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+          .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; max-width: none; margin: 0; }
           .db-card { width: 100% !important; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
           .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
           .db-card .btn-primary { width: 100%; max-width: 300px; margin-top: 20px; }
-          .db-card.full { grid-column: span 1; text-align: center; align-items: center; }
+          .db-card.full { grid-column: span 1; text-align: center; align-items: center; max-width: none !important; margin: 0; }
           .plans-selection { grid-template-columns: 1fr 1fr !important; }
           .payment-card { width: 100% !important; box-sizing: border-box; }
         }
