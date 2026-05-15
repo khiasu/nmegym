@@ -2668,7 +2668,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   .admin-body-elite {
     margin-left: 15px !important;
     margin-right: 15px !important;
-    padding-top: 100px !important; /* Space for logo */
+    padding-top: 130px !important; /* Space for logo and transparent header */
     padding-bottom: 80px !important; /* Space for bottom nav */
   }
 
@@ -2707,7 +2707,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
 
   .admin-body-elite {
-    padding-top: 100px !important; /* Space for the new solid header */
+    padding-top: 130px !important; /* Space for the new solid header */
   }
 
   .nav-logo-img {
@@ -2997,12 +2997,34 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   
   .admin-body-elite {
     margin-top: 0 !important; /* Remove top margin */
-    padding-top: 75px !important; /* Exact height of the mobile header + slight buffer */
+    padding-top: 130px !important; /* Fixed overlap */
   }
 
   .admin-global-header {
-    height: 100px !important; /* Increased to accommodate larger logo */
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2000;
+    height: 100px !important; /* Accommodate larger logo */
     padding: 10px 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: transparent !important; /* Transparent initially */
+    border-bottom: 1px solid transparent !important;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.3s ease, border-color 0.3s ease !important;
+  }
+
+  .admin-global-header.scrolled {
+    background: rgba(10, 10, 10, 0.95) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .admin-global-header.nav-hidden {
+    transform: translateY(-100%) !important;
   }
 }
 

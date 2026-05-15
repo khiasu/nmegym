@@ -21,6 +21,32 @@ import ToastNotification from "@/components/ui/ToastNotification";
 export default function AdminClient(props) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+  
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setNavHidden(true); // Scrolling down
+      } else {
+        setNavHidden(false); // Scrolling up
+      }
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   
   // GLOBAL CUSTOM ALERT STATE
   const [alertState, setAlertState] = useState({ isOpen: false, message: "" });
@@ -111,7 +137,7 @@ export default function AdminClient(props) {
   return (
     <div id="page-admin">
       {/* GLOBAL BRAND ANCHOR & MOBILE HEADER */}
-      <div className="admin-global-header">
+      <div className={`admin-global-header ${scrolled ? "scrolled" : ""} ${navHidden ? "nav-hidden" : ""}`}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <img 
             src={props.settings?.logoUrl || "/newlogo.png"} 

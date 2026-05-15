@@ -103,6 +103,35 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
             <p style={{fontSize:"11px", color:"rgba(255,255,255,0.3)", marginTop:"10px"}}>SQUARE CROP (1:1) REQUIRED FOR PERFECT ALIGNMENT</p>
           </div>
         </div>
+
+        {/* HERO BACKGROUND */}
+        <div style={{marginTop: "30px", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px"}}>
+          <div className="admin-section-card-title" style={{fontSize: "14px", marginBottom: "15px"}}>Hero Background Image</div>
+          <div style={{display:"flex", alignItems:"center", gap:"30px", flexWrap:"wrap"}}>
+            <div style={{width:"200px", height:"112px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "8px", position: "relative"}}>
+              {settings.heroBackgroundUrl ? (
+                <img src={settings.heroBackgroundUrl} alt="Hero Background" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+              ) : (
+                <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>No Image Set</span>
+              )}
+              {settings.heroBackgroundUrl && (
+                <button type="button" onClick={() => setSettings({...settings, heroBackgroundUrl: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              )}
+            </div>
+            <div>
+              <CldUploadWidget 
+                uploadPreset="nmegym_preset" 
+                options={{ cropping: false }}
+                onSuccess={(res) => setSettings({...settings, heroBackgroundUrl: res.info.secure_url})}
+              >
+                {({ open }) => (
+                  <button className="admin-btn-sm" onClick={() => open()}>Upload Hero Image</button>
+                )}
+              </CldUploadWidget>
+              <p style={{fontSize:"11px", color:"rgba(255,255,255,0.3)", marginTop:"10px"}}>RECOMMENDED: 1920x1080 (16:9) HIGH QUALITY IMAGE</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* PAYMENT SETTINGS */}
@@ -140,6 +169,65 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
         <div className="admin-form-group" style={{marginTop: "20px"}}>
           <label className="admin-label">About Us Description</label>
           <textarea className="admin-input" style={{height:"120px", width:"100%"}} value={settings.aboutText || ""} onChange={(e) => setSettings({...settings, aboutText: e.target.value})} placeholder="Describe your gym..."></textarea>
+        </div>
+
+        {/* ABOUT IMAGES */}
+        <div style={{marginTop: "30px", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px"}}>
+          <div className="admin-section-card-title" style={{fontSize: "14px", marginBottom: "15px"}}>About Section Images</div>
+          <p style={{fontSize:"11px", color:"rgba(255,255,255,0.4)", marginBottom:"15px"}}>Upload 3 images to showcase your gym in the About section.</p>
+          
+          <div style={{display:"flex", gap:"15px", flexWrap:"wrap"}}>
+            {/* About Image 1 */}
+            <div style={{flex: 1, minWidth: "150px"}}>
+              <div style={{width:"100%", height:"100px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "8px", position: "relative", marginBottom: "10px"}}>
+                {settings.aboutImage1Url ? (
+                  <img src={settings.aboutImage1Url} alt="About 1" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                ) : (
+                  <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>Image 1 (Tall)</span>
+                )}
+                {settings.aboutImage1Url && (
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage1Url: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                )}
+              </div>
+              <CldUploadWidget uploadPreset="nmegym_preset" onSuccess={(res) => setSettings({...settings, aboutImage1Url: res.info.secure_url})}>
+                {({ open }) => <button className="admin-btn-sm" style={{width:"100%"}} onClick={() => open()}>Upload Image 1</button>}
+              </CldUploadWidget>
+            </div>
+
+            {/* About Image 2 */}
+            <div style={{flex: 1, minWidth: "150px"}}>
+              <div style={{width:"100%", height:"100px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "8px", position: "relative", marginBottom: "10px"}}>
+                {settings.aboutImage2Url ? (
+                  <img src={settings.aboutImage2Url} alt="About 2" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                ) : (
+                  <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>Image 2 (Square)</span>
+                )}
+                {settings.aboutImage2Url && (
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage2Url: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                )}
+              </div>
+              <CldUploadWidget uploadPreset="nmegym_preset" onSuccess={(res) => setSettings({...settings, aboutImage2Url: res.info.secure_url})}>
+                {({ open }) => <button className="admin-btn-sm" style={{width:"100%"}} onClick={() => open()}>Upload Image 2</button>}
+              </CldUploadWidget>
+            </div>
+
+            {/* About Image 3 */}
+            <div style={{flex: 1, minWidth: "150px"}}>
+              <div style={{width:"100%", height:"100px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "8px", position: "relative", marginBottom: "10px"}}>
+                {settings.aboutImage3Url ? (
+                  <img src={settings.aboutImage3Url} alt="About 3" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                ) : (
+                  <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>Image 3 (Square)</span>
+                )}
+                {settings.aboutImage3Url && (
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage3Url: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                )}
+              </div>
+              <CldUploadWidget uploadPreset="nmegym_preset" onSuccess={(res) => setSettings({...settings, aboutImage3Url: res.info.secure_url})}>
+                {({ open }) => <button className="admin-btn-sm" style={{width:"100%"}} onClick={() => open()}>Upload Image 3</button>}
+              </CldUploadWidget>
+            </div>
+          </div>
         </div>
       </div>
 
