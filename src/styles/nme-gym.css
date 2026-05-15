@@ -1499,12 +1499,16 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   font-style: normal;
 }
 
-/* Dots Indicator */
+/* Dots Indicator - Superimposed on Image */
 .trainer-dots {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-top: 25px;
+  z-index: 10;
 }
 
 .trainer-dot {
@@ -1606,7 +1610,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
 
   .trainer-dots {
-    margin-top: 16px;
+    margin-top: 0;
   }
 }
 

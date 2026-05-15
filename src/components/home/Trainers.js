@@ -120,6 +120,19 @@ export default function Trainers({ trainers }) {
           <div className="trainer-slide-img-wrap">
             <img src={t.img} alt={t.name} className="trainer-slide-img" />
             <div className="trainer-slide-img-overlay" />
+            
+            {/* Superimposed Dots */}
+            <div className="trainer-dots">
+              {trainerData.map((_, i) => (
+                <button
+                  key={i}
+                  className={`trainer-dot ${i === active ? "active" : ""}`}
+                  onClick={() => goTo(i, i > active ? "next" : "prev")}
+                  aria-label={`Go to trainer ${i + 1}`}
+                />
+              ))}
+            </div>
+
             {/* Counter Badge */}
             <div className="trainer-counter">
               <span className="trainer-counter-active">{String(active + 1).padStart(2, "0")}</span>
@@ -138,18 +151,6 @@ export default function Trainers({ trainers }) {
             <div className="trainer-slide-quote">
               <span className="quote-mark">&ldquo;</span>
               {t.quote}
-            </div>
-
-            {/* Dots Only */}
-            <div className="trainer-dots">
-              {trainerData.map((_, i) => (
-                <button
-                  key={i}
-                  className={`trainer-dot ${i === active ? "active" : ""}`}
-                  onClick={() => goTo(i, i > active ? "next" : "prev")}
-                  aria-label={`Go to trainer ${i + 1}`}
-                />
-              ))}
             </div>
           </div>
         </div>
