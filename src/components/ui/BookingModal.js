@@ -38,39 +38,57 @@ export default function BookingModal({ isOpen, onClose }) {
   return (
     <div className="modal-overlay open" id="bookingModal">
       <div className="modal">
-        <div className="modal-header" style={{ flexDirection: "column", gap: "15px", alignItems: "center", paddingBottom: "25px" }}>
-          <img src="/newlogo.png" alt="NME GYM" style={{ height: "45px", objectFit: "contain" }} />
-          <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ margin: 0 }}>BOOK FREE TRIAL</h3>
-            <button className="modal-close" onClick={onClose} style={{ position: "relative", top: 0, right: 0 }}>✕</button>
+        <div className="modal-header" style={{ flexDirection: "column", gap: "10px", alignItems: "center", padding: "30px 20px 20px 20px", background: "#0a0a0a", borderBottom: "1px solid #222" }}>
+          <img src="/newlogo.png" alt="NME GYM" style={{ height: "40px", objectFit: "contain", marginBottom: "5px" }} />
+          <div style={{ display: "flex", width: "100%", justifyContent: "center", position: "relative" }}>
+            <h3 style={{ margin: 0, fontSize: "20px", letterSpacing: "1px", color: "#888" }}>TRIAL BOOKING</h3>
+            <button className="modal-close" onClick={onClose} style={{ position: "absolute", top: "-5px", right: "0", background: "none", border: "none", color: "#666", fontSize: "20px" }}>✕</button>
           </div>
         </div>
         
         {success ? (
-          <div className="modal-body" style={{ textAlign: "center", padding: "50px 30px" }}>
+          <div className="modal-body" style={{ textAlign: "center", padding: "40px 30px", background: "#111" }}>
             <div style={{ 
-              width: "100px", 
-              height: "40px", 
-              border: "2px solid var(--red)", 
-              borderRadius: "4px", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
-              margin: "0 auto 24px auto",
+              display: "inline-block",
+              padding: "6px 20px",
+              border: "1px solid var(--red)",
+              borderRadius: "50px", // Rounded rectangle
               color: "var(--red)",
-              fontSize: "14px",
-              fontWeight: "900",
-              fontFamily: "'Bebas Neue', sans-serif",
-              letterSpacing: "2px"
+              fontSize: "12px",
+              fontWeight: "700",
+              letterSpacing: "2px",
+              marginBottom: "24px",
+              fontFamily: "'Barlow Condensed', sans-serif"
             }}>SUCCESS</div>
-            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "36px", letterSpacing: "3px", margin: "0 0 12px 0", color: "white" }}>
+
+            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "36px", letterSpacing: "3px", margin: "0 0 10px 0", color: "white" }}>
               BOOKING <span className="red">CONFIRMED</span>
             </h3>
-            <div style={{ width: "40px", height: "2px", background: "var(--red)", margin: "0 auto 20px auto" }}></div>
-            <p style={{ color: "#888", fontSize: "14px", lineHeight: "1.6", maxWidth: "260px", margin: "0 auto" }}>
-              Your trial session is scheduled. Our team will contact you shortly to finalize your elite experience.
+            <div style={{ width: "30px", height: "2px", background: "var(--red)", margin: "0 auto 24px auto" }}></div>
+            
+            <p style={{ color: "#888", fontSize: "14px", lineHeight: "1.6", maxWidth: "280px", margin: "0 auto" }}>
+              Your trial session is scheduled. We'll reach out shortly to finalize your elite experience.
             </p>
-            <button className="btn-primary" onClick={onClose} style={{ marginTop: "32px", width: "100%", borderRadius: "0", letterSpacing: "2px" }}>
+
+            <button 
+              onClick={onClose} 
+              style={{ 
+                marginTop: "35px", 
+                width: "100%", 
+                padding: "16px",
+                background: "var(--red)",
+                color: "white",
+                border: "none",
+                borderRadius: "8px", // Simple rounded rectangle
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "18px",
+                letterSpacing: "2px",
+                cursor: "pointer",
+                transition: "transform 0.2s ease"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
+              onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+            >
               DISMISS
             </button>
           </div>

@@ -224,7 +224,7 @@ export default function DashboardClient({ user, plans }) {
                     <p>Plan: <strong>{currentMembership.planTier}</strong></p>
                     <p>Expires: <strong>{currentMembership.endDate ? new Date(currentMembership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}</strong></p>
                     {!isExpired && daysLeft <= 7 && (
-                      <p style={{color: "var(--red)", marginTop: 10, fontSize: 13, fontWeight: "600"}}>⚠️ Expiring in {daysLeft} day{daysLeft !== 1 ? "s" : ""}</p>
+                      <p style={{color: "#ffc800", marginTop: 10, fontSize: 13}}>⚠️ Expiring in {daysLeft} day{daysLeft !== 1 ? "s" : ""}</p>
                     )}
                   </div>
                 )}
