@@ -205,9 +205,9 @@ export default function DashboardClient({ user, plans }) {
           <div className="db-header-inner">
             <Link href="/" className="db-logo-group">
               <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
-              <div className="db-header-text">
-                <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
-                <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+              <div className="db-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
+                <h1 style={{ display: 'inline' }}>Welcome, <span className="red">{user.firstName}</span></h1>
+                <p className="gray" style={{ display: 'inline', fontSize: '11px', borderLeft: '1px solid #333', paddingLeft: '15px' }}>ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
               </div>
             </Link>
 
@@ -572,7 +572,7 @@ export default function DashboardClient({ user, plans }) {
         .db-header-text p { font-size: 10px !important; margin: 0 !important; color: #888; }
         
         .db-header-hidden { transform: translateY(-100%); }
-        .db-header-scrolled { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); }
+        .db-header-scrolled { background: none; backdrop-filter: none; }
 
         .dashboard-toggle { display: flex !important; position: relative !important; margin-top: 0px; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
