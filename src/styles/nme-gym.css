@@ -1325,8 +1325,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   background: var(--card);
   border: 1px solid var(--border);
   overflow: hidden;
-  height: 280px; /* Fixed height for perfect screen fitting */
-  min-height: 280px;
+  height: 340px; /* Optimal middle ground */
+  min-height: 340px;
   position: relative;
   transition: opacity 0.6s ease;
   will-change: opacity;
@@ -1344,8 +1344,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 .trainer-slide-img-wrap {
   position: relative;
   overflow: hidden;
-  height: 280px;
-  min-height: 280px;
+  height: 340px;
+  min-height: 340px;
 }
 
 .trainer-slide-img {
@@ -1421,7 +1421,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 /* Content Side */
 .trainer-slide-content {
-  padding: 30px 40px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1470,7 +1470,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   font-size: 15px;
   color: rgba(255,255,255,0.6);
   line-height: 1.7;
-  max-width: 380px;
+  max-width: 480px;
 }
 
 /* Quote */
