@@ -141,6 +141,16 @@ export default function DashboardClient({ user, plans }) {
         </div>
       </aside>
 
+      {/* MOBILE TOGGLE BUTTON — FIXED ON TOP */}
+      <div 
+        className={`hamburger dashboard-toggle ${mobileOpen ? "open" : ""}`} 
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
       {/* MOBILE MENU — MIRRORING MAIN WEBSITE */}
       <div className={`mobile-menu ${mobileOpen ? "open" : ""}`} id="mobileMenu">
         <div className="mm-bg-text">NME</div>
@@ -157,7 +167,7 @@ export default function DashboardClient({ user, plans }) {
               key={item.id} 
               onClick={() => { setActiveTab(item.id); setMobileOpen(false); }} 
               className={`mm-link ${activeTab === item.id ? "active" : ""}`}
-              style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', padding: 0 }}
+              style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', padding: 0, cursor: 'pointer' }}
             >
               <span className="mm-num">0{i + 1}</span>
               <span className="mm-text" style={{ color: activeTab === item.id ? 'var(--red)' : 'inherit' }}>{item.name}</span>
@@ -167,7 +177,13 @@ export default function DashboardClient({ user, plans }) {
 
         <div className="mm-footer">
           <Link href="/" className="mm-member-link">← BACK TO HOME</Link>
-          <button onClick={() => signOut()} className="mm-cta">SIGN OUT</button>
+          <button 
+            onClick={() => signOut()} 
+            className="mm-cta"
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+          >
+            SIGN OUT
+          </button>
         </div>
       </div>
 
@@ -176,14 +192,6 @@ export default function DashboardClient({ user, plans }) {
         <header className="db-header">
           <div className="db-header-top">
             <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
-            <div 
-              className={`hamburger dashboard-toggle ${mobileOpen ? "open" : ""}`} 
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
           </div>
           <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
         </header>
@@ -523,7 +531,13 @@ export default function DashboardClient({ user, plans }) {
             border-bottom: 1px solid #222;
           }
           .db-header-top { display: flex; justify-content: space-between; align-items: center; }
-          .dashboard-toggle { display: flex !important; }
+          .dashboard-toggle { 
+            display: flex !important; 
+            position: fixed !important;
+            top: 30px !important;
+            right: 30px !important;
+            z-index: 3000 !important;
+          }
           
           .db-main { padding: 30px 20px; }
           .db-header h1 { font-size: 32px; }
