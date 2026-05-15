@@ -31,9 +31,14 @@ export async function POST(request) {
     let targetUserId = userId;
 
     if (isFirstTimer && !userId) {
-      // First-timer: Create or find the user (upsert by email)
-      const existingUser = await prisma.user.findUnique({
-        where: { email: email.toLowerCase().trim() },
+      // First-timer: Create or find the user (find by email OR phone)
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: email.toLowerCase().trim() },
+            { phone: phone ? phone.trim() : undefined }
+          ].filter(c => c.email || c.phone)
+        },
       });
 
       if (existingUser) {
@@ -49,13 +54,13 @@ export async function POST(request) {
           },
         });
       } else {
-        // Create brand new user (no password yet — will be generated on verification)
+        // Create brand new user
         const newUser = await prisma.user.create({
           data: {
             firstName,
             lastName,
             email: email.toLowerCase().trim(),
-            phone: phone || null,
+            phone: phone ? phone.trim() : null,
             role: "MEMBER",
           },
         });
@@ -69,6 +74,25 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    // ── Rate Limit: Max 3 payment submissions per user per day ──────────────
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const todayCount = await prisma.payment.count({
+      where: {
+        userId: targetUserId,
+        createdAt: { gte: startOfDay },
+      },
+    });
+
+    if (todayCount >= 3) {
+      return NextResponse.json(
+        { error: "Daily submission limit reached. A maximum of 3 payment requests can be made per day per account. Contact support if you need help." },
+        { status: 429 }
+      );
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     // Create payment record
     const payment = await prisma.payment.create({

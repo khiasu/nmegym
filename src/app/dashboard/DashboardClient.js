@@ -29,6 +29,9 @@ export default function DashboardClient({ user, plans }) {
   const [testiLoading, setTestiLoading] = useState(false);
   const [testiSuccess, setTestiSuccess] = useState(false);
 
+  // Payment error state
+  const [paymentError, setPaymentError] = useState("");
+
   const searchParams = useSearchParams();
   
   useEffect(() => {
@@ -90,28 +93,22 @@ export default function DashboardClient({ user, plans }) {
 
   async function handlePaymentSubmit(e) {
     e.preventDefault();
+    setPaymentError("");
     if (!selectedPlan || !screenshotUrl) {
-      alert("Please select a plan and upload your payment screenshot.");
+      setPaymentError("Please select a plan and upload your payment screenshot.");
       return;
     }
 
     setUploading(true);
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          phone: user.phone,
+          amount: paymentAmount,
           planName: selectedPlan.name,
-          planPrice: selectedPlan.price,
-          admissionFee: 0, // Existing members don't pay admission
-          totalAmount: paymentAmount,
+          paymentMethod: "UPI",
           screenshotUrl,
-          isFirstTimer: false,
-          userId: user.id,
         }),
       });
 
@@ -122,10 +119,10 @@ export default function DashboardClient({ user, plans }) {
         setSelectedPlan(null);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "Failed to submit payment.");
+        setPaymentError(data.error || "Failed to submit payment. Please try again.");
       }
     } catch (err) {
-      alert("Error submitting payment.");
+      setPaymentError("Network error. Please check your connection and try again.");
     } finally {
       setUploading(false);
     }
@@ -371,6 +368,11 @@ export default function DashboardClient({ user, plans }) {
                             </button>
                           </div>
                           <p style={{color: "#00ff64", marginBottom: "15px"}}>✓ Screenshot uploaded</p>
+                          {paymentError && (
+                            <div style={{ background: "rgba(232,0,29,0.1)", border: "1px solid rgba(232,0,29,0.4)", borderRadius: "8px", padding: "12px 16px", marginBottom: "15px", color: "#ff6b6b", fontSize: "13px", lineHeight: "1.5" }}>
+                              ⚠️ {paymentError}
+                            </div>
+                          )}
                           <button className="btn-primary" onClick={handlePaymentSubmit} disabled={uploading} style={{width: "100%", padding: "15px"}}>
                             {uploading ? "SUBMITTING..." : `CONFIRM PAYMENT — ₹${paymentAmount}`}
                           </button>

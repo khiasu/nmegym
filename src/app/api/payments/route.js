@@ -15,6 +15,25 @@ export async function POST(request) {
       return NextResponse.json({ error: "Amount and screenshot are required" }, { status: 400 });
     }
 
+    // ── Rate Limit: Max 3 payment submissions per user per day ──────────────
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const todayCount = await prisma.payment.count({
+      where: {
+        userId: session.user.id,
+        createdAt: { gte: startOfDay },
+      },
+    });
+
+    if (todayCount >= 3) {
+      return NextResponse.json(
+        { error: "Daily limit reached. You can only submit 3 payment requests per day. Please contact support if you need assistance." },
+        { status: 429 }
+      );
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { firstName: true, lastName: true, email: true, phone: true },
