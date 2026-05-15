@@ -592,7 +592,7 @@ export default function DashboardClient({ user, plans }) {
           .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
           .db-card .btn-primary { width: 100%; max-width: 300px; margin-top: 20px; }
           .db-card.full { grid-column: span 1; text-align: center; align-items: center; }
-          .plans-selection { grid-template-columns: 1fr; }
+          .plans-selection { grid-template-columns: 1fr 1fr !important; }
           .payment-card { width: 100% !important; box-sizing: border-box; }
         }
       `}</style>
