@@ -541,7 +541,7 @@ export default function DashboardClient({ user, plans }) {
       <style jsx>{`
         .db-layout { display: flex; min-height: 100vh; background: #050505; color: white; font-family: 'Barlow', sans-serif; }
         .db-sidebar { display: none !important; }
-        .db-main { flex: 1; padding: 180px 40px 40px 40px; }
+        .db-main { flex: 1; padding: 150px 40px 40px 40px; }
         .db-header { 
           position: fixed;
           top: 0;
@@ -670,7 +670,7 @@ export default function DashboardClient({ user, plans }) {
           .welcome-txt { font-size: 14px; }
           .id-txt { font-size: 10px; padding: 3px 8px; }
           .db-header-text-center { gap: 8px; }
-          .db-main { padding: 140px 20px 40px 20px; }
+          .db-main { padding: 110px 20px 40px 20px; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; max-width: none; margin: 0; }
           .db-card { width: 100% !important; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
           .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
