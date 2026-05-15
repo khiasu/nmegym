@@ -1084,13 +1084,14 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 @media(max-width:768px){
   nav {
     height: auto !important;
-    padding: 15px 30px !important; /* Lifted up to 15px to restore 'perfect' toggle height */
+    padding: 16px 30px !important; /* Reverting top space to original 16px for the toggle */
     display: flex !important;
     align-items: flex-start !important; 
     justify-content: space-between !important;
   }
   .nav-logo-img {
-    height: 80px !important; /* Refined to 80px as requested */
+    height: 80px !important; 
+    margin-top: -5px; /* Nudging the logo UP as requested */
     max-width: 240px !important;
     object-fit: contain;
   }
