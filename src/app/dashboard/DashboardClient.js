@@ -548,7 +548,7 @@ export default function DashboardClient({ user, plans }) {
           width: 100%;
           background: transparent; 
           z-index: 5000;
-          padding: 10px 20px;
+          padding: 20px 0;
           box-sizing: border-box;
           transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
@@ -556,6 +556,9 @@ export default function DashboardClient({ user, plans }) {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 40px;
         }
         .db-logo-group {
           display: flex;
@@ -600,6 +603,7 @@ export default function DashboardClient({ user, plans }) {
         .db-header { margin-bottom: 40px; }
         .db-mobile-logo { display: none; }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
+        .db-content { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .db-card { background: #111; border: 1px solid #222; padding: 30px; border-radius: 12px; }
         .db-card.full { grid-column: span 2; }
@@ -655,6 +659,8 @@ export default function DashboardClient({ user, plans }) {
         @media (max-width: 1024px) {
           .db-table-desktop { display: none; }
           .db-mobile-list { display: block; width: 100%; }
+          .db-header-inner { padding: 0 20px; }
+          .db-content { max-width: 100%; padding: 0; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
           .db-card { width: 100% !important; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
           .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
