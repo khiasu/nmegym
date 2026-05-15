@@ -399,9 +399,27 @@ export default function DashboardClient({ user, plans }) {
         .db-layout { display: flex; min-height: 100vh; background: #050505; color: white; font-family: 'Barlow', sans-serif; }
         .db-sidebar { width: 260px; background: #111; border-right: 1px solid #222; padding: 40px 20px; display: flex; flex-direction: column; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
-        .db-nav { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-        .db-nav button { background: none; border: none; color: #888; text-align: left; padding: 12px 15px; font-size: 16px; cursor: pointer; transition: 0.3s; border-radius: 6px; }
-        .db-nav button:hover, .db-nav button.active { background: rgba(232,0,29,0.1); color: var(--red); }
+        .db-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .db-nav button { 
+          background: none; 
+          border: none; 
+          color: #888; 
+          text-align: left; 
+          padding: 14px 20px; 
+          font-size: 14px; 
+          font-family: 'Barlow Condensed', sans-serif;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          font-weight: 600;
+          cursor: pointer; 
+          transition: all 0.3s ease; 
+          border-left: 3px solid transparent;
+        }
+        .db-nav button:hover, .db-nav button.active { 
+          background: rgba(232,0,29,0.05); 
+          color: white; 
+          border-left-color: var(--red);
+        }
         .db-main { flex: 1; padding: 60px; }
         .db-header { margin-bottom: 40px; }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
@@ -435,24 +453,77 @@ export default function DashboardClient({ user, plans }) {
         .db-form textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 15px; border-radius: 8px; font-family: inherit; }
         .btn-logout { background: none; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; }
         .btn-logout:hover { color: var(--red); border-color: var(--red); }
-        .db-actions { display: flex; flex-direction: column; gap: 10px; }
-        .btn-outline { background: transparent; border: 1px solid #333; color: #ccc; padding: 12px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-align: left; }
-        .btn-outline:hover { border-color: var(--red); color: white; }
+        .db-actions { display: flex; flex-direction: column; gap: 12px; }
+        .btn-outline { 
+          background: rgba(255,255,255,0.02); 
+          border: 1px solid #222; 
+          color: #aaa; 
+          padding: 16px 20px; 
+          border-radius: 8px; 
+          cursor: pointer; 
+          font-family: 'Barlow Condensed', sans-serif;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-weight: 700;
+          transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
+          text-align: left; 
+        }
+        .btn-outline:hover { 
+          background: rgba(232,0,29,0.05);
+          border-color: var(--red); 
+          color: white; 
+          transform: translateX(5px);
+        }
         .db-info p { margin: 5px 0; color: #888; font-size: 14px; }
 
         @media (max-width: 768px) {
           .db-layout { flex-direction: column; }
-          .db-sidebar { width: 100%; padding: 20px; flex-direction: row; align-items: center; }
-          .db-brand { margin-bottom: 0; margin-right: auto; }
-          .db-brand img { height: 30px; margin-bottom: 0; }
-          .db-nav { flex-direction: row; flex-wrap: wrap; gap: 5px; }
-          .db-nav button { padding: 8px 12px; font-size: 13px; }
+          .db-sidebar { 
+            width: 100%; 
+            padding: 15px 20px; 
+            flex-direction: row; 
+            align-items: center; 
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10,10,10,0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #222;
+          }
+          .db-brand { margin-bottom: 0; margin-right: 20px; }
+          .db-brand img { height: 24px; margin-bottom: 0; }
+          .db-nav { 
+            flex-direction: row; 
+            flex-wrap: nowrap; 
+            gap: 20px; 
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .db-nav::-webkit-scrollbar { display: none; }
+          .db-nav button { 
+            padding: 8px 0; 
+            font-size: 11px; 
+            font-family: 'Barlow Condensed', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            border-radius: 0;
+            border-bottom: 2px solid transparent;
+          }
+          .db-nav button:hover, .db-nav button.active { 
+            background: none; 
+            color: white; 
+            border-bottom-color: var(--red); 
+          }
           .db-footer { display: none; }
-          .db-main { padding: 20px; }
-          .db-header h1 { font-size: 28px; }
-          .db-grid { grid-template-columns: 1fr; }
+          .db-main { padding: 30px 20px; }
+          .db-header h1 { font-size: 32px; }
+          .db-grid { grid-template-columns: 1fr; gap: 20px; }
           .db-card.full { grid-column: span 1; }
-          .plans-selection { grid-template-columns: repeat(2, 1fr); }
+          .plans-selection { grid-template-columns: 1fr; }
         }
       `}</style>
     </div>
