@@ -540,7 +540,7 @@ export default function DashboardClient({ user, plans }) {
       <style jsx>{`
         .db-layout { display: flex; min-height: 100vh; background: #050505; color: white; font-family: 'Barlow', sans-serif; }
         .db-sidebar { display: none !important; }
-        .db-main { flex: 1; padding: 100px 20px 40px 20px; }
+        .db-main { flex: 1; padding: 120px 0 40px 0; }
         .db-header { 
           position: fixed;
           top: 0;
@@ -556,9 +556,9 @@ export default function DashboardClient({ user, plans }) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          max-width: 1400px;
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 0 40px;
+          padding: 0 20px;
         }
         .db-logo-group {
           display: flex;
@@ -603,7 +603,7 @@ export default function DashboardClient({ user, plans }) {
         .db-header { margin-bottom: 40px; }
         .db-mobile-logo { display: none; }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
-        .db-content { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .db-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .db-card { background: #111; border: 1px solid #222; padding: 30px; border-radius: 12px; }
         .db-card.full { grid-column: span 2; }
