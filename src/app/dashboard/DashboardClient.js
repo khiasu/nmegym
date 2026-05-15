@@ -369,7 +369,8 @@ export default function DashboardClient({ user, plans }) {
           {activeTab === "payments" && (
             <div className="db-card full">
               <h3>Payment History</h3>
-              <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              {/* Desktop Table View */}
+              <div className="db-table-desktop" style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                 <table className="db-table" style={{ minWidth: '600px' }}>
                   <thead>
                     <tr>
@@ -396,12 +397,43 @@ export default function DashboardClient({ user, plans }) {
                         </td>
                       </tr>
                     ))}
-                    {user.payments.length === 0 && (
-                      <tr><td colSpan="5" style={{ textAlign: "center", padding: 40, color: "#666" }}>No payments found. Select a plan to get started.</td></tr>
-                    )}
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile Card List View */}
+              <div className="db-mobile-list">
+                {user.payments.map(pay => (
+                  <div key={pay.id} className="payment-card">
+                    <div className="pc-row">
+                      <span className="pc-label">Date</span>
+                      <span className="pc-value">{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                    <div className="pc-row">
+                      <span className="pc-label">Plan</span>
+                      <span className="pc-value">{pay.planName || "—"}</span>
+                    </div>
+                    <div className="pc-row">
+                      <span className="pc-label">Amount</span>
+                      <span className="pc-value red" style={{fontWeight: 700}}>₹{Number(pay.amount)}</span>
+                    </div>
+                    <div className="pc-row">
+                      <span className="pc-label">Status</span>
+                      <span className={`tag-${pay.status.toLowerCase().replace(/_/g, '-')}`}>
+                        {pay.status === "PENDING_VERIFICATION" ? "⏳ Pending" : 
+                         pay.status === "VERIFIED" ? "✓ Verified" : 
+                         "✕ Rejected"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {user.payments.length === 0 && (
+                <div style={{ textAlign: "center", padding: "40px 20px", color: "#666", fontSize: "14px" }}>
+                  No payments found. Select a plan to get started.
+                </div>
+              )}
             </div>
           )}
 
@@ -543,11 +575,32 @@ export default function DashboardClient({ user, plans }) {
         .btn-logout:hover { color: var(--red); border-color: var(--red); }
         .db-info p { margin: 5px 0; color: #888; font-size: 14px; }
 
+        .db-mobile-list { display: none; }
+        .payment-card { 
+          background: #1a1a1a; 
+          border: 1px solid #222; 
+          border-radius: 8px; 
+          padding: 15px; 
+          margin-bottom: 12px; 
+        }
+        .pc-row { 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+          padding: 8px 0; 
+          border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        .pc-row:last-child { border-bottom: none; }
+        .pc-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .pc-value { font-size: 14px; color: white; }
+
         @media (max-width: 1024px) {
+          .db-table-desktop { display: none; }
+          .db-mobile-list { display: block; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
           .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 100%; box-sizing: border-box; }
           .db-card .btn-primary { width: 100%; margin-top: 15px; }
-          .db-card.full { grid-column: span 1; }
+          .db-card.full { grid-column: span 1; text-align: left; align-items: flex-start; }
           .plans-selection { grid-template-columns: 1fr; }
         }
       `}</style>
