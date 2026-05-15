@@ -412,9 +412,9 @@ section::before {
   margin-bottom: 0;
 }
 
-/* Tighter padding for PC viewport fitting */
+/* Minimized padding to allow large cards to fit on small screens */
 @media (min-width: 1024px) {
-  .squad-section { padding: 60px 48px !important; }
+  .squad-section { padding: 15px 48px !important; }
 }
 
 .membership-section {
@@ -1325,8 +1325,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   background: var(--card);
   border: 1px solid var(--border);
   overflow: hidden;
-  height: 340px; /* Optimal middle ground */
-  min-height: 340px;
+  height: 480px; /* Restored original premium height */
+  min-height: 480px;
   position: relative;
   transition: opacity 0.6s ease;
   will-change: opacity;
@@ -1344,8 +1344,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 .trainer-slide-img-wrap {
   position: relative;
   overflow: hidden;
-  height: 340px;
-  min-height: 340px;
+  height: 480px;
+  min-height: 480px;
 }
 
 .trainer-slide-img {
@@ -1421,7 +1421,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 /* Content Side */
 .trainer-slide-content {
-  padding: 40px;
+  padding: 60px 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1470,7 +1470,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   font-size: 15px;
   color: rgba(255,255,255,0.6);
   line-height: 1.7;
-  max-width: 480px;
+  max-width: 420px;
 }
 
 /* Quote */
