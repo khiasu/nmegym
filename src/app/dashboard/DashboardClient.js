@@ -541,7 +541,9 @@ export default function DashboardClient({ user, plans }) {
           
           .db-main { padding: 30px 20px; }
           .db-header h1 { font-size: 32px; }
-          .db-grid { grid-template-columns: 1fr; gap: 20px; }
+          .db-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; }
+          .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; }
+          .db-card .btn-primary { width: 100%; margin-top: 15px; }
           .db-card.full { grid-column: span 1; }
           .plans-selection { grid-template-columns: 1fr; }
         }
