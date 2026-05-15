@@ -518,25 +518,29 @@ export default function DashboardClient({ user, plans }) {
             padding: 20px;
             border-bottom: 1px solid #222;
           }
-          .db-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; text-align: left; }
-          .db-mobile-logo { 
-            display: block !important; 
+          .db-header-top { 
             position: fixed !important;
-            top: 5px !important; /* Matches 20px padding - 15px nudge */
-            left: 10px !important; /* Matches 15px padding - 5px nudge */
+            top: 5px !important;
+            left: 10px !important;
+            display: flex !important; 
+            align-items: center !important; 
+            gap: 15px !important; 
+            text-align: left; 
             z-index: 3000 !important;
+            width: auto;
           }
+          .db-mobile-logo { display: block !important; }
           .db-mobile-logo img {
-            height: 80px !important;
+            height: 60px !important; /* Slightly smaller for inline layout */
           }
-          .db-header-text { flex: 1; margin-left: 90px; } 
-          .db-header-text h1 { font-size: 24px !important; margin: 0 !important; line-height: 1.2; }
-          .db-header-text p { font-size: 11px !important; margin: 2px 0 0 0 !important; }
+          .db-header-text { flex: 1; } 
+          .db-header-text h1 { font-size: 20px !important; margin: 0 !important; line-height: 1.1; }
+          .db-header-text p { font-size: 10px !important; margin: 0 !important; }
           .dashboard-toggle { 
             display: flex !important; 
             position: fixed !important;
             top: 20px !important; 
-            right: 15px !important; /* Moved slightly left from 10px */
+            right: 15px !important; 
             z-index: 3000 !important;
           }
           
