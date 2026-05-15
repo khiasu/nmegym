@@ -1084,9 +1084,9 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 @media(max-width:768px){
   nav {
     height: auto !important;
-    padding: 30px !important; /* Perfectly symmetrical 30px padding */
+    padding: 15px 30px !important; /* Lifted up to 15px to restore 'perfect' toggle height */
     display: flex !important;
-    align-items: center !important; 
+    align-items: flex-start !important; 
     justify-content: space-between !important;
   }
   .nav-logo-img {
