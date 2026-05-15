@@ -205,9 +205,9 @@ export default function DashboardClient({ user, plans }) {
           <div className="db-header-inner">
             <Link href="/" className="db-logo-group">
               <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
-              <div className="db-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
-                <h1 style={{ display: 'inline' }}>Welcome, <span className="red">{user.firstName}</span></h1>
-                <p className="gray" style={{ display: 'inline', fontSize: '11px', borderLeft: '1px solid #333', paddingLeft: '15px' }}>ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+              <div className="db-header-text" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <span style={{ fontSize: '20px', fontWeight: '800', fontFamily: "'Bebas Neue', sans-serif", color: 'white', letterSpacing: '1px' }}>WELCOME, <span className="red">{user.firstName}</span></span>
+                <span style={{ fontSize: '11px', color: '#666', border: '1px solid #333', padding: '4px 10px', borderRadius: '4px', fontFamily: 'monospace' }}>ID: {memberId}</span>
               </div>
             </Link>
 
@@ -540,7 +540,7 @@ export default function DashboardClient({ user, plans }) {
       <style jsx>{`
         .db-layout { display: flex; min-height: 100vh; background: #050505; color: white; font-family: 'Barlow', sans-serif; }
         .db-sidebar { display: none !important; }
-        .db-main { flex: 1; padding: 120px 0 40px 0; }
+        .db-main { flex: 1; padding: 120px 40px 40px 40px; }
         .db-header { 
           position: fixed;
           top: 0;
@@ -556,9 +556,8 @@ export default function DashboardClient({ user, plans }) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          max-width: 1200px;
+          max-width: 1600px;
           margin: 0 auto;
-          padding: 0 20px;
         }
         .db-logo-group {
           display: flex;
@@ -567,9 +566,8 @@ export default function DashboardClient({ user, plans }) {
           text-decoration: none;
         }
         .db-logo-img {
-          height: 60px !important;
+          height: 70px !important;
           object-fit: contain;
-          margin-top: 0px;
         }
         .db-header-text h1 { font-family: 'Bebas Neue', sans-serif; font-size: 18px !important; margin: 0 !important; color: white; line-height: 1; letter-spacing: 1px; text-transform: uppercase; }
         .db-header-text p { font-size: 11px !important; margin: 0 !important; color: #888; text-transform: uppercase; }
@@ -600,11 +598,10 @@ export default function DashboardClient({ user, plans }) {
           color: white; 
           border-left-color: var(--red);
         }
-        .db-header { margin-bottom: 20px; }
-        .db-mobile-logo { display: none; }
-        .db-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .db-card { background: #111; border: 1px solid #222; padding: 30px; border-radius: 12px; }
+        .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
+        .db-content { max-width: 1600px; margin: 0 auto; }
+        .db-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
+        .db-card { background: #111; border: 1px solid #222; padding: 50px; border-radius: 16px; }
         .db-card.full { grid-column: span 2; }
         .db-card h3 { margin-bottom: 20px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; margin-bottom: 15px; }
@@ -660,6 +657,8 @@ export default function DashboardClient({ user, plans }) {
           .db-mobile-list { display: block; width: 100%; }
           .db-header-inner { padding: 0 20px; }
           .db-content { max-width: 100%; padding: 0; }
+          .db-logo-img { height: 60px !important; }
+          .db-main { padding: 80px 20px 40px 20px; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
           .db-card { width: 100% !important; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
           .db-card h3 { font-size: 28px !important; margin-bottom: 20px !important; }
