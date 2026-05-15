@@ -39,14 +39,16 @@ export default function Trainers({ trainers }) {
   const total = trainerData.length;
 
   const goTo = useCallback((idx, dir) => {
-    if (isAnimating) return;
+    if (isAnimating || idx === active) return;
     setDirection(dir);
     setIsAnimating(true);
+    
+    // Sync with CSS transition duration (600ms)
     setTimeout(() => {
       setActive(idx);
-      setTimeout(() => setIsAnimating(false), 50);
-    }, 400);
-  }, [isAnimating]);
+      setIsAnimating(false);
+    }, 600);
+  }, [isAnimating, active]);
 
   const goNext = useCallback(() => {
     goTo((active + 1) % total, "next");
