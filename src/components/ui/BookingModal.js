@@ -49,17 +49,20 @@ export default function BookingModal({ isOpen, onClose }) {
         {success ? (
           <div className="modal-body" style={{ textAlign: "center", padding: "50px 30px" }}>
             <div style={{ 
-              width: "60px", 
-              height: "60px", 
+              width: "100px", 
+              height: "40px", 
               border: "2px solid var(--red)", 
-              borderRadius: "50%", 
+              borderRadius: "4px", 
               display: "flex", 
               alignItems: "center", 
               justifyContent: "center", 
               margin: "0 auto 24px auto",
               color: "var(--red)",
-              fontSize: "24px"
-            }}>✓</div>
+              fontSize: "14px",
+              fontWeight: "900",
+              fontFamily: "'Bebas Neue', sans-serif",
+              letterSpacing: "2px"
+            }}>SUCCESS</div>
             <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "36px", letterSpacing: "3px", margin: "0 0 12px 0", color: "white" }}>
               BOOKING <span className="red">CONFIRMED</span>
             </h3>
