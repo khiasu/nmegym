@@ -574,7 +574,7 @@ export default function DashboardClient({ user, plans }) {
         .db-header-hidden { transform: translateY(-100%); }
         .db-header-scrolled { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); }
 
-        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: -15px; }
+        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: -20px; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
         .db-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .db-nav button { 
