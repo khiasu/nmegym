@@ -578,7 +578,7 @@ export default function DashboardClient({ user, plans }) {
           justify-content: center;
         }
         .welcome-txt { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: white; letter-spacing: 1px; }
-        .id-txt { font-size: 10px; color: #666; border: 1px solid #333; padding: 3px 8px; borderRadius: 4px; fontFamily: 'monospace'; }
+        .id-txt { font-size: 12px; color: #e8001d; border: 1px solid rgba(232,0,29,0.3); padding: 4px 10px; border-radius: 4px; font-family: 'monospace'; font-weight: 700; background: rgba(232,0,29,0.05); }
         
         .db-header-hidden { transform: translateY(-100%); }
         .db-header-scrolled { background: none; backdrop-filter: none; }
@@ -668,7 +668,7 @@ export default function DashboardClient({ user, plans }) {
           .db-content { max-width: 100%; padding: 0; }
           .db-logo-img { height: 50px !important; }
           .welcome-txt { font-size: 14px; }
-          .id-txt { font-size: 8px; padding: 2px 6px; }
+          .id-txt { font-size: 10px; padding: 3px 8px; }
           .db-header-text-center { gap: 8px; }
           .db-main { padding: 80px 20px 40px 20px; }
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; max-width: none; margin: 0; }
