@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import DashboardClient from "./DashboardClient";
+import { Suspense } from "react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -44,7 +45,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <DashboardClient user={serializedUser} plans={plans} />
+      <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050505' }}></div>}>
+        <DashboardClient user={serializedUser} plans={plans} />
+      </Suspense>
     </div>
   );
 }

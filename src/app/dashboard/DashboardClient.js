@@ -1,8 +1,9 @@
 // src/app/dashboard/DashboardClient.js — Member Dashboard (Client Component)
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signOut } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
 
@@ -21,6 +22,21 @@ export default function DashboardClient({ user, plans }) {
   const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMessage, setPwMessage] = useState({ text: "", type: "" });
+
+  // Testimonial State
+  const [testiContent, setTestiContent] = useState("");
+  const [testiRating, setTestiRating] = useState(5);
+  const [testiLoading, setTestiLoading] = useState(false);
+  const [testiSuccess, setTestiSuccess] = useState(false);
+
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && ["overview", "membership", "payments", "settings", "testimonials"].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   async function handlePasswordChange(e) {
     e.preventDefault();
@@ -157,7 +173,7 @@ export default function DashboardClient({ user, plans }) {
             { id: "membership", name: "Membership" },
             { id: "payments", name: "Payments" },
             { id: "settings", name: "Settings" },
-            { id: "feedback", name: "Feedback" }
+            { id: "testimonials", name: "Testimonials" }
           ].map((item, i) => (
             <button 
               key={item.id} 
@@ -456,14 +472,66 @@ export default function DashboardClient({ user, plans }) {
             </div>
           )}
 
-          {activeTab === "feedback" && (
+          {activeTab === "testimonials" && (
             <div className="db-card full">
-              <h3>Share Your Feedback</h3>
-              <p className="gray">We value your input. Let us know how we're doing.</p>
-              <form className="db-form" style={{ marginTop: 20 }}>
-                <textarea placeholder="Tell us about your experience..." rows="5"></textarea>
-                <button type="button" className="btn-primary" style={{ marginTop: 15 }} onClick={() => alert("Feedback sent! Thank you.")}>Send Feedback</button>
-              </form>
+              <h3>Share Your Story</h3>
+              <p className="gray">Your journey inspires others. Share your experience at NME GYM.</p>
+              
+              {testiSuccess ? (
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
+                  <div style={{ color: "#00ff64", fontSize: "48px", marginBottom: "15px" }}>✓</div>
+                  <h4 style={{ color: "white", fontSize: "20px", marginBottom: "10px" }}>SUBMITTED FOR REVIEW</h4>
+                  <p style={{ color: "#888", fontSize: "14px" }}>Thank you for sharing! Our team will review and publish your story soon.</p>
+                  <button className="btn-primary" onClick={() => setTestiSuccess(false)} style={{ marginTop: "20px" }}>SUBMIT ANOTHER</button>
+                </div>
+              ) : (
+                <form className="db-form" style={{ marginTop: 25, maxWidth: "600px" }} onSubmit={async (e) => {
+                  e.preventDefault();
+                  setTestiLoading(true);
+                  try {
+                    const res = await fetch("/api/testimonials", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ content: testiContent, rating: testiRating })
+                    });
+                    if (res.ok) setTestiSuccess(true);
+                    else alert("Error submitting testimonial");
+                  } catch (err) {
+                    alert("Submission failed");
+                  } finally {
+                    setTestiLoading(false);
+                  }
+                }}>
+                  <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", textTransform: "uppercase" }}>Your Experience</label>
+                    <textarea 
+                      placeholder="Tell us about your transformation, the environment, or the trainers..." 
+                      rows="6" 
+                      required
+                      value={testiContent}
+                      onChange={e => setTestiContent(e.target.value)}
+                      style={{ width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "15px", borderRadius: "8px", fontFamily: "inherit" }}
+                    ></textarea>
+                  </div>
+                  <div style={{ marginBottom: "25px" }}>
+                    <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", textTransform: "uppercase" }}>Rating</label>
+                    <select 
+                      value={testiRating} 
+                      onChange={e => setTestiRating(e.target.value)}
+                      style={{ width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "8px" }}
+                    >
+                      <option value="5">★★★★★ (Excellent)</option>
+                      <option value="4">★★★★☆ (Great)</option>
+                      <option value="3">★★★☆☆ (Good)</option>
+                      <option value="2">★★☆☆☆ (Fair)</option>
+                      <option value="1">★☆☆☆☆ (Poor)</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="btn-primary" disabled={testiLoading} style={{ width: "100%", maxWidth: "200px" }}>
+                    {testiLoading ? "SUBMITTING..." : "POST TESTIMONIAL →"}
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </section>

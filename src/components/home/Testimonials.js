@@ -65,11 +65,11 @@ export default function Testimonials() {
 
       <div className="max-w reveal" style={{ textAlign: "center", marginTop: "40px" }}>
         {session ? (
-          <button className="testi-login-link" onClick={() => setModalOpen(true)} style={{ background: "none", border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer" }}>
+          <Link href="/dashboard?tab=testimonials" className="testi-login-link">
             SHARE YOUR STORY
-          </button>
+          </Link>
         ) : (
-          <Link href="/auth/login" className="testi-login-link">
+          <Link href="/auth/login?callbackUrl=/dashboard?tab=testimonials" className="testi-login-link">
             SHARE YOUR STORY
           </Link>
         )}
