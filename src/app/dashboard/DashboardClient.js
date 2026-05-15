@@ -143,33 +143,9 @@ export default function DashboardClient({ user, plans }) {
 
   return (
     <div className="db-layout">
-      {/* Dashboard Sidebar (Desktop Only) */}
-      <aside className="db-sidebar">
-        <div className="db-brand">
-          <img src="/newlogo.png" alt="NME GYM" />
-        </div>
-        <nav className="db-nav">
-          <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>Overview</button>
-          <button className={activeTab === "membership" ? "active" : ""} onClick={() => setActiveTab("membership")}>My Membership</button>
-          <button className={activeTab === "payments" ? "active" : ""} onClick={() => setActiveTab("payments")}>Payments</button>
-          <button className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>Settings</button>
-          <button className={activeTab === "feedback" ? "active" : ""} onClick={() => setActiveTab("feedback")}>Feedback</button>
-        </nav>
-        <div className="db-footer">
-          <Link href="/" style={{display: "block", textAlign: "center", marginBottom: 10, color: "#666", fontSize: 13, textDecoration: "none"}}>← Back to Home</Link>
-          <button onClick={() => signOut()} className="btn-logout">Sign Out</button>
-        </div>
-      </aside>
+      {/* Legacy sidebar removed — Using toggle menu exclusively */}
 
-      {/* MOBILE TOGGLE BUTTON — FIXED ON TOP */}
-      <div 
-        className={`hamburger dashboard-toggle ${mobileOpen ? "open" : ""}`} 
-        onClick={() => setMobileOpen(!mobileOpen)}
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      {/* Redundant toggle removed — Header toggle is the only one now */}
 
       {/* MOBILE MENU — MIRRORING MAIN WEBSITE */}
       <div className={`mobile-menu ${mobileOpen ? "open" : ""}`} id="mobileMenu">
@@ -473,7 +449,8 @@ export default function DashboardClient({ user, plans }) {
 
       <style jsx>{`
         .db-layout { display: flex; min-height: 100vh; background: #050505; color: white; font-family: 'Barlow', sans-serif; }
-        .db-sidebar { width: 260px; background: #111; border-right: 1px solid #222; padding: 40px 20px; display: flex; flex-direction: column; }
+        .db-sidebar { display: none !important; }
+        .db-main { flex: 1; padding: 100px 20px 40px 20px; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
         .db-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .db-nav button { 
@@ -496,7 +473,6 @@ export default function DashboardClient({ user, plans }) {
           color: white; 
           border-left-color: var(--red);
         }
-        .db-main { flex: 1; padding: 60px; }
         .db-header { margin-bottom: 40px; }
         .db-mobile-logo { display: none; }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
@@ -535,27 +511,20 @@ export default function DashboardClient({ user, plans }) {
 
         @media (max-width: 768px) {
           .db-layout { flex-direction: column; }
-        /* DASHBOARD HEADER REDESIGN */
-        .db-header { 
-          display: none; /* Hidden on desktop, handled by sidebar */
-          transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-          border-bottom: 1px solid #222;
-        }
-
-        @media (max-width: 1024px) {
+          .db-sidebar { display: none !important; } 
           .db-header { 
-            display: block; 
+            display: block !important; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: transparent; /* No background */
-            backdrop-filter: none; /* No blur */
+            background: transparent; 
             z-index: 5000;
             padding: 10px 20px;
             box-sizing: border-box;
-            border: none !important; /* Removed the line completely */
+            border: none !important;
           }
+          .dashboard-toggle { display: flex !important; }
           .db-header-inner {
             display: flex;
             justify-content: space-between;
