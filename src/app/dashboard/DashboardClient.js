@@ -205,9 +205,10 @@ export default function DashboardClient({ user, plans }) {
           <div className="db-header-inner">
             <Link href="/" className="db-logo-group">
               <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
-              <div className="db-header-text">
-                <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
-                <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+              <div className="db-header-text" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <h1 style={{ margin: 0, whiteSpace: 'nowrap' }}>Welcome back, <span className="red">{user.firstName}</span></h1>
+                <div style={{ height: '15px', width: '1px', background: '#333' }}></div>
+                <p className="gray" style={{ margin: 0, whiteSpace: 'nowrap', fontSize: '11px' }}>Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
               </div>
             </Link>
 
@@ -564,9 +565,9 @@ export default function DashboardClient({ user, plans }) {
           text-decoration: none;
         }
         .db-logo-img {
-          height: 60px !important;
+          height: 50px !important;
           object-fit: contain;
-          margin-top: -15px;
+          margin-top: 0px;
         }
         .db-header-text h1 { font-family: 'Bebas Neue', sans-serif; font-size: 20px !important; margin: 0 !important; color: white; line-height: 1.1; letter-spacing: 1px; }
         .db-header-text p { font-size: 10px !important; margin: 0 !important; color: #888; }
@@ -574,7 +575,7 @@ export default function DashboardClient({ user, plans }) {
         .db-header-hidden { transform: translateY(-100%); }
         .db-header-scrolled { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); }
 
-        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: -20px; }
+        .dashboard-toggle { display: flex !important; position: relative !important; margin-top: 0px; }
         .db-brand img { height: 40px; margin-bottom: 50px; }
         .db-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .db-nav button { 
