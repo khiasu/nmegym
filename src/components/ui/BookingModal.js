@@ -47,13 +47,29 @@ export default function BookingModal({ isOpen, onClose }) {
         </div>
         
         {success ? (
-          <div className="modal-body" style={{ textAlign: "center", padding: "40px 20px" }}>
-            <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔥</div>
-            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "32px", letterSpacing: "2px" }}>BOOKING CONFIRMED</h3>
-            <p style={{ color: "var(--gray)", marginTop: "10px" }}>
-              We'll see you at the gym! Our team might reach out to confirm your timing.
+          <div className="modal-body" style={{ textAlign: "center", padding: "50px 30px" }}>
+            <div style={{ 
+              width: "60px", 
+              height: "60px", 
+              border: "2px solid var(--red)", 
+              borderRadius: "50%", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              margin: "0 auto 24px auto",
+              color: "var(--red)",
+              fontSize: "24px"
+            }}>✓</div>
+            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "36px", letterSpacing: "3px", margin: "0 0 12px 0", color: "white" }}>
+              BOOKING <span className="red">CONFIRMED</span>
+            </h3>
+            <div style={{ width: "40px", height: "2px", background: "var(--red)", margin: "0 auto 20px auto" }}></div>
+            <p style={{ color: "#888", fontSize: "14px", lineHeight: "1.6", maxWidth: "260px", margin: "0 auto" }}>
+              Your trial session is scheduled. Our team will contact you shortly to finalize your elite experience.
             </p>
-            <button className="btn-primary" onClick={onClose} style={{ marginTop: "24px" }}>CLOSE</button>
+            <button className="btn-primary" onClick={onClose} style={{ marginTop: "32px", width: "100%", borderRadius: "0", letterSpacing: "2px" }}>
+              DISMISS
+            </button>
           </div>
         ) : (
           <form className="modal-body" onSubmit={handleSubmit}>
