@@ -194,9 +194,11 @@ export default function DashboardClient({ user, plans }) {
             <Link href="/" className="db-mobile-logo">
               <img src="/newlogo.png" alt="NME GYM" style={{ height: '30px' }} />
             </Link>
-            <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+            <div className="db-header-text">
+              <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+              <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+            </div>
           </div>
-          <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
         </header>
 
         <section className="db-content">
@@ -534,9 +536,11 @@ export default function DashboardClient({ user, plans }) {
             padding: 20px;
             border-bottom: 1px solid #222;
           }
-          .db-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+          .db-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; text-align: left; }
           .db-mobile-logo { display: block !important; }
-          .db-header-top h1 { font-size: 20px !important; flex: 1; margin: 0; }
+          .db-header-text { flex: 1; }
+          .db-header-text h1 { font-size: 24px !important; margin: 0 !important; line-height: 1.2; }
+          .db-header-text p { font-size: 11px !important; margin: 2px 0 0 0 !important; }
           .dashboard-toggle { 
             display: flex !important; 
             position: fixed !important;
@@ -547,8 +551,8 @@ export default function DashboardClient({ user, plans }) {
           
           .db-main { padding: 30px 20px; }
           .db-header h1 { font-size: 32px; }
-          .db-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; }
-          .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; }
+          .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+          .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 100%; box-sizing: border-box; }
           .db-card .btn-primary { width: 100%; margin-top: 15px; }
           .db-card.full { grid-column: span 1; }
           .plans-selection { grid-template-columns: 1fr; }
