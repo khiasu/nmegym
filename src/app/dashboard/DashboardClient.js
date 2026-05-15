@@ -364,37 +364,39 @@ export default function DashboardClient({ user, plans }) {
           {activeTab === "payments" && (
             <div className="db-card full">
               <h3>Payment History</h3>
-              <table className="db-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Plan</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {user.payments.map(pay => (
-                    <tr key={pay.id}>
-                      <td>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                      <td>{pay.planName || "—"}</td>
-                      <td>₹{Number(pay.amount)}</td>
-                      <td>{pay.paymentMethod}</td>
-                      <td>
-                        <span className={`tag-${pay.status.toLowerCase().replace(/_/g, '-')}`}>
-                          {pay.status === "PENDING_VERIFICATION" ? "⏳ Pending" : 
-                           pay.status === "VERIFIED" ? "✓ Verified" : 
-                           "✕ Rejected"}
-                        </span>
-                      </td>
+              <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table className="db-table" style={{ minWidth: '600px' }}>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                  {user.payments.length === 0 && (
-                    <tr><td colSpan="5" style={{ textAlign: "center", padding: 40, color: "#666" }}>No payments found. Select a plan to get started.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {user.payments.map(pay => (
+                      <tr key={pay.id}>
+                        <td>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                        <td>{pay.planName || "—"}</td>
+                        <td>₹{Number(pay.amount)}</td>
+                        <td>{pay.paymentMethod}</td>
+                        <td>
+                          <span className={`tag-${pay.status.toLowerCase().replace(/_/g, '-')}`}>
+                            {pay.status === "PENDING_VERIFICATION" ? "⏳ Pending" : 
+                             pay.status === "VERIFIED" ? "✓ Verified" : 
+                             "✕ Rejected"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {user.payments.length === 0 && (
+                      <tr><td colSpan="5" style={{ textAlign: "center", padding: 40, color: "#666" }}>No payments found. Select a plan to get started.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -475,8 +477,9 @@ export default function DashboardClient({ user, plans }) {
         .db-card h3 { margin-bottom: 20px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; margin-bottom: 15px; }
         .status-badge[data-status="ACTIVE"] { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid #00ff64; }
-        .status-badge[data-status="EXPIRED"] { background: rgba(255,200,0,0.1); color: #ffc800; border: 1px solid #ffc800; }
-        .status-badge[data-status="PENDING"] { background: rgba(255,200,0,0.1); color: #ffc800; border: 1px solid #ffc800; }
+        .status-badge[data-status="ACTIVE"] { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid #00ff64; }
+        .status-badge[data-status="EXPIRED"] { background: rgba(232,0,29,0.1); color: var(--red); border: 1px solid var(--red); }
+        .status-badge[data-status="PENDING"] { background: rgba(255,255,255,0.05); color: #888; border: 1px solid #333; }
         .status-badge[data-status="NONE"] { background: #222; color: #888; }
         
         .plans-selection { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
@@ -492,7 +495,7 @@ export default function DashboardClient({ user, plans }) {
         .db-table th { text-align: left; color: #666; font-size: 12px; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #222; }
         .db-table td { padding: 15px; border-bottom: 1px solid #111; font-size: 14px; }
         
-        .tag-pending-verification, .tag-pending_verification { color: #ffc800; }
+        .tag-pending-verification, .tag-pending_verification { color: #888; }
         .tag-verified { color: #00ff64; }
         .tag-rejected { color: var(--red); }
         
