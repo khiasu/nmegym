@@ -123,23 +123,53 @@ export default function DashboardClient({ user, plans }) {
 
   return (
     <div className="db-layout">
-      {/* Sidebar */}
-      <aside className={`db-sidebar ${mobileOpen ? "open" : ""}`}>
+      {/* Dashboard Sidebar (Desktop Only) */}
+      <aside className="db-sidebar">
         <div className="db-brand">
           <img src="/newlogo.png" alt="NME GYM" />
         </div>
         <nav className="db-nav">
-          <button className={activeTab === "overview" ? "active" : ""} onClick={() => { setActiveTab("overview"); setMobileOpen(false); }}>Overview</button>
-          <button className={activeTab === "membership" ? "active" : ""} onClick={() => { setActiveTab("membership"); setMobileOpen(false); }}>My Membership</button>
-          <button className={activeTab === "payments" ? "active" : ""} onClick={() => { setActiveTab("payments"); setMobileOpen(false); }}>Payments</button>
-          <button className={activeTab === "settings" ? "active" : ""} onClick={() => { setActiveTab("settings"); setMobileOpen(false); }}>Settings</button>
-          <button className={activeTab === "feedback" ? "active" : ""} onClick={() => { setActiveTab("feedback"); setMobileOpen(false); }}>Feedback</button>
+          <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>Overview</button>
+          <button className={activeTab === "membership" ? "active" : ""} onClick={() => setActiveTab("membership")}>My Membership</button>
+          <button className={activeTab === "payments" ? "active" : ""} onClick={() => setActiveTab("payments")}>Payments</button>
+          <button className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>Settings</button>
+          <button className={activeTab === "feedback" ? "active" : ""} onClick={() => setActiveTab("feedback")}>Feedback</button>
         </nav>
         <div className="db-footer">
           <Link href="/" style={{display: "block", textAlign: "center", marginBottom: 10, color: "#666", fontSize: 13, textDecoration: "none"}}>← Back to Home</Link>
           <button onClick={() => signOut()} className="btn-logout">Sign Out</button>
         </div>
       </aside>
+
+      {/* MOBILE MENU — MIRRORING MAIN WEBSITE */}
+      <div className={`mobile-menu ${mobileOpen ? "open" : ""}`} id="mobileMenu">
+        <div className="mm-bg-text">NME</div>
+        
+        <div className="mm-links">
+          {[
+            { id: "overview", name: "Overview" },
+            { id: "membership", name: "Membership" },
+            { id: "payments", name: "Payments" },
+            { id: "settings", name: "Settings" },
+            { id: "feedback", name: "Feedback" }
+          ].map((item, i) => (
+            <button 
+              key={item.id} 
+              onClick={() => { setActiveTab(item.id); setMobileOpen(false); }} 
+              className={`mm-link ${activeTab === item.id ? "active" : ""}`}
+              style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', padding: 0 }}
+            >
+              <span className="mm-num">0{i + 1}</span>
+              <span className="mm-text" style={{ color: activeTab === item.id ? 'var(--red)' : 'inherit' }}>{item.name}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mm-footer">
+          <Link href="/" className="mm-member-link">← BACK TO HOME</Link>
+          <button onClick={() => signOut()} className="mm-cta">SIGN OUT</button>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="db-main">
@@ -480,28 +510,8 @@ export default function DashboardClient({ user, plans }) {
 
         @media (max-width: 768px) {
           .db-layout { flex-direction: column; }
-          .db-sidebar { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%; 
-            height: 100vh;
-            padding: 40px; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            z-index: 2000;
-            background: rgba(5,5,5,0.98);
-            backdrop-filter: blur(20px);
-            border: none;
-            display: none;
-            opacity: 0;
-            transition: all 0.4s ease;
-          }
-          .db-sidebar.open {
-            display: flex;
-            opacity: 1;
-          }
+          .db-sidebar { display: none; } /* Hide desktop sidebar */
+          
           .db-header { 
             position: sticky;
             top: 0;
@@ -514,20 +524,9 @@ export default function DashboardClient({ user, plans }) {
           }
           .db-header-top { display: flex; justify-content: space-between; align-items: center; }
           .dashboard-toggle { display: flex !important; }
-          .db-nav { 
-            flex-direction: column;
-            width: 100%;
-            text-align: center;
-            gap: 25px;
-            margin: 40px 0;
-          }
-          .db-nav button { 
-            padding: 15px;
-            font-size: 24px;
-            text-align: center;
-            border: none !important;
-          }
-          .db-footer { display: block; border-top: 1px solid #222; padding-top: 20px; width: 100%; }
+          
+          .db-main { padding: 30px 20px; }
+          .db-header h1 { font-size: 32px; }
           .db-grid { grid-template-columns: 1fr; gap: 20px; }
           .db-card.full { grid-column: span 1; }
           .plans-selection { grid-template-columns: 1fr; }
