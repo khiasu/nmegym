@@ -14,6 +14,8 @@ export default function DashboardClient({ user, plans }) {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [lastPayment, setLastPayment] = useState({ amount: 0, planName: "" });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
   // Password change state
   const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
@@ -121,6 +123,24 @@ export default function DashboardClient({ user, plans }) {
     ? Math.max(0, Math.ceil((new Date(currentMembership.endDate) - new Date()) / (1000 * 60 * 60 * 24)))
     : 0;
 
+  // Scroll logic for hiding/showing header
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 20);
+      
+      if (currentScrollY > 100) {
+        setHeaderVisible(currentScrollY < lastScrollY);
+      } else {
+        setHeaderVisible(true);
+      }
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="db-layout">
       {/* Dashboard Sidebar (Desktop Only) */}
@@ -189,14 +209,23 @@ export default function DashboardClient({ user, plans }) {
 
       {/* Main Content */}
       <main className="db-main">
-        <header className="db-header">
-          <div className="db-header-top">
-            <Link href="/" className="db-mobile-logo">
-              <img src="/newlogo.png" alt="NME GYM" style={{ height: '70px', objectFit: 'contain' }} />
+        <header className={`db-header ${!headerVisible ? "db-header-hidden" : ""} ${scrolled ? "db-header-scrolled" : ""}`}>
+          <div className="db-header-inner">
+            <Link href="/" className="db-logo-group">
+              <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
+              <div className="db-header-text">
+                <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+                <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+              </div>
             </Link>
-            <div className="db-header-text">
-              <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
-              <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+
+            <div
+              className={`hamburger dashboard-toggle ${mobileOpen ? "open" : ""}`}
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </div>
         </header>
@@ -506,46 +535,55 @@ export default function DashboardClient({ user, plans }) {
 
         @media (max-width: 768px) {
           .db-layout { flex-direction: column; }
-          .db-sidebar { display: none; } /* Hide desktop sidebar */
-          
+        /* DASHBOARD HEADER REDESIGN */
+        .db-header { 
+          display: none; /* Hidden on desktop, handled by sidebar */
+          transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+          border-bottom: 1px solid #222;
+        }
+
+        @media (max-width: 1024px) {
           .db-header { 
-            position: sticky;
+            display: block; 
+            position: fixed;
             top: 0;
-            background: rgba(5,5,5,0.8);
+            left: 0;
+            width: 100%;
+            background: rgba(5,5,5,0.95);
             backdrop-filter: blur(20px);
-            z-index: 1000;
-            margin: -20px -20px 30px -20px;
-            padding: 20px;
-            border-bottom: 1px solid #222;
+            z-index: 5000;
+            padding: 10px 20px;
+            box-sizing: border-box;
           }
-          .db-header-top { 
-            position: fixed !important;
-            top: 5px !important;
-            left: 10px !important;
-            display: flex !important; 
-            align-items: center !important; 
-            gap: 15px !important; 
-            text-align: left; 
-            z-index: 3000 !important;
-            width: auto;
+          .db-header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
           }
-          .db-mobile-logo { display: block !important; }
-          .db-mobile-logo img {
-            height: 60px !important; /* Slightly smaller for inline layout */
+          .db-logo-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
           }
-          .db-header-text { flex: 1; } 
-          .db-header-text h1 { font-size: 20px !important; margin: 0 !important; line-height: 1.1; }
-          .db-header-text p { font-size: 10px !important; margin: 0 !important; }
+          .db-logo-img {
+            height: 60px !important;
+            object-fit: contain;
+          }
+          .db-header-text h1 { font-size: 18px !important; margin: 0 !important; color: white; line-height: 1.1; }
+          .db-header-text p { font-size: 10px !important; margin: 0 !important; color: #888; }
+          
+          .db-header-hidden { transform: translateY(-100%); }
+          .db-header-scrolled { border-bottom-color: var(--red); background: #050505; }
+
           .dashboard-toggle { 
             display: flex !important; 
-            position: fixed !important;
-            top: 20px !important; 
-            right: 15px !important; 
-            z-index: 3000 !important;
+            position: relative !important;
+            top: 0 !important;
+            right: 0 !important;
           }
-          
-          .db-main { padding: 30px 20px; }
-          .db-header h1 { font-size: 32px; }
+
+          .db-main { padding: 100px 20px 40px 20px; } /* Buffer for fixed header */
           .db-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
           .db-card { padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 100%; box-sizing: border-box; }
           .db-card .btn-primary { width: 100%; margin-top: 15px; }
