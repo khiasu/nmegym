@@ -205,10 +205,9 @@ export default function DashboardClient({ user, plans }) {
           <div className="db-header-inner">
             <Link href="/" className="db-logo-group">
               <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
-              <div className="db-header-text" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <h1 style={{ margin: 0, whiteSpace: 'nowrap' }}>Welcome back, <span className="red">{user.firstName}</span></h1>
-                <div style={{ height: '15px', width: '1px', background: '#333' }}></div>
-                <p className="gray" style={{ margin: 0, whiteSpace: 'nowrap', fontSize: '11px' }}>Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
+              <div className="db-header-text">
+                <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
+                <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
               </div>
             </Link>
 
@@ -565,7 +564,7 @@ export default function DashboardClient({ user, plans }) {
           text-decoration: none;
         }
         .db-logo-img {
-          height: 50px !important;
+          height: 60px !important;
           object-fit: contain;
           margin-top: 0px;
         }
