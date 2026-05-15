@@ -1,7 +1,7 @@
 // src/app/dashboard/DashboardClient.js — Member Dashboard (Client Component)
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
@@ -549,11 +549,12 @@ export default function DashboardClient({ user, plans }) {
             top: 0;
             left: 0;
             width: 100%;
-            background: rgba(5,5,5,0.95);
-            backdrop-filter: blur(20px);
+            background: transparent;
+            backdrop-filter: none;
             z-index: 5000;
             padding: 10px 20px;
             box-sizing: border-box;
+            border-bottom: none !important;
           }
           .db-header-inner {
             display: flex;
@@ -574,7 +575,7 @@ export default function DashboardClient({ user, plans }) {
           .db-header-text p { font-size: 10px !important; margin: 0 !important; color: #888; }
           
           .db-header-hidden { transform: translateY(-100%); }
-          .db-header-scrolled { border-bottom-color: var(--red); background: #050505; }
+          .db-header-scrolled { border-bottom: none !important; background: transparent !important; }
 
           .dashboard-toggle { 
             display: flex !important; 
