@@ -1084,19 +1084,20 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 @media(max-width:768px){
   nav {
     height: auto !important;
-    padding: 16px 20px !important; /* Pushing logo left and toggle right by reducing side space */
+    padding: 16px 15px !important; /* Pushing both even closer to the edges */
     display: flex !important;
     align-items: flex-start !important; 
     justify-content: space-between !important;
   }
   .nav-logo-img {
     height: 80px !important; 
-    margin-top: -5px; /* Nudging the logo UP as requested */
+    margin-top: -10px; /* Nudging even higher as requested */
+    margin-left: -5px; /* Pushing further left */
     max-width: 240px !important;
     object-fit: contain;
   }
   .nav-links{display:none;}
-  .hamburger{display:flex;}
+  .hamburger{display:flex; margin-right: -5px;}
   .hero-stats{display:flex; flex-direction:column; bottom:30px; left:20px; gap:16px; text-align:left; transform:none;}
   .stat-item{text-align:left;}
   .stat-num{font-size:24px;}
