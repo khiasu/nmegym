@@ -535,8 +535,8 @@ export default function DashboardClient({ user, plans }) {
           .dashboard-toggle { 
             display: flex !important; 
             position: fixed !important;
-            top: 20px !important; /* Matches 20px padding */
-            right: 10px !important; /* Matches 15px padding - 5px nudge */
+            top: 20px !important; 
+            right: 15px !important; /* Moved slightly left from 10px */
             z-index: 3000 !important;
           }
           
