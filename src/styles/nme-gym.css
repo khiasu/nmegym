@@ -2808,7 +2808,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   }
   
   .nav-logo-img {
-    height: 35px !important; /* Tiny logo */
+    height: 45px !important; /* Larger admin logo on mobile */
   }
 
   .admin-portal-title {

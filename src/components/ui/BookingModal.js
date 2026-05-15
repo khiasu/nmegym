@@ -38,9 +38,12 @@ export default function BookingModal({ isOpen, onClose }) {
   return (
     <div className="modal-overlay open" id="bookingModal">
       <div className="modal">
-        <div className="modal-header">
-          <h3>BOOK FREE TRIAL</h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-header" style={{ flexDirection: "column", gap: "15px", alignItems: "center", paddingBottom: "25px" }}>
+          <img src="/newlogo.png" alt="NME GYM" style={{ height: "45px", objectFit: "contain" }} />
+          <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ margin: 0 }}>BOOK FREE TRIAL</h3>
+            <button className="modal-close" onClick={onClose} style={{ position: "relative", top: 0, right: 0 }}>✕</button>
+          </div>
         </div>
         
         {success ? (

@@ -191,6 +191,9 @@ export default function DashboardClient({ user, plans }) {
       <main className="db-main">
         <header className="db-header">
           <div className="db-header-top">
+            <Link href="/" className="db-mobile-logo">
+              <img src="/newlogo.png" alt="NME GYM" style={{ height: '30px' }} />
+            </Link>
             <h1>Welcome back, <span className="red">{user.firstName}</span></h1>
           </div>
           <p className="gray">Member ID: <strong style={{color: "#e8001d", fontFamily: "monospace"}}>{memberId}</strong></p>
@@ -462,6 +465,7 @@ export default function DashboardClient({ user, plans }) {
         }
         .db-main { flex: 1; padding: 60px; }
         .db-header { margin-bottom: 40px; }
+        .db-mobile-logo { display: none; }
         .db-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
         .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .db-card { background: #111; border: 1px solid #222; padding: 30px; border-radius: 12px; }
@@ -530,7 +534,9 @@ export default function DashboardClient({ user, plans }) {
             padding: 20px;
             border-bottom: 1px solid #222;
           }
-          .db-header-top { display: flex; justify-content: space-between; align-items: center; }
+          .db-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+          .db-mobile-logo { display: block !important; }
+          .db-header-top h1 { font-size: 20px !important; flex: 1; margin: 0; }
           .dashboard-toggle { 
             display: flex !important; 
             position: fixed !important;
