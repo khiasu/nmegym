@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function DashboardClient({ user, plans }) {
+export default function DashboardClient({ user, plans, settings, offers }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [uploading, setUploading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -31,6 +31,9 @@ export default function DashboardClient({ user, plans }) {
 
   // Payment error state
   const [paymentError, setPaymentError] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedOffer, setAppliedOffer] = useState(null);
+  const [promoError, setPromoError] = useState("");
 
   const searchParams = useSearchParams();
   
@@ -79,17 +82,34 @@ export default function DashboardClient({ user, plans }) {
   const memberId = user.memberId || user.id.slice(-6).toUpperCase();
 
   // UPI details
-  const upiId = "coolarentiger-3@oksbi";
-  const upiName = "NMEGym";
+  const upiId = settings?.upiId || "nmegym@upi";
+  const upiName = settings?.gymName || "NMEGym";
 
   // Calculate payment amount (existing members don't pay admission fee)
-  const paymentAmount = selectedPlan ? selectedPlan.price : 0;
+  const baseAmount = selectedPlan ? selectedPlan.price : 0;
+  const discountAmount = appliedOffer ? Math.floor(baseAmount * (appliedOffer.discount / 100)) : 0;
+  const paymentAmount = baseAmount - discountAmount;
+
   const upiUri = selectedPlan
     ? `upi://pay?pa=${upiId}&pn=${upiName}&am=${paymentAmount}&cu=INR`
     : "";
   const qrCodeUrl = selectedPlan
     ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`
     : "";
+
+  const handleApplyPromo = () => {
+    setPromoError("");
+    if (!promoCode) return;
+    
+    const offer = offers?.find(o => o.promoCode?.toLowerCase() === promoCode.toLowerCase() && o.isActive);
+    if (offer) {
+      setAppliedOffer(offer);
+      setPromoError("");
+    } else {
+      setAppliedOffer(null);
+      setPromoError("Invalid or expired code");
+    }
+  };
 
   async function handlePaymentSubmit(e) {
     e.preventDefault();
@@ -109,6 +129,7 @@ export default function DashboardClient({ user, plans }) {
           planName: selectedPlan.name,
           paymentMethod: "UPI",
           screenshotUrl,
+          promoCode: appliedOffer ? promoCode : null,
         }),
       });
 
@@ -201,7 +222,7 @@ export default function DashboardClient({ user, plans }) {
         <header className={`db-header ${!headerVisible ? "db-header-hidden" : ""} ${scrolled ? "db-header-scrolled" : ""}`}>
           <div className="db-header-inner">
             <Link href="/" className="db-logo-group">
-              <img src="/newlogo.png" alt="NME GYM" className="db-logo-img" />
+              <img src={settings?.logoUrl || "/newlogo.png"} alt="NME GYM" className="db-logo-img" />
             </Link>
 
             <div className="db-header-text-center">
@@ -315,7 +336,9 @@ export default function DashboardClient({ user, plans }) {
                         key={plan.id} 
                         className={`plan-option ${selectedPlan?.id === plan.id ? "selected" : ""}`}
                         onClick={() => { setSelectedPlan(plan); setScreenshotUrl(""); }}
+                        style={{position: "relative"}}
                       >
+                        {plan.badge && <div style={{position: "absolute", top: "-8px", left: "10px", background: "var(--red)", color: "white", fontSize: "9px", padding: "2px 6px", borderRadius: "4px", fontWeight: "bold"}}>{plan.badge}</div>}
                         <div className="po-name">{plan.name}</div>
                         <div className="po-price">₹{plan.price}</div>
                       </div>
@@ -328,12 +351,41 @@ export default function DashboardClient({ user, plans }) {
                       <div style={{background: "rgba(255,255,255,0.03)", padding: "15px 20px", borderRadius: "8px", marginBottom: "25px", textAlign: "left"}}>
                         <div style={{display: "flex", justifyContent: "space-between", marginBottom: "8px"}}>
                           <span style={{color: "#888"}}>Plan: {selectedPlan.name}</span>
-                          <span style={{fontWeight: "bold"}}>₹{selectedPlan.price}</span>
+                          <span style={{fontWeight: "bold"}}>₹{baseAmount}</span>
                         </div>
+                        {appliedOffer && (
+                          <div style={{display: "flex", justifyContent: "space-between", marginBottom: "8px", color: "#00ff64"}}>
+                            <span style={{fontSize: "13px"}}>Discount ({appliedOffer.discount}%):</span>
+                            <span>- ₹{discountAmount}</span>
+                          </div>
+                        )}
                         <div style={{display: "flex", justifyContent: "space-between", borderTop: "1px solid #222", paddingTop: "10px"}}>
                           <span style={{fontWeight: "bold"}}>TOTAL TO PAY</span>
                           <span style={{color: "#e8001d", fontWeight: "bold", fontSize: "20px"}}>₹{paymentAmount}</span>
                         </div>
+                      </div>
+
+                      {/* Promo Code Input */}
+                      <div style={{marginBottom: "25px", textAlign: "left"}}>
+                        <label style={{fontSize: "11px", color: "#666", marginBottom: "8px", display: "block", textTransform: "uppercase"}}>Promo Code</label>
+                        <div style={{display: "flex", gap: "10px"}}>
+                          <input 
+                            type="text" 
+                            placeholder="Enter code" 
+                            value={promoCode} 
+                            onChange={e => setPromoCode(e.target.value)} 
+                            style={{flex: 1, background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px"}}
+                          />
+                          <button 
+                            type="button" 
+                            onClick={handleApplyPromo}
+                            style={{padding: "0 20px", background: "transparent", border: "1px solid var(--red)", color: "var(--red)", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontWeight: "bold"}}
+                          >
+                            APPLY
+                          </button>
+                        </div>
+                        {promoError && <p style={{color: "#ff4444", fontSize: "11px", marginTop: "5px"}}>⚠️ {promoError}</p>}
+                        {appliedOffer && <p style={{color: "#00ff64", fontSize: "11px", marginTop: "5px"}}>✓ Code applied! You save ₹{discountAmount}</p>}
                       </div>
 
                       {/* QR Code */}
@@ -569,6 +621,8 @@ export default function DashboardClient({ user, plans }) {
         }
         .db-logo-img {
           height: 70px !important;
+          width: auto !important;
+          max-width: 200px;
           object-fit: contain;
         }
         .db-header-text-center {
@@ -669,7 +723,11 @@ export default function DashboardClient({ user, plans }) {
           .db-mobile-list { display: block; width: 100%; }
           .db-header-inner { padding: 0 20px; }
           .db-content { max-width: 100%; padding: 0; }
-          .db-logo-img { height: 50px !important; }
+          .db-logo-img { 
+            height: 50px !important; 
+            width: auto !important;
+            max-width: 150px;
+          }
           .welcome-txt { font-size: 14px; }
           .id-txt { font-size: 10px; padding: 3px 8px; }
           .db-header-text-center { gap: 8px; }

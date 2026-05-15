@@ -2,30 +2,40 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function PlansTab({ initialPlans }) {
-  const [plans, setPlans] = useState(initialPlans);
+export default function PlansTab({ initialPlans, requestConfirmation, executeWithUndo }) {
+  const router = useRouter();
+  const [plans, setPlans] = useState(initialPlans || []);
   const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   async function handleSave(e) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    data.price = parseInt(data.price);
-
+    if (!editing.name || !editing.price) return alert("Name and Price are required.");
+    
+    setSaving(true);
     try {
       const res = await fetch("/api/admin/plans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, id: editing?.id }),
+        body: JSON.stringify(editing),
       });
       if (res.ok) {
         const saved = await res.json();
-        if (editing?.id) setPlans(plans.map(p => p.id === saved.id ? saved : p));
+        if (editing.id) setPlans(plans.map(p => p.id === saved.id ? saved : p));
         else setPlans([...plans, saved]);
+        router.refresh();
         setEditing(null);
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to save plan.");
       }
-    } catch (err) { alert("Error saving plan."); }
+    } catch (err) { 
+      alert("Error saving plan."); 
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -35,7 +45,7 @@ export default function PlansTab({ initialPlans }) {
           <h2 className="admin-page-title">MEMBERSHIP PLANS</h2>
           <p className="admin-page-sub">Adjust the pricing and features of NME GYM packages.</p>
         </div>
-        <button className="admin-btn-sm" onClick={() => setEditing({})}>+ NEW PLAN</button>
+        <button className="admin-btn-sm" onClick={() => setEditing({ name: "", price: 0, period: "month", badge: "" })}>+ NEW PLAN</button>
       </div>
 
       <div className="admin-section-card">
@@ -43,8 +53,8 @@ export default function PlansTab({ initialPlans }) {
           <thead>
             <tr>
               <th>Plan Name</th>
+              <th>Badge</th>
               <th>Price</th>
-              <th>Features</th>
               <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
@@ -52,8 +62,8 @@ export default function PlansTab({ initialPlans }) {
             {plans.map(p => (
               <tr key={p.id}>
                 <td><strong>{p.name.toUpperCase()}</strong></td>
+                <td><span className="status-badge" style={{background: "rgba(255,255,255,0.05)", color: "white"}}>{p.badge || "—"}</span></td>
                 <td><span style={{ color: "var(--red)", fontWeight: 800, fontSize: "16px" }}>₹{p.price}</span></td>
-                <td style={{ fontSize: "11px", color: "var(--gray)", maxWidth: "300px" }}>{p.features}</td>
                 <td style={{ textAlign: "right" }}>
                   <button className="admin-btn-sm outline" onClick={() => setEditing(p)}>EDIT</button>
                 </td>
@@ -73,22 +83,51 @@ export default function PlansTab({ initialPlans }) {
             <div className="modal-body">
               <form onSubmit={handleSave}>
                 <div className="admin-form-group">
-                  <label className="admin-label">NAME</label>
-                  <input name="name" defaultValue={editing.name} className="admin-input" required />
+                  <label className="admin-label">NAME (DURATION)</label>
+                  <input 
+                    name="name" 
+                    value={editing.name} 
+                    onChange={e => setEditing({...editing, name: e.target.value})}
+                    className="admin-input" 
+                    placeholder="e.g. 3 Months"
+                    required 
+                  />
+                </div>
+                <div className="admin-form-group">
+                  <label className="admin-label">BADGE (LABEL)</label>
+                  <input 
+                    name="badge" 
+                    value={editing.badge || ""} 
+                    onChange={e => setEditing({...editing, badge: e.target.value})}
+                    className="admin-input" 
+                    placeholder="e.g. BEST VALUE" 
+                  />
                 </div>
                 <div className="admin-form-group">
                   <label className="admin-label">PRICE (₹)</label>
-                  <input name="price" type="number" defaultValue={editing.price} className="admin-input" required />
+                  <input 
+                    name="price" 
+                    type="number" 
+                    value={editing.price} 
+                    onChange={e => setEditing({...editing, price: parseInt(e.target.value) || 0})}
+                    className="admin-input" 
+                    required 
+                  />
                 </div>
                 <div className="admin-form-group">
-                  <label className="admin-label">PERIOD (TAG)</label>
-                  <input name="period" defaultValue={editing.period} className="admin-input" required />
+                  <label className="admin-label">PERIOD (SUBTEXT)</label>
+                  <input 
+                    name="period" 
+                    value={editing.period} 
+                    onChange={e => setEditing({...editing, period: e.target.value})}
+                    className="admin-input" 
+                    placeholder="e.g. per month"
+                    required 
+                  />
                 </div>
-                <div className="admin-form-group">
-                  <label className="admin-label">FEATURES (COMMA SEP)</label>
-                  <textarea name="features" defaultValue={editing.features} className="admin-input" rows="3" />
-                </div>
-                <button type="submit" className="admin-btn-sm" style={{ width: "100%", padding: "12px", marginTop: "10px" }}>SAVE PLAN</button>
+                <button type="submit" className="admin-btn-sm" disabled={saving} style={{ width: "100%", padding: "12px", marginTop: "10px" }}>
+                  {saving ? "SAVING..." : "SAVE PLAN"}
+                </button>
               </form>
             </div>
           </div>

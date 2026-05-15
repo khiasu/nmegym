@@ -18,6 +18,7 @@ export async function POST(request) {
       screenshotUrl,
       isFirstTimer,
       userId, // null for first-timers who aren't logged in
+      promoCode,
     } = body;
 
     // Validation
@@ -102,6 +103,7 @@ export async function POST(request) {
         planName,
         admissionFee: admissionFee || 0,
         isFirstTimer: isFirstTimer || false,
+        promoCode: promoCode || null,
         paymentMethod: "UPI",
         screenshotUrl,
         status: "PENDING_VERIFICATION",

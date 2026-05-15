@@ -2,9 +2,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
 export default function TrainersTab({ initialTrainers, requestConfirmation, executeWithUndo }) {
+  const router = useRouter();
   const [trainers, setTrainers] = useState(initialTrainers || []);
   const [newTrainer, setNewTrainer] = useState({ id: null, name: "", role: "", imageUrl: "", bio: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -26,6 +28,7 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
           setTrainers([saved, ...trainers]);
           alert("Trainer added!");
         }
+        router.refresh();
         resetForm();
       }
     } catch (err) { alert("Error saving trainer."); }
@@ -43,12 +46,6 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
   }
 
   async function deleteTrainer(id) {
-    if (!requestConfirmation || !executeWithUndo) {
-      if (!confirm("Delete this trainer?")) return;
-      executeDelete(id);
-      return;
-    }
-
     requestConfirmation({
       title: "DELETE TRAINER",
       message: "Are you sure you want to permanently remove this trainer? This action cannot be undone.",
@@ -85,6 +82,7 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
       });
       if (res.ok) {
         setTrainers(trainers.filter(t => t.id !== id));
+        router.refresh();
       } else {
         alert("Failed to delete trainer. Incorrect password or server error.");
       }
@@ -113,13 +111,11 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
           <div className="admin-form-group">
             <label className="admin-label">Profile Image</label>
             <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {newTrainer.imageUrl ? (
+              {newTrainer.imageUrl && (
                 <div style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--elite-border)' }}>
                   <img src={newTrainer.imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button type="button" onClick={() => setNewTrainer({...newTrainer, imageUrl: ''})} style={{ position: 'absolute', top: 0, right: 0, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                 </div>
-              ) : (
-                <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.05)', border: '1px dashed #333', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444', fontSize: '10px', textAlign: 'center' }}>NO PHOTO</div>
               )}
               
               <CldUploadWidget 

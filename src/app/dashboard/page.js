@@ -43,10 +43,16 @@ export default async function DashboardPage() {
   // Fetch available plans for renewal
   const plans = await prisma.plan.findMany({ orderBy: { price: "asc" } });
 
+  // Fetch settings for UPI ID
+  const settings = await prisma.settings.findFirst();
+
+  // Fetch active offers for promo codes
+  const offers = await prisma.offer.findMany({ where: { isActive: true } });
+
   return (
     <div className="dashboard-container">
       <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050505' }}></div>}>
-        <DashboardClient user={serializedUser} plans={plans} />
+        <DashboardClient user={serializedUser} plans={plans} settings={settings} offers={offers} />
       </Suspense>
     </div>
   );

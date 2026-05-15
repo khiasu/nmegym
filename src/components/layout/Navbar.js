@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function Navbar({ onOpenBooking }) {
+export default function Navbar({ onOpenBooking, settings }) {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function Navbar({ onOpenBooking }) {
       {/* NAV — old index.html line 20-33 */}
       <nav id="nav" className={`${scrolled ? "scrolled" : ""} ${!visible ? "nav-hidden" : ""}`}>
         <Link href="/" style={{ display: "flex", alignItems: "center" }}>
-          <img src="/newlogo.png" alt="NME GYM" className="nav-logo-img" />
+          <img src={settings?.logoUrl || "/newlogo.png"} alt="NME GYM" className="nav-logo-img" />
         </Link>
         <div className="nav-links">
           <a href="#about">About</a>
@@ -104,8 +104,8 @@ export default function Navbar({ onOpenBooking }) {
           </a>
           
           <div className="mm-socials">
-            <a href="https://instagram.com/nme_gym" target="_blank" rel="noopener noreferrer">INSTA</a>
-            <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WHATSAPP</a>
+            <a href={settings?.instagramUrl || "https://instagram.com/nme_gym"} target="_blank" rel="noopener noreferrer">INSTA</a>
+            <a href={`https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">WHATSAPP</a>
           </div>
         </div>
 

@@ -2,8 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PaymentsTab({ pendingPayments: initialPending, verifiedPayments, requestConfirmation, executeWithUndo }) {
+  const router = useRouter();
   const [pendingPayments, setPendingPayments] = useState(initialPending || []);
   const [processing, setProcessing] = useState(null); // Track which payment is processing
   const [previewImg, setPreviewImg] = useState(null); // Screenshot preview modal
@@ -20,23 +22,23 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         ? "Confirm this payment? The member's plan will be activated and they'll receive a confirmation email."
         : "Reject this payment? The member will need to re-submit.",
       isCritical: status === "REJECTED",
-      onConfirm: async () => {
+      onConfirm: async (password) => {
         executeWithUndo({
           message: status === "VERIFIED" ? "Payment verified." : "Payment rejected.",
           revertUI: () => setPendingPayments(prev => prev.filter(p => p.id !== paymentId)),
-          executeFunction: async () => await executeVerify(paymentId, status)
+          executeFunction: async () => await executeVerify(paymentId, status, password)
         });
       }
     });
   }
 
-  async function executeVerify(paymentId, status) {
+  async function executeVerify(paymentId, status, password) {
     setProcessing(paymentId);
     try {
       const res = await fetch("/api/admin/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentId, status }),
+        body: JSON.stringify({ paymentId, status, password }),
       });
 
       if (res.ok) {
@@ -49,10 +51,15 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
             : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
           
           const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
-          if (window.confirm("Payment verified successfully! Would you like to send the confirmation via WhatsApp to the member now?")) {
-            window.open(waUrl, "_blank");
-          }
+          requestConfirmation({
+            title: "SEND CONFIRMATION?",
+            message: "Payment verified successfully! Would you like to send the confirmation via WhatsApp to the member now?",
+            onConfirm: () => {
+              window.open(waUrl, "_blank");
+            }
+          });
         }
+        router.refresh();
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(errData.error || "Verification failed.");
@@ -93,6 +100,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                 <th>Member</th>
                 <th>Contact</th>
                 <th>Plan</th>
+                <th>Promo</th>
                 <th>Amount</th>
                 <th>Type</th>
                 <th>Screenshot</th>
@@ -111,6 +119,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                       <span style={{ opacity: 0.5, fontSize: "11px" }}>{pay.user?.phone}</span>
                     </td>
                     <td>{pay.planName || "—"}</td>
+                    <td>{pay.promoCode ? <span style={{color: "var(--red)", fontSize: "11px", fontWeight: "bold"}}>{pay.promoCode}</span> : "—"}</td>
                     <td style={{fontWeight: "bold", color: "var(--red)"}}>₹{pay.amount}</td>
                     <td>
                       {pay.isFirstTimer ? (
@@ -169,7 +178,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         <div style={{overflowX: "auto"}}>
           <table className="admin-table">
             <thead>
-              <tr><th>Member</th><th>Plan</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr>
+              <tr><th>Member</th><th>Plan</th><th>Promo</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr>
             </thead>
             <tbody>
               {verifiedPayments?.map(pay => {
@@ -177,6 +186,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                   <tr key={pay.id}>
                     <td>{pay.user?.firstName} {pay.user?.lastName}</td>
                     <td>{pay.planName || pay.user?.memberships?.[0]?.planTier || "Monthly"}</td>
+                    <td>{pay.promoCode || "—"}</td>
                     <td>₹{pay.amount}</td>
                     <td>{pay.paymentMethod}</td>
                     <td>{new Date(pay.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>

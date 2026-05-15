@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import BookingModal from "@/components/ui/BookingModal";
 
-export default function HomepageClient({ children }) {
+export default function HomepageClient({ children, settings }) {
   const [bookingOpen, setBookingOpen] = useState(false);
 
   // ScrollReveal observer — matches old main.js lines 70-77
@@ -76,7 +76,7 @@ export default function HomepageClient({ children }) {
 
   return (
     <>
-      <Navbar onOpenBooking={() => setBookingOpen(true)} />
+      <Navbar onOpenBooking={() => setBookingOpen(true)} settings={settings} />
       {children}
       <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
     </>

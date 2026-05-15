@@ -5,8 +5,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegistrationsTab({ newRegistrations: initialRegs, requestConfirmation, executeWithUndo }) {
+  const router = useRouter();
   const [registrations, setRegistrations] = useState(initialRegs || []);
   const [processing, setProcessing] = useState(null);
   const [previewImg, setPreviewImg] = useState(null);
@@ -26,23 +28,23 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
         ? "Approve this new member? A member ID, initial password, and welcome email will be automatically generated and sent."
         : "Reject this registration? The applicant will need to re-submit their payment.",
       isCritical: !isVerify,
-      onConfirm: async () => {
+      onConfirm: async (password) => {
         executeWithUndo({
           message: isVerify ? "Registration approved." : "Registration rejected.",
           revertUI: () => setRegistrations(prev => prev.filter(r => r.id !== paymentId)),
-          executeFunction: async () => await executeAction(paymentId, status)
+          executeFunction: async () => await executeAction(paymentId, status, password)
         });
       }
     });
   }
 
-  async function executeAction(paymentId, status) {
+  async function executeAction(paymentId, status, password) {
     setProcessing(paymentId);
     try {
       const res = await fetch("/api/admin/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentId, status }),
+        body: JSON.stringify({ paymentId, status, password }),
       });
 
       if (res.ok) {
@@ -55,10 +57,15 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
             : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
           
           const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
-          if (window.confirm("Registration verified successfully! Would you like to send the welcome details via WhatsApp to the member now?")) {
-            window.open(waUrl, "_blank");
-          }
+          requestConfirmation({
+            title: "SEND WELCOME MESSAGE?",
+            message: "Registration verified successfully! Would you like to send the welcome details via WhatsApp to the member now?",
+            onConfirm: () => {
+              window.open(waUrl, "_blank");
+            }
+          });
         }
+        router.refresh();
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(errData.error || "Action failed.");
@@ -162,7 +169,10 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
                   {/* Plan */}
                   <div style={{textAlign: "center", minWidth: "100px"}}>
                     <div style={{fontSize: "11px", color: "#666", textTransform: "uppercase", letterSpacing: "1px"}}>Plan</div>
-                    <div style={{fontWeight: "bold", color: "#e8001d", marginTop: "2px"}}>{reg.planName || "—"}</div>
+                    <div style={{fontWeight: "bold", color: "#e8001d", marginTop: "2px"}}>
+                      {reg.planName || "—"}
+                      {reg.promoCode && <span style={{fontSize: "10px", color: "#00ff64", marginLeft: "5px"}}>({reg.promoCode})</span>}
+                    </div>
                   </div>
 
                   {/* Amount */}

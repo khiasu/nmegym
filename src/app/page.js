@@ -1,7 +1,8 @@
 // src/app/page.js — Homepage (Server Component)
 // Fetches data from Neon DB and composes all section components
+export const dynamic = "force-dynamic";
 
-import { getTrainers, getPlans, getActiveOffer, getSettings, getFacilities } from "@/lib/data";
+import { getTrainers, getPlans, getActiveOffer, getSettings, getFacilities, getAllOffers } from "@/lib/data";
 import HomepageClient from "./HomepageClient";
 
 // Sections
@@ -16,24 +17,25 @@ import Contact from "@/components/home/Contact";
 
 export default async function HomePage() {
   // Parallel data fetching — all queries run simultaneously
-  const [trainers, plans, offer, settings, facilities] = await Promise.all([
+  const [trainers, plans, offer, settings, facilities, offers] = await Promise.all([
     getTrainers(),
     getPlans(),
     getActiveOffer(),
     getSettings(),
     getFacilities(),
+    getAllOffers(),
   ]);
 
   return (
-    <HomepageClient>
+    <HomepageClient settings={settings}>
       <Hero offer={offer} settings={settings} />
       <Marquee />
       <About settings={settings} />
       <Facilities facilities={facilities} />
       <Trainers trainers={trainers} />
-      <Plans plans={plans} />
+      <Plans plans={plans} settings={settings} offers={offers} />
       <Testimonials />
-      <Contact />
+      <Contact settings={settings} />
     </HomepageClient>
   );
 }

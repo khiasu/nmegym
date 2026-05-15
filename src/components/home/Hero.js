@@ -29,8 +29,8 @@ export default function Hero({ offer, settings }) {
         <div id="promoBadge" className="promo-badge-container">
           {offer && offer.isActive && (
             <div className="promo-badge reveal visible">
-              <span className="pb-tag">{offer.badge || 'OFFER'}</span>
-              <span className="pb-text">{offer.title} — {offer.discount ? offer.discount + '% OFF' : 'CLAIM NOW'}</span>
+              <span className="pb-tag">{offer.discount ? offer.discount + '% OFF' : offer.badge || 'OFFER'}</span>
+              <span className="pb-text">{offer.title} {offer.promoCode && <>— Use Code: <strong style={{color: 'white', letterSpacing: '1px'}}>{offer.promoCode}</strong></>}</span>
             </div>
           )}
         </div>

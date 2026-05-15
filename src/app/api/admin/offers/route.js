@@ -8,23 +8,28 @@ export async function POST(request) {
     const session = await auth();
     if (!session || session.user.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, title, badge, discount, isActive, promoImage } = await request.json();
+    const body = await request.json();
+    const { id, title, badge, isActive } = body;
+    
+    // Normalize data
+    const promoCode = body.promoCode?.trim() || null;
+    const discount = body.discount ? parseInt(body.discount) : 0;
     
     if (id) {
       const updated = await prisma.offer.update({
         where: { id },
-        data: { title, badge, discount, isActive, promoImage },
+        data: { title, badge, discount, isActive, promoCode },
       });
       return NextResponse.json(updated);
     } else {
       const created = await prisma.offer.create({
-        data: { title, badge, discount, isActive, promoImage },
+        data: { title, badge, discount, isActive, promoCode },
       });
       return NextResponse.json(created, { status: 201 });
     }
   } catch (error) {
     console.error("Offer save error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
 

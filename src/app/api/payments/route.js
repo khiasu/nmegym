@@ -9,7 +9,7 @@ export async function POST(request) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { amount, planName, paymentMethod, screenshotUrl } = await request.json();
+    const { amount, planName, paymentMethod, screenshotUrl, promoCode } = await request.json();
 
     if (!amount || !screenshotUrl) {
       return NextResponse.json({ error: "Amount and screenshot are required" }, { status: 400 });
@@ -46,6 +46,7 @@ export async function POST(request) {
         planName: planName || null,
         admissionFee: 0,
         isFirstTimer: false,
+        promoCode: promoCode || null,
         paymentMethod: paymentMethod || "UPI",
         screenshotUrl,
         status: "PENDING_VERIFICATION",

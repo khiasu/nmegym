@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }) {
+export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, settings, offers }) {
   const [isFirstTimer, setIsFirstTimer] = useState(!session);
   const [formData, setFormData] = useState({
     firstName: session?.user?.firstName || "",
@@ -15,18 +15,39 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedOffer, setAppliedOffer] = useState(null);
+  const [promoError, setPromoError] = useState("");
 
   if (!isOpen || !selectedPlan) return null;
 
   const admissionFee = 1000;
   const planPrice = Number(selectedPlan.price);
-  const totalAmount = isFirstTimer ? planPrice + admissionFee : planPrice;
+  
+  // Calculate discount
+  const discountAmount = appliedOffer ? Math.floor(planPrice * (appliedOffer.discount / 100)) : 0;
+  const finalPlanPrice = planPrice - discountAmount;
+  const totalAmount = isFirstTimer ? finalPlanPrice + admissionFee : finalPlanPrice;
 
   // Generate UPI URI
-  const upiId = "coolarentiger-3@oksbi";
-  const upiName = "NMEGym";
+  const upiId = settings?.upiId || "nmegym@upi";
+  const upiName = settings?.gymName || "NMEGym";
   const upiUri = `upi://pay?pa=${upiId}&pn=${upiName}&am=${totalAmount}&cu=INR`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`;
+
+  const handleApplyPromo = () => {
+    setPromoError("");
+    if (!promoCode) return;
+    
+    const offer = offers?.find(o => o.promoCode?.toLowerCase() === promoCode.toLowerCase() && o.isActive);
+    if (offer) {
+      setAppliedOffer(offer);
+      setPromoError("");
+    } else {
+      setAppliedOffer(null);
+      setPromoError("Invalid or expired code");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +68,8 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
           totalAmount,
           screenshotUrl,
           isFirstTimer,
-          userId: session?.user?.id
+          userId: session?.user?.id,
+          promoCode: appliedOffer ? promoCode : null
         }),
       });
 
@@ -119,6 +141,13 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
                   <span style={{ color: 'var(--gray)' }}>Plan: {selectedPlan.name}</span>
                   <span style={{ fontWeight: 'bold' }}>₹{planPrice}</span>
                 </div>
+
+                {appliedOffer && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', color: '#00ff64' }}>
+                    <span>Discount ({appliedOffer.discount}%):</span>
+                    <span>- ₹{discountAmount}</span>
+                  </div>
+                )}
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                   <label style={{ color: 'var(--gray)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -126,7 +155,6 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
                       type="checkbox" 
                       checked={isFirstTimer} 
                       onChange={(e) => setIsFirstTimer(e.target.checked)}
-                      disabled={!session ? false : false} // Allow even logged in users to pay admission if needed, though usually they aren't first timers
                     />
                     First-Time Admission Fee
                   </label>
@@ -137,6 +165,31 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session }
                   <span style={{ color: 'white', fontWeight: 'bold' }}>TOTAL TO PAY</span>
                   <span style={{ color: 'var(--red)', fontWeight: 'bold', fontSize: '20px' }}>₹{totalAmount}</span>
                 </div>
+              </div>
+
+              {/* PROMO CODE */}
+              <div style={{ marginBottom: '25px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--gray)', marginBottom: '8px', display: 'block' }}>PROMO CODE</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Enter code" 
+                    value={promoCode} 
+                    onChange={e => setPromoCode(e.target.value)} 
+                    className="admin-input" 
+                    style={{ flex: 1, margin: 0 }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleApplyPromo}
+                    className="admin-btn-sm outline" 
+                    style={{ padding: '0 20px', border: '1px solid var(--elite-red)', color: 'var(--elite-red)' }}
+                  >
+                    APPLY
+                  </button>
+                </div>
+                {promoError && <p style={{ color: 'var(--red)', fontSize: '11px', marginTop: '5px' }}>{promoError}</p>}
+                {appliedOffer && <p style={{ color: '#00ff64', fontSize: '11px', marginTop: '5px' }}>✓ Code applied! You save ₹{discountAmount}</p>}
               </div>
 
               {/* USER DETAILS */}

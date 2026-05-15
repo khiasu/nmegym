@@ -46,10 +46,24 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { paymentId, status } = await request.json();
+    const { paymentId, status, password } = await request.json();
 
     if (!paymentId || !status) {
       return NextResponse.json({ error: "Payment ID and status are required" }, { status: 400 });
+    }
+
+    // Verify admin password if provided (for critical actions like Rejection)
+    if (password) {
+      const adminUser = await prisma.user.findUnique({
+        where: { id: session.user.id }
+      });
+      if (!adminUser || !adminUser.passwordHash) {
+        return NextResponse.json({ error: "Admin account error" }, { status: 500 });
+      }
+      const isValid = await bcrypt.compare(password, adminUser.passwordHash);
+      if (!isValid) {
+        return NextResponse.json({ error: "Invalid admin password" }, { status: 401 });
+      }
     }
 
     const payment = await prisma.payment.findUnique({

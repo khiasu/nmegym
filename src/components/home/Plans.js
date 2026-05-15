@@ -5,25 +5,11 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import CheckoutModal from "@/components/ui/CheckoutModal";
 
-export default function Plans({ plans, onOpenBooking }) {
+export default function Plans({ plans, onOpenBooking, settings, offers }) {
   const { data: session } = useSession();
   const [checkoutPlan, setCheckoutPlan] = useState(null);
 
-  const fallbackPlans = [
-    { id: '1', name: 'Monthly', price: 800, period: 'month', badge: "STARTER" },
-    { id: '2', name: '3 Months', price: 2000, period: '3 months', featured: true, badge: "POPULAR" },
-    { id: '3', name: '6 Months', price: 4000, period: '6 months', badge: "BEST VALUE" },
-  ];
-  
-  const displayPlans = (plans && plans.length > 0) ? plans : fallbackPlans;
-
-  const getBadge = (name) => {
-    if (name.toLowerCase().includes('monthly')) return "STARTER";
-    if (name.toLowerCase().includes('3 month')) return "BEST VALUE";
-    if (name.toLowerCase().includes('6 month')) return "MOST POPULAR";
-    if (name.toLowerCase().includes('year')) return "ELITE CHOICE";
-    return "MEMBER";
-  };
+  const displayPlans = plans && plans.length > 0 ? plans : [];
 
   return (
     <section className="membership-section" id="plans">
@@ -48,8 +34,8 @@ export default function Plans({ plans, onOpenBooking }) {
             </div>
             <div className="plans-2x2-grid">
               {displayPlans.map((plan, i) => {
-                const isFeatured = plan.featured || plan.name === '3 Months' || i === 1;
-                const badgeText = plan.badge || getBadge(plan.name);
+                const isFeatured = plan.name === '3 Months' || i === 1;
+                const badgeText = plan.badge;
 
                 return (
                   <div
@@ -57,7 +43,7 @@ export default function Plans({ plans, onOpenBooking }) {
                     key={plan.id}
                     style={{ transitionDelay: `${(i + 1) * 0.1}s`, paddingBottom: '30px' }}
                   >
-                    <div className="pm-badge">{badgeText}</div>
+                    {badgeText && <div className="pm-badge">{badgeText}</div>}
                     <div className="pm-dur">{plan.name || plan.period}</div>
                     <div className="pm-price">₹{plan.price?.toLocaleString()}</div>
 
@@ -80,6 +66,8 @@ export default function Plans({ plans, onOpenBooking }) {
         onClose={() => setCheckoutPlan(null)} 
         selectedPlan={checkoutPlan}
         session={session}
+        settings={settings}
+        offers={offers}
       />
     </section>
   );

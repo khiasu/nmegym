@@ -57,11 +57,14 @@ export default function ConfirmationModal({
             </label>
             <input 
               type="password" 
+              name="adminAuthToken"
+              autoComplete="new-password"
               className="admin-input" 
               placeholder="Enter Admin Password..." 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ width: "100%", borderColor: "var(--elite-red)" }}
+              spellCheck={false}
             />
           </div>
         )}

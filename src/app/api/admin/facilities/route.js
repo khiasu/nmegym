@@ -12,7 +12,7 @@ export async function POST(request) {
 
     const { id, name, description, mediaUrl, mediaType } = await request.json();
 
-    if (id && !isNaN(id)) {
+    if (id) {
       // It's a real ID (from DB)
       const updated = await prisma.facility.update({
         where: { id },

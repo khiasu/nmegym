@@ -8,17 +8,17 @@ export async function POST(request) {
     const session = await auth();
     if (!session || session.user.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, name, price, period, features } = await request.json();
+    const { id, name, price, period, badge } = await request.json();
 
     if (id) {
       const updated = await prisma.plan.update({
         where: { id },
-        data: { name, price, period, features },
+        data: { name, price, period, badge },
       });
       return NextResponse.json(updated);
     } else {
       const created = await prisma.plan.create({
-        data: { name, price, period, features },
+        data: { name, price, period, badge },
       });
       return NextResponse.json(created, { status: 201 });
     }

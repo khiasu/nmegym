@@ -2,8 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function MembersTab({ members: initialMembers, requestConfirmation }) {
+export default function MembersTab({ members: initialMembers, plans: availablePlans, requestConfirmation }) {
+  const router = useRouter();
   const [members, setMembers] = useState(initialMembers || []);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,7 +16,7 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
     lastName: "",
     phone: "",
     email: "",
-    planTier: "STARTER",
+    planTier: availablePlans?.[0]?.name || "STARTER",
     startDate: new Date().toISOString().split('T')[0]
   });
 
@@ -37,6 +39,7 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
         const newMember = await res.json();
         setMembers([newMember, ...members]);
         setFormData({ firstName: "", lastName: "", phone: "", email: "", planTier: "STARTER", startDate: new Date().toISOString().split('T')[0] });
+        router.refresh();
         alert("Member added successfully!");
       }
     } catch (err) {
@@ -47,11 +50,6 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
   }
 
   function deleteMember(id) {
-    if (!requestConfirmation) {
-      if (!confirm("Are you sure you want to remove this member?")) return;
-      return executeDelete(id);
-    }
-    
     requestConfirmation({
       title: "DELETE MEMBER",
       message: "Are you sure you want to permanently remove this member and their access? This cannot be undone.",
@@ -71,6 +69,7 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
       });
       if (res.ok) {
         setMembers(members.filter(m => m.id !== id));
+        router.refresh();
       } else {
         alert("Failed to delete. Incorrect password or server error.");
       }
@@ -111,9 +110,10 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
           <div className="admin-form-group">
             <label className="admin-label">Plan Tier</label>
             <select className="admin-input" value={formData.planTier} onChange={e => setFormData({...formData, planTier: e.target.value})}>
-              <option value="STARTER">Starter</option>
-              <option value="WARRIOR">Warrior</option>
-              <option value="ELITE">Elite</option>
+              {availablePlans?.map(p => (
+                <option key={p.id} value={p.name}>{p.name}</option>
+              ))}
+              {!availablePlans?.length && <option value="STARTER">Starter</option>}
             </select>
           </div>
           <div className="admin-form-group">
@@ -130,6 +130,7 @@ export default function MembersTab({ members: initialMembers, requestConfirmatio
             className="admin-input" 
             style={{width: "180px", padding: "6px 10px", fontSize: "12px"}} 
             placeholder="Search members..." 
+            autoComplete="off"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

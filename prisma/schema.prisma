@@ -98,6 +98,7 @@ model Payment {
   planName       String?  // Name of plan purchased (Monthly, 3 Months, etc.)
   admissionFee   Decimal? @db.Decimal(10, 2) // Admission fee for first-timers
   isFirstTimer   Boolean  @default(false) // Whether this is a first-time admission payment
+  promoCode      String?  // The promo code used for this payment
   paymentMethod  String   // UPI, CARD, CASH
   screenshotUrl  String?
   status         String   @default("PENDING_VERIFICATION") // PENDING_VERIFICATION, VERIFIED, REJECTED
@@ -157,10 +158,10 @@ model Facility {
 
 model Plan {
   id        String   @id @default(cuid())
-  name      String   @unique // STARTER, WARRIOR, ELITE
+  name      String   @unique // Monthly, 3 Months, etc.
+  badge     String?  // STARTER, WARRIOR, ELITE, BEST VALUE, etc.
   price     Int
   period    String
-  features  String   @db.Text // Comma separated
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -170,6 +171,7 @@ model Offer {
   title       String
   badge       String?
   discount    Int?
+  promoCode   String?   @unique
   promoImage  String?
   description String?   @db.Text
   isActive    Boolean   @default(true)

@@ -2,8 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function BookingsTab({ initialBookings, requestConfirmation }) {
+  const router = useRouter();
   const [bookings, setBookings] = useState(initialBookings || []);
   const [processing, setProcessing] = useState(null);
 
@@ -21,6 +23,24 @@ export default function BookingsTab({ initialBookings, requestConfirmation }) {
       });
       if (res.ok) {
         setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
+        router.refresh();
+
+        if (status === "CONFIRMED") {
+          const booking = bookings.find(b => b.id === id);
+          if (booking && booking.phone) {
+            const dateStr = new Date(booking.preferredDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+            const text = `Hello ${booking.name}! 🎉\n\nYour trial class booking for *${booking.interest}* on *${dateStr}* at *${booking.preferredTimeSlot}* is CONFIRMED.\n\nWe look forward to seeing you at NME GYM! 💪`;
+            const waUrl = `https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+            
+            requestConfirmation({
+              title: "SEND CONFIRMATION?",
+              message: `Booking confirmed! Would you like to send the confirmation message to ${booking.name} via WhatsApp now?`,
+              onConfirm: () => {
+                window.open(waUrl, "_blank");
+              }
+            });
+          }
+        }
       }
     } catch (err) {
       alert("Failed to update status");
@@ -30,10 +50,6 @@ export default function BookingsTab({ initialBookings, requestConfirmation }) {
   }
 
   function deleteBooking(id) {
-    if (!requestConfirmation) {
-      if (!confirm("Remove this booking?")) return;
-      return executeDelete(id);
-    }
     requestConfirmation({
       title: "DELETE BOOKING",
       message: "Are you sure you want to remove this booking from the system?",
@@ -49,6 +65,7 @@ export default function BookingsTab({ initialBookings, requestConfirmation }) {
       const res = await fetch(`/api/admin/bookings?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setBookings(bookings.filter(b => b.id !== id));
+        router.refresh();
       }
     } catch (err) {
       alert("Failed to delete");

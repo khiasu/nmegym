@@ -7,7 +7,8 @@ import DashboardTab from "./tabs/DashboardTab";
 import MembersTab from "./tabs/MembersTab";
 import RegistrationsTab from "./tabs/RegistrationsTab";
 import PaymentsTab from "./tabs/PaymentsTab";
-import PlansOffersTab from "./tabs/PlansOffersTab";
+import PlansTab from "./tabs/PlansTab";
+import OffersTab from "./tabs/OffersTab";
 import TrainersTab from "./tabs/TrainersTab";
 import FacilitiesTab from "./tabs/FacilitiesTab";
 import BookingsTab from "./tabs/BookingsTab";
@@ -98,7 +99,8 @@ export default function AdminClient(props) {
     { id: "registrations", label: "New Registrations", badge: regCount, icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg> },
     { id: "members", label: "Members", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> },
     { id: "payments", label: "Payments", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> },
-    { id: "plans", label: "Plans & Offers", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> },
+    { id: "plans", label: "Membership Plans", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> },
+    { id: "offers", label: "Promo Offers", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> },
     { id: "trainers", label: "Trainers", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v8H2z"></path><line x1="6" y1="20" x2="6" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg> },
     { id: "facilities", label: "Facilities", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> },
     { id: "bookings", label: "Bookings", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> },
@@ -114,7 +116,7 @@ export default function AdminClient(props) {
           <img 
             src={props.settings?.logoUrl || "/newlogo.png"} 
             alt="NME GYM" 
-            className="nav-logo-img" 
+            className="admin-portal-logo" 
           />
           <span className="admin-portal-title">ADMIN</span>
         </div>
@@ -171,9 +173,10 @@ export default function AdminClient(props) {
         <div className="admin-main-elite" key={activeTab}>
           {activeTab === "dashboard" && <DashboardTab {...props} setActiveTab={setActiveTab} />}
           {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "members" && <MembersTab members={props.members} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
+          {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
           {activeTab === "payments" && <PaymentsTab pendingPayments={props.pendingPayments} verifiedPayments={props.verifiedPayments} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "plans" && <PlansOffersTab plans={props.plans} offers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
+          {activeTab === "plans" && <PlansTab initialPlans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
+          {activeTab === "offers" && <OffersTab initialOffers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
           {activeTab === "trainers" && <TrainersTab initialTrainers={props.trainers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
           {activeTab === "facilities" && <FacilitiesTab initialFacilities={props.facilities} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
           {activeTab === "bookings" && <BookingsTab initialBookings={props.bookings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}

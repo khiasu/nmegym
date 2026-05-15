@@ -54,7 +54,7 @@ export default function Footer() {
           </div>
           <div className="footer-col">
             <h5>Support</h5>
-            <a href="/auth/login">Member Login</a>
+            <Link href="/legal">Legal Policy</Link>
             <a href="#contact">Contact</a>
             <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </div>
@@ -62,7 +62,7 @@ export default function Footer() {
             <h5>Contact</h5>
             <a href="tel:+917005310568">+91 70053 10568</a>
             <a href="mailto:nmegym.india@gmail.com">nmegym.india@gmail.com</a>
-            <a href="https://goo.gl/maps/placeholder" target="_blank" rel="noopener noreferrer">View on Maps</a>
+            <a href="https://maps.app.goo.gl/9egiUnvKSZbBp9jc9?g_st=ac" target="_blank" rel="noopener noreferrer">View on Maps</a>
             <Link href="/admin" style={{ color: "#333", fontSize: "10px", marginTop: "10px" }}>Admin</Link>
           </div>
         </div>

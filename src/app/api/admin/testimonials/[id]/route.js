@@ -9,7 +9,7 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const { isPublic } = await req.json();
 
     const testimonial = await prisma.testimonial.update({
@@ -19,6 +19,7 @@ export async function PATCH(req, { params }) {
 
     return NextResponse.json(testimonial);
   } catch (error) {
+    console.error("Testimonial PATCH Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -30,11 +31,12 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     await prisma.testimonial.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Testimonial DELETE Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

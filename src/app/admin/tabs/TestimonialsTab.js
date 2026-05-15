@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function TestimonialsTab({ requestConfirmation }) {
+  const router = useRouter();
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,14 +29,11 @@ export default function TestimonialsTab({ requestConfirmation }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isPublic: !current }),
     });
+    router.refresh();
     fetchTestis();
   };
 
   const deleteTesti = async (id) => {
-    if (!requestConfirmation) {
-      if (!confirm("Are you sure you want to delete this testimonial?")) return;
-      return executeDelete(id);
-    }
     requestConfirmation({
       title: "DELETE REVIEW",
       message: "Are you sure you want to permanently delete this member review?",
@@ -47,6 +46,7 @@ export default function TestimonialsTab({ requestConfirmation }) {
 
   const executeDelete = async (id) => {
     await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+    router.refresh();
     fetchTestis();
   };
 

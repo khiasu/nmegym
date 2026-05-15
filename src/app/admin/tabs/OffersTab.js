@@ -2,41 +2,57 @@
 "use client";
 
 import { useState } from "react";
-import { CldUploadWidget } from "next-cloudinary";
+import { useRouter } from "next/navigation";
 
-export default function OffersTab({ initialOffers }) {
-  const [offers, setOffers] = useState(initialOffers);
+export default function OffersTab({ initialOffers, requestConfirmation }) {
+  const router = useRouter();
+  const [offers, setOffers] = useState(initialOffers || []);
   const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   async function handleSave(e) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    data.isActive = formData.get("isActive") === "on";
-    if (data.discount) data.discount = parseInt(data.discount);
-    if (editing?.promoImage) data.promoImage = editing.promoImage;
-
+    if (!editing.title || !editing.badge) return alert("Title and Badge are required.");
+    
+    setSaving(true);
     try {
       const res = await fetch("/api/admin/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, id: editing?.id }),
+        body: JSON.stringify(editing),
       });
+
       if (res.ok) {
         const saved = await res.json();
-        if (editing?.id) setOffers(offers.map(o => o.id === saved.id ? saved : o));
+        if (editing.id) setOffers(offers.map(o => o.id === saved.id ? saved : o));
         else setOffers([saved, ...offers]);
+        router.refresh();
         setEditing(null);
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to save offer.");
       }
-    } catch (err) { alert("Error saving offer."); }
+    } catch (err) { 
+      alert("Error saving offer."); 
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDelete(id) {
-    if (!confirm("Delete offer?")) return;
-    try {
-      const res = await fetch(`/api/admin/offers?id=${id}`, { method: "DELETE" });
-      if (res.ok) setOffers(offers.filter(o => o.id !== id));
-    } catch (err) { alert("Error deleting offer."); }
+    requestConfirmation({
+      title: "DELETE OFFER",
+      message: "Are you sure you want to remove this promotional offer?",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/admin/offers?id=${id}`, { method: "DELETE" });
+          if (res.ok) {
+            setOffers(offers.filter(o => o.id !== id));
+            router.refresh();
+          }
+        } catch (err) { alert("Error deleting offer."); }
+      }
+    });
   }
 
   return (
@@ -46,16 +62,16 @@ export default function OffersTab({ initialOffers }) {
           <h2 className="admin-page-title">PROMO OFFERS</h2>
           <p className="admin-page-sub">Manage the red banner badges shown on the homepage.</p>
         </div>
-        <button className="admin-btn-sm" onClick={() => setEditing({ isActive: true })}>+ NEW OFFER</button>
+        <button className="admin-btn-sm" onClick={() => setEditing({ title: "", badge: "", promoCode: "", discount: 0, isActive: true })}>+ NEW OFFER</button>
       </div>
 
       <div className="admin-section-card">
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Preview</th>
               <th>Offer Title</th>
-              <th>Badge</th>
+              <th>Code</th>
+              <th>Discount</th>
               <th>Status</th>
               <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
@@ -63,11 +79,9 @@ export default function OffersTab({ initialOffers }) {
           <tbody>
             {offers.map(o => (
               <tr key={o.id}>
-                <td>
-                  <img src={o.promoImage || "/newlogo.png"} style={{width: "40px", height: "25px", objectFit: "cover", borderRadius: "2px", border: "1px solid #333"}} alt="Offer" />
-                </td>
                 <td><strong>{o.title}</strong></td>
-                <td><span className="pb-tag">{o.badge}</span></td>
+                <td><code style={{ color: "var(--red)", background: "rgba(232,0,29,0.1)", padding: "2px 6px", borderRadius: "4px" }}>{o.promoCode || "—"}</code></td>
+                <td><span style={{ fontWeight: 700 }}>{o.discount ? `${o.discount}%` : "—"}</span></td>
                 <td>
                   <span className={`status-badge ${o.isActive ? "status-active" : "status-expired"}`}>
                      {o.isActive ? "VISIBLE" : "HIDDEN"}
@@ -94,40 +108,63 @@ export default function OffersTab({ initialOffers }) {
             </header>
             <div className="modal-body">
               <form onSubmit={handleSave}>
-                <div className="admin-form-group">
-                  <label className="admin-label">OFFER IMAGE</label>
-                  <div style={{display:"flex", gap:"15px", alignItems:"center", marginBottom: "15px"}}>
-                    {editing.promoImage ? (
-                      <img src={editing.promoImage} style={{width:"80px", height:"50px", objectFit:"cover", borderRadius: "4px", border: "1px solid var(--elite-border)"}} alt="Preview" />
-                    ) : (
-                      <div style={{width:"80px", height:"50px", background:"rgba(255,255,255,0.05)", border: "1px dashed #333", borderRadius:"4px", display:"flex", alignItems:"center", justifyContent:"center", color:"#444", fontSize:"10px"}}>NO IMAGE</div>
-                    )}
-                    <CldUploadWidget 
-                      uploadPreset="nmegym_preset" 
-                      options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1.6 }}
-                      onSuccess={(res) => setEditing({...editing, promoImage: res.info.secure_url})}
-                    >
-                      {({ open }) => (
-                        <button type="button" onClick={() => open()} className="admin-btn-sm outline">
-                          {editing.promoImage ? "Change Image" : "Upload Image"}
-                        </button>
-                      )}
-                    </CldUploadWidget>
-                  </div>
-                </div>
+
                 <div className="admin-form-group">
                   <label className="admin-label">TITLE</label>
-                  <input name="title" defaultValue={editing.title} className="admin-input" required />
+                  <input 
+                    name="title" 
+                    value={editing.title} 
+                    onChange={e => setEditing({...editing, title: e.target.value})}
+                    className="admin-input" 
+                    required 
+                  />
                 </div>
                 <div className="admin-form-group">
-                  <label className="admin-label">BADGE TEXT</label>
-                  <input name="badge" defaultValue={editing.badge} className="admin-input" required />
+                  <label className="admin-label">BADGE TEXT (Banners)</label>
+                  <input 
+                    name="badge" 
+                    value={editing.badge} 
+                    onChange={e => setEditing({...editing, badge: e.target.value})}
+                    className="admin-input" 
+                    required 
+                  />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
+                  <div className="admin-form-group">
+                    <label className="admin-label">PROMO CODE</label>
+                    <input 
+                      name="promoCode" 
+                      value={editing.promoCode || ""} 
+                      onChange={e => setEditing({...editing, promoCode: e.target.value})}
+                      className="admin-input" 
+                      placeholder="e.g. NME10" 
+                    />
+                  </div>
+                  <div className="admin-form-group">
+                    <label className="admin-label">DISCOUNT %</label>
+                    <input 
+                      type="number" 
+                      name="discount" 
+                      value={editing.discount || ""} 
+                      onChange={e => setEditing({...editing, discount: parseInt(e.target.value) || 0})}
+                      className="admin-input" 
+                      placeholder="10" 
+                    />
+                  </div>
                 </div>
                 <div className="admin-form-group" style={{ display: "flex", alignItems: "center", gap: "10px", margin: "10px 0" }}>
-                  <input type="checkbox" name="isActive" defaultChecked={editing.isActive} id="isActive" />
+                  <input 
+                    type="checkbox" 
+                    name="isActive" 
+                    checked={editing.isActive} 
+                    onChange={e => setEditing({...editing, isActive: e.target.checked})}
+                    id="isActive" 
+                  />
                   <label htmlFor="isActive" style={{ margin: 0, fontSize: "11px", letterSpacing: "1px", color: "white" }}>ACTIVE ON SITE</label>
                 </div>
-                <button type="submit" className="admin-btn-sm" style={{ width: "100%", padding: "12px", marginTop: "10px" }}>SAVE OFFER</button>
+                <button type="submit" className="admin-btn-sm" disabled={saving} style={{ width: "100%", padding: "12px", marginTop: "10px" }}>
+                  {saving ? "SAVING..." : "SAVE OFFER"}
+                </button>
               </form>
             </div>
           </div>

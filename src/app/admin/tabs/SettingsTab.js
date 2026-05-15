@@ -2,11 +2,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
 export default function SettingsTab({ initialSettings, requestConfirmation, executeWithUndo }) {
+  const router = useRouter();
   const [settings, setSettings] = useState(initialSettings || {});
   const [saving, setSaving] = useState(false);
+  const [passwords, setPasswords] = useState({ current: "", new: "" });
 
   function handleSaveSettings() {
     if (!requestConfirmation || !executeWithUndo) return executeSave();
@@ -33,7 +36,10 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (res.ok) alert("Site settings updated!");
+      if (res.ok) {
+        router.refresh();
+        alert("Site settings updated!");
+      }
     } catch (err) {
       alert("Error saving settings.");
     } finally {
@@ -41,16 +47,32 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
     }
   }
 
-  function changeAdminPassword() {
-    if (!requestConfirmation) return alert("Not implemented.");
-    requestConfirmation({
-      title: "CHANGE PASSWORD",
-      message: "Please enter your CURRENT admin password to authorize changing the system password.",
-      isCritical: true,
-      onConfirm: async (password) => {
-        alert("Change password functionality not fully implemented yet. Password captured securely.");
+  async function changeAdminPassword() {
+    if (!passwords.current || !passwords.new) return alert("Please fill both password fields.");
+    
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          currentPassword: passwords.current, 
+          newPassword: passwords.new 
+        }),
+      });
+
+      if (res.ok) {
+        alert("Admin password updated successfully! Use the new password for next login.");
+        setPasswords({ current: "", new: "" });
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to update password.");
       }
-    });
+    } catch (err) {
+      alert("Error updating password.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -62,8 +84,11 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
       <div className="elite-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Gym Logo</span></div>
         <div style={{display:"flex", alignItems:"center", gap:"30px", flexWrap:"wrap"}}>
-          <div style={{width:"100px", height:"100px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "15px"}}>
+          <div style={{width:"100px", height:"100px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "15px", position: "relative"}}>
             <img src={settings.logoUrl || "/newlogo.png"} alt="Logo" style={{maxWidth:"100%", maxHeight:"100%", objectFit:"contain"}} />
+            {settings.logoUrl && (
+              <button type="button" onClick={() => setSettings({...settings, logoUrl: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            )}
           </div>
           <div>
             <CldUploadWidget 
@@ -92,17 +117,9 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
             <input className="admin-input" type="text" value={settings.upiId || ""} onChange={(e) => setSettings({...settings, upiId: e.target.value})} placeholder="e.g. nmegym@oksbi" />
           </div>
           <div className="admin-form-group">
-            <label className="admin-label">UPI QR Code</label>
-            <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {settings.upiQrUrl && <img src={settings.upiQrUrl} style={{height:"50px", width:"50px", objectFit:"contain", border:"1px solid var(--elite-border)"}} alt="QR" />}
-              <CldUploadWidget 
-                uploadPreset="nmegym_preset" 
-                options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1 }}
-                onSuccess={(res) => setSettings({...settings, upiQrUrl: res.info.secure_url})}
-              >
-                {({ open }) => <button className="admin-btn-sm outline" onClick={() => open()}>Upload QR</button>}
-              </CldUploadWidget>
-            </div>
+            <label className="admin-label">Payment Instruction</label>
+            <p style={{fontSize:"12px", color:"var(--elite-red)", fontWeight:"bold", margin:"10px 0"}}>DYNAMIC QR GENERATION ACTIVE</p>
+            <p style={{fontSize:"11px", color:"#888"}}>The payment page will automatically generate a unique QR code for each transaction based on the UPI ID above.</p>
           </div>
         </div>
       </div>
@@ -118,7 +135,7 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
           <div className="admin-form-group"><label className="admin-label">Email</label><input className="admin-input" type="email" value={settings.email || ""} onChange={(e) => setSettings({...settings, email: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Location</label><input className="admin-input" type="text" value={settings.address || ""} onChange={(e) => setSettings({...settings, address: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Instagram URL</label><input className="admin-input" type="url" value={settings.instagramUrl || ""} onChange={(e) => setSettings({...settings, instagramUrl: e.target.value})} /></div>
-          <div className="admin-form-group"><label className="admin-label">Opening Hours Text</label><input className="admin-input" type="text" value={settings.openingHours || ""} onChange={(e) => setSettings({...settings, openingHours: e.target.value})} /></div>
+
         </div>
         <div className="admin-form-group" style={{marginTop: "20px"}}>
           <label className="admin-label">About Us Description</label>
@@ -136,7 +153,12 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
           <div className="admin-form-group">
             <label className="admin-label">Hero Background Image</label>
             <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {settings.heroBackgroundUrl && <img src={settings.heroBackgroundUrl} style={{height:"50px", width:"80px", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="Hero" />}
+              {settings.heroBackgroundUrl && (
+                <div style={{ position: 'relative', height: '50px', width: '80px' }}>
+                  <img src={settings.heroBackgroundUrl} style={{height:"100%", width:"100%", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="Hero" />
+                  <button type="button" onClick={() => setSettings({...settings, heroBackgroundUrl: ''})} style={{ position: 'absolute', top: -5, right: -5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                </div>
+              )}
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1.77 }} // 16:9
@@ -151,7 +173,12 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
           <div className="admin-form-group">
             <label className="admin-label">About Us Image 1 (Tall)</label>
             <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {settings.aboutImage1Url && <img src={settings.aboutImage1Url} style={{height:"80px", width:"50px", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 1" />}
+              {settings.aboutImage1Url && (
+                <div style={{ position: 'relative', height: '80px', width: '50px' }}>
+                  <img src={settings.aboutImage1Url} style={{height:"100%", width:"100%", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 1" />
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage1Url: ''})} style={{ position: 'absolute', top: -5, right: -5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                </div>
+              )}
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 0.6 }} // Tall portrait
@@ -166,7 +193,12 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
           <div className="admin-form-group">
             <label className="admin-label">About Us Image 2 (Square)</label>
             <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {settings.aboutImage2Url && <img src={settings.aboutImage2Url} style={{height:"50px", width:"50px", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 2" />}
+              {settings.aboutImage2Url && (
+                <div style={{ position: 'relative', height: '50px', width: '50px' }}>
+                  <img src={settings.aboutImage2Url} style={{height:"100%", width:"100%", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 2" />
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage2Url: ''})} style={{ position: 'absolute', top: -5, right: -5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '16px', height: '16px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                </div>
+              )}
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1 }}
@@ -180,7 +212,12 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
           <div className="admin-form-group">
             <label className="admin-label">About Us Image 3 (Square)</label>
             <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
-              {settings.aboutImage3Url && <img src={settings.aboutImage3Url} style={{height:"50px", width:"50px", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 3" />}
+              {settings.aboutImage3Url && (
+                <div style={{ position: 'relative', height: '50px', width: '50px' }}>
+                  <img src={settings.aboutImage3Url} style={{height:"100%", width:"100%", objectFit:"cover", border:"1px solid var(--elite-border)"}} alt="About 3" />
+                  <button type="button" onClick={() => setSettings({...settings, aboutImage3Url: ''})} style={{ position: 'absolute', top: -5, right: -5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '16px', height: '16px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                </div>
+              )}
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1 }}
@@ -193,57 +230,36 @@ export default function SettingsTab({ initialSettings, requestConfirmation, exec
         </div>
       </div>
 
-      {/* GYM POLICIES & LEGAL */}
-      <div className="elite-card">
-        <div className="admin-section-card-header">
-          <span className="admin-section-card-title">Gym Policies & Legal</span>
-          <button className="admin-btn-sm" onClick={handleSaveSettings} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
-        </div>
-        <div className="admin-form-group" style={{marginTop: "20px"}}>
-          <label className="admin-label">Terms and Conditions</label>
-          <textarea 
-            className="admin-input" 
-            style={{height:"150px", width:"100%"}} 
-            value={settings.termsAndConditions || ""} 
-            onChange={(e) => setSettings({...settings, termsAndConditions: e.target.value})} 
-            placeholder="Official gym rules and member responsibilities..."
-            maxLength={3000}
-          ></textarea>
-          <p style={{fontSize:"11px", color:"rgba(255,255,255,0.3)", marginTop:"5px"}}>Max 3000 characters. These will appear on the /legal page.</p>
-        </div>
-        <div className="admin-form-group" style={{marginTop: "20px"}}>
-          <label className="admin-label">Privacy & Data Policy</label>
-          <textarea 
-            className="admin-input" 
-            style={{height:"150px", width:"100%"}} 
-            value={settings.privacyPolicy || ""} 
-            onChange={(e) => setSettings({...settings, privacyPolicy: e.target.value})} 
-            placeholder="Data collection and security protocols..."
-            maxLength={3000}
-          ></textarea>
-        </div>
-        <div className="admin-form-group" style={{marginTop: "20px"}}>
-          <label className="admin-label">Refund Policy</label>
-          <textarea 
-            className="admin-input" 
-            style={{height:"120px", width:"100%"}} 
-            value={settings.refundPolicy || ""} 
-            onChange={(e) => setSettings({...settings, refundPolicy: e.target.value})} 
-            placeholder="Cancellation and refund rules..."
-            maxLength={2000}
-          ></textarea>
-        </div>
-      </div>
 
       {/* SECURITY */}
       <div className="elite-card">
         <div className="admin-section-card-header">
           <span className="admin-section-card-title">Security</span>
-          <button className="admin-btn-sm" onClick={changeAdminPassword}>Update Password</button>
+          <button className="admin-btn-sm" onClick={changeAdminPassword} disabled={saving}>{saving ? "Updating..." : "Update Password"}</button>
         </div>
         <div className="admin-form-grid">
-          <div className="admin-form-group"><label className="admin-label">Current Password</label><input className="admin-input" type="password" placeholder="••••••••" /></div>
-          <div className="admin-form-group"><label className="admin-label">New Password</label><input className="admin-input" type="password" placeholder="••••••••" /></div>
+          <div className="admin-form-group">
+            <label className="admin-label">Current Password</label>
+            <input 
+              className="admin-input" 
+              type="password" 
+              placeholder="••••••••" 
+              value={passwords.current}
+              onChange={e => setPasswords({...passwords, current: e.target.value})}
+              autoComplete="new-password"
+            />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">New Password</label>
+            <input 
+              className="admin-input" 
+              type="password" 
+              placeholder="••••••••" 
+              value={passwords.new}
+              onChange={e => setPasswords({...passwords, new: e.target.value})}
+              autoComplete="new-password"
+            />
+          </div>
         </div>
       </div>
     </div>

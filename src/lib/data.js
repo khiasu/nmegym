@@ -32,10 +32,24 @@ export async function getActiveOffer() {
   try {
     return await prisma.offer.findFirst({
       where: { isActive: true },
+      orderBy: { createdAt: "desc" }, // Get the newest active offer
     });
   } catch (e) {
     console.error("Failed to fetch offer:", e);
     return null;
+  }
+}
+
+/** Fetch all active offers for promo code validation */
+export async function getAllOffers() {
+  try {
+    return await prisma.offer.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (e) {
+    console.error("Failed to fetch offers:", e);
+    return [];
   }
 }
 
