@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { CldUploadWidget } from "next-cloudinary";
 
 export default function OffersTab({ initialOffers }) {
   const [offers, setOffers] = useState(initialOffers);
@@ -13,6 +14,7 @@ export default function OffersTab({ initialOffers }) {
     const data = Object.fromEntries(formData.entries());
     data.isActive = formData.get("isActive") === "on";
     if (data.discount) data.discount = parseInt(data.discount);
+    if (editing?.promoImage) data.promoImage = editing.promoImage;
 
     try {
       const res = await fetch("/api/admin/offers", {
@@ -51,6 +53,7 @@ export default function OffersTab({ initialOffers }) {
         <table className="admin-table">
           <thead>
             <tr>
+              <th>Preview</th>
               <th>Offer Title</th>
               <th>Badge</th>
               <th>Status</th>
@@ -60,11 +63,14 @@ export default function OffersTab({ initialOffers }) {
           <tbody>
             {offers.map(o => (
               <tr key={o.id}>
+                <td>
+                  <img src={o.promoImage || "/newlogo.png"} style={{width: "40px", height: "25px", objectFit: "cover", borderRadius: "2px", border: "1px solid #333"}} alt="Offer" />
+                </td>
                 <td><strong>{o.title}</strong></td>
                 <td><span className="pb-tag">{o.badge}</span></td>
                 <td>
                   <span className={`status-badge ${o.isActive ? "status-active" : "status-expired"}`}>
-                    {o.isActive ? "VISIBLE" : "HIDDEN"}
+                     {o.isActive ? "VISIBLE" : "HIDDEN"}
                   </span>
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -81,13 +87,34 @@ export default function OffersTab({ initialOffers }) {
 
       {editing && (
         <div className="modal-overlay open">
-          <div className="modal" style={{ maxWidth: "400px" }}>
+          <div className="modal" style={{ maxWidth: "450px" }}>
             <header className="modal-header">
               <h3>{editing.id ? "EDIT OFFER" : "NEW OFFER"}</h3>
               <button className="modal-close" onClick={() => setEditing(null)}>×</button>
             </header>
             <div className="modal-body">
               <form onSubmit={handleSave}>
+                <div className="admin-form-group">
+                  <label className="admin-label">OFFER IMAGE</label>
+                  <div style={{display:"flex", gap:"15px", alignItems:"center", marginBottom: "15px"}}>
+                    {editing.promoImage ? (
+                      <img src={editing.promoImage} style={{width:"80px", height:"50px", objectFit:"cover", borderRadius: "4px", border: "1px solid var(--elite-border)"}} alt="Preview" />
+                    ) : (
+                      <div style={{width:"80px", height:"50px", background:"rgba(255,255,255,0.05)", border: "1px dashed #333", borderRadius:"4px", display:"flex", alignItems:"center", justifyContent:"center", color:"#444", fontSize:"10px"}}>NO IMAGE</div>
+                    )}
+                    <CldUploadWidget 
+                      uploadPreset="nmegym_preset" 
+                      options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1.6 }}
+                      onSuccess={(res) => setEditing({...editing, promoImage: res.info.secure_url})}
+                    >
+                      {({ open }) => (
+                        <button type="button" onClick={() => open()} className="admin-btn-sm outline">
+                          {editing.promoImage ? "Change Image" : "Upload Image"}
+                        </button>
+                      )}
+                    </CldUploadWidget>
+                  </div>
+                </div>
                 <div className="admin-form-group">
                   <label className="admin-label">TITLE</label>
                   <input name="title" defaultValue={editing.title} className="admin-input" required />

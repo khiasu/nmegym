@@ -80,7 +80,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation }
           </div>
           <div className="admin-form-group">
             <label className="admin-label">Type</label>
-            <select name="mediaType" className="admin-input" defaultValue="IMAGE">
+            <select name="mediaType" className="admin-input" value={editing.mediaType || "IMAGE"} onChange={(e) => setEditing({...editing, mediaType: e.target.value})}>
               <option value="IMAGE">Image</option>
               <option value="VIDEO">Video</option>
             </select>
@@ -91,14 +91,35 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation }
           </div>
           <div className="admin-form-group">
             <label className="admin-label">Media (Image/Video)</label>
-            <div style={{display:"flex", gap:"10px"}}>
-              <input name="mediaUrl" className="admin-input" type="text" value={editing.mediaUrl || ''} onChange={(e) => setEditing({...editing, mediaUrl: e.target.value})} placeholder="https://..." readOnly />
+            <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
+              {editing.mediaUrl ? (
+                <div style={{ position: 'relative', width: '80px', height: '50px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--elite-border)' }}>
+                  {editing.mediaType === "VIDEO" ? (
+                    <video src={editing.mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
+                  ) : (
+                    <img src={editing.mediaUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  )}
+                  <button type="button" onClick={() => setEditing({...editing, mediaUrl: ''})} style={{ position: 'absolute', top: 2, right: 2, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '12px' }}>×</button>
+                </div>
+              ) : (
+                <div style={{ width: '80px', height: '50px', background: 'rgba(255,255,255,0.05)', border: '1px dashed #333', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444', fontSize: '10px' }}>NO MEDIA</div>
+              )}
+              
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
-                options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1.5 }}
+                options={{ 
+                  cropping: true, 
+                  showSkipCropButton: true, 
+                  croppingAspectRatio: 1.5,
+                  resourceType: editing.mediaType === "VIDEO" ? "video" : "image"
+                }}
                 onSuccess={(res) => setEditing({ ...editing, mediaUrl: res.info.secure_url })}
               >
-                {({ open }) => (<button type="button" onClick={() => open()} className="admin-btn-sm outline">Upload</button>)}
+                {({ open }) => (
+                  <button type="button" onClick={() => open()} className="admin-btn-sm outline">
+                    {editing.mediaUrl ? "Change Media" : "Upload File"}
+                  </button>
+                )}
               </CldUploadWidget>
             </div>
           </div>

@@ -111,15 +111,27 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
           <div className="admin-form-group"><label className="admin-label">Trainer Name</label><input className="admin-input" type="text" placeholder="e.g. John Doe" value={newTrainer.name} onChange={e => setNewTrainer({...newTrainer, name: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Role / Speciality</label><input className="admin-input" type="text" placeholder="e.g. Head Coach, CrossFit" value={newTrainer.role} onChange={e => setNewTrainer({...newTrainer, role: e.target.value})} /></div>
           <div className="admin-form-group">
-            <label className="admin-label">Profile Image URL</label>
-            <div style={{display:"flex", gap:"10px"}}>
-              <input name="imageUrl" className="admin-input" type="text" value={newTrainer.imageUrl || ''} onChange={(e) => setNewTrainer({...newTrainer, imageUrl: e.target.value})} placeholder="https://..." readOnly />
+            <label className="admin-label">Profile Image</label>
+            <div style={{display:"flex", gap:"15px", alignItems:"center"}}>
+              {newTrainer.imageUrl ? (
+                <div style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--elite-border)' }}>
+                  <img src={newTrainer.imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => setNewTrainer({...newTrainer, imageUrl: ''})} style={{ position: 'absolute', top: 0, right: 0, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                </div>
+              ) : (
+                <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.05)', border: '1px dashed #333', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444', fontSize: '10px', textAlign: 'center' }}>NO PHOTO</div>
+              )}
+              
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
-                options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 0.75 }}
+                options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1 }}
                 onSuccess={(res) => setNewTrainer({ ...newTrainer, imageUrl: res.info.secure_url })}
               >
-                {({ open }) => (<button type="button" onClick={() => open()} className="admin-btn-sm outline">Upload</button>)}
+                {({ open }) => (
+                  <button type="button" onClick={() => open()} className="admin-btn-sm outline">
+                    {newTrainer.imageUrl ? "Change Photo" : "Upload Photo"}
+                  </button>
+                )}
               </CldUploadWidget>
             </div>
           </div>
