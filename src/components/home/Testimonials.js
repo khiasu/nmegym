@@ -66,11 +66,11 @@ export default function Testimonials() {
       <div className="max-w reveal" style={{ textAlign: "center", marginTop: "40px" }}>
         {session ? (
           <button className="testi-login-link" onClick={() => setModalOpen(true)} style={{ background: "none", border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer" }}>
-            SHARE YOUR EXPERIENCE
+            SHARE YOUR STORY
           </button>
         ) : (
           <Link href="/auth/login" className="testi-login-link">
-            Log in to share your story
+            SHARE YOUR STORY
           </Link>
         )}
       </div>
