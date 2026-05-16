@@ -78,7 +78,7 @@ export default function TestimonialsTab({ requestConfirmation, executeWithUndo, 
       <p className="admin-page-sub">Review and moderate member submissions.</p>
       
       <div className="admin-section-card" style={{ marginTop: '20px' }}>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="elite-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr>

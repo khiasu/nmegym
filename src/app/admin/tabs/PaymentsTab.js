@@ -93,7 +93,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         <div className="admin-section-card-header">
           <span className="admin-section-card-title">Pending Verification ({pendingPayments.length})</span>
         </div>
-        <div style={{overflowX: "auto"}}>
+        <div className="elite-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr>
@@ -165,7 +165,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                 );
               })}
               {pendingPayments.length === 0 && (
-                <tr><td colSpan="8" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending verifications. All caught up! 🎉</td></tr>
+                <tr><td colSpan="9" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending verifications. All caught up! 🎉</td></tr>
               )}
             </tbody>
           </table>
@@ -175,7 +175,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
       {/* VERIFIED PAYMENTS */}
       <div className="admin-section-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Verified Payments</span></div>
-        <div style={{overflowX: "auto"}}>
+        <div className="elite-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr><th>Member</th><th>Plan</th><th>Promo</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr>
@@ -195,7 +195,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                 );
               })}
               {(!verifiedPayments || verifiedPayments.length === 0) && (
-                <tr><td colSpan="6" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No verified payments yet.</td></tr>
+                <tr><td colSpan="7" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No verified payments yet.</td></tr>
               )}
             </tbody>
           </table>

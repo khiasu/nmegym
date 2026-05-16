@@ -171,41 +171,43 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
 
       <div className="admin-section-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Gallery Items</span></div>
-        <table className="admin-table">
-          <thead>
-            <tr><th>Name</th><th>Type</th><th>Banner</th><th>Description</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            {facilities.map(f => (
-              <tr key={f.id}>
-                <td>
-                  <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
-                    {f.mediaType === "VIDEO" ? (
-                      <video src={f.mediaUrl} style={{width:"40px", height:"40px", objectFit:"cover", borderRadius: "2px"}} muted />
-                    ) : (
-                      <img src={f.mediaUrl || "/newlogo.png"} style={{width:"40px", height:"40px", objectFit:"cover", borderRadius: "2px"}} alt={f.name} />
-                    )}
-                    {f.name}
-                  </div>
-                </td>
-                <td><span className={`status-badge ${f.mediaType === 'VIDEO' ? 'status-pending' : 'status-active'}`}>{f.mediaType}</span></td>
-                <td>{f.tag ? <span className="status-badge status-active" style={{background: "var(--red)"}}>{f.tag}</span> : '—'}</td>
-                <td className="admin-truncate-text">{f.description || '—'}</td>
-                <td>
-                  <div style={{display: "flex", gap: "8px"}}>
-                    <button className="admin-toggle-btn" onClick={() => handleEdit(f)} title="Edit">
-                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                    </button>
-                    <button className="admin-toggle-btn" onClick={() => handleDelete(f.id)} title="Delete">
-                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {facilities.length === 0 && <tr><td colSpan="4" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No facilities added.</td></tr>}
-          </tbody>
-        </table>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Type</th><th>Banner</th><th>Description</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              {facilities.map(f => (
+                <tr key={f.id}>
+                  <td>
+                    <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
+                      {f.mediaType === "VIDEO" ? (
+                        <video src={f.mediaUrl} style={{width:"40px", height:"40px", objectFit:"cover", borderRadius: "2px"}} muted />
+                      ) : (
+                        <img src={f.mediaUrl || "/newlogo.png"} style={{width:"40px", height:"40px", objectFit:"cover", borderRadius: "2px"}} alt={f.name} />
+                      )}
+                      {f.name}
+                    </div>
+                  </td>
+                  <td><span className={`status-badge ${f.mediaType === 'VIDEO' ? 'status-pending' : 'status-active'}`}>{f.mediaType}</span></td>
+                  <td>{f.tag ? <span className="status-badge status-active" style={{background: "var(--red)"}}>{f.tag}</span> : '—'}</td>
+                  <td className="admin-truncate-text">{f.description || '—'}</td>
+                  <td>
+                    <div style={{display: "flex", gap: "8px"}}>
+                      <button className="admin-toggle-btn" onClick={() => handleEdit(f)} title="Edit">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                      </button>
+                      <button className="admin-toggle-btn" onClick={() => handleDelete(f.id)} title="Delete">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {facilities.length === 0 && <tr><td colSpan="5" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No facilities added.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

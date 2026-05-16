@@ -95,7 +95,7 @@ export default function BookingsTab({ initialBookings, requestConfirmation, exec
 
       <div className="admin-section-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Recent Requests</span></div>
-        <div style={{overflowX: "auto"}}>
+        <div className="elite-table-wrapper">
           <table className="admin-table" id="bookingsTable">
             <thead>
               <tr><th>Date</th><th>Name</th><th>Phone</th><th>Interest</th><th>Slot</th><th>Status</th><th>Action</th></tr>

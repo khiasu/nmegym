@@ -148,7 +148,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div style={{overflowX: "auto"}}>
+        <div className="elite-table-wrapper">
           <table className="admin-table" id="membersTable">
             <thead>
               <tr><th>ID</th><th>Name</th><th>Contact</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Action</th></tr>
