@@ -9,7 +9,12 @@ export default function Plans({ plans, onOpenBooking, settings, offers }) {
   const { data: session } = useSession();
   const [checkoutPlan, setCheckoutPlan] = useState(null);
 
-  const displayPlans = plans && plans.length > 0 ? plans : [];
+  const displayPlans = plans && plans.length > 0 ? plans : [
+    { id: 'p1', name: '1 Month', price: 1500, period: 'per month', badge: 'BASIC' },
+    { id: 'p2', name: '3 Months', price: 4000, period: 'quarterly', badge: 'MOST POPULAR' },
+    { id: 'p3', name: '6 Months', price: 7500, period: 'half-year', badge: 'BEST VALUE' },
+    { id: 'p4', name: '12 Months', price: 13000, period: 'annual', badge: 'PRO ELITE' }
+  ];
 
   return (
     <section className="membership-section" id="plans">
@@ -30,7 +35,7 @@ export default function Plans({ plans, onOpenBooking, settings, offers }) {
           {/* Plans Grid (2x2) */}
           <div className="membership-plans">
             <div className="admission-banner reveal">
-              <span className="ab-dot"></span> ₹1,000 ONE-TIME ADMISSION FEE APPLIES TO ALL PLANS
+              <span className="ab-dot"></span> ₹<span id="dynamicAdmissionFee">{(settings?.admissionFee || 1000).toLocaleString()}</span> ONE-TIME ADMISSION FEE APPLIES TO ALL PLANS
             </div>
             <div className="plans-2x2-grid">
               {displayPlans.map((plan, i) => {

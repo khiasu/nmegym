@@ -501,12 +501,19 @@ h2.section-title .gray{color:var(--gray);}
   opacity: 1;
   transform: translateX(0);
 }
-.about-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.about-img{border-radius:2px;overflow:hidden;position:relative;border:1px solid transparent;transition:border-color 0.6s cubic-bezier(0.19, 1, 0.22, 1);}
-.about-img img{width:100%;height:160px;object-fit:cover;filter:grayscale(40%) brightness(0.9);transition:all 0.8s cubic-bezier(0.19, 1, 0.22, 1);}
+.about-img-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+.about-img-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.about-img { border-radius: 4px; overflow: hidden; position: relative; border: 1px solid transparent; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+.about-img img { width: 100%; height: 280px; object-fit: cover; filter: grayscale(40%) brightness(0.9); transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
+.about-img-tall img { height: 450px !important; }
+@media (max-width: 768px) {
+  .about-img img { height: 160px; }
+  .about-img-tall img { height: 220px !important; }
+  .about-img-grid { gap: 8px; }
+  .about-img-sub { gap: 8px; }
+}
 .about-img:hover img{filter:grayscale(0%) brightness(1.1);transform:scale(1.05);}
 .about-img:hover{border-color:rgba(232,0,29,0.3);}
-.about-img-tall img{height:328px;}
 .about-features {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -894,9 +901,13 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   .nav-links{display:flex!important;}
   section{padding:110px 48px;}
   .hero-stats{display:flex;}
-  .about-img img{height:200px;}
-  .about-img-tall img{height:408px;}
-  .about-features{grid-template-columns:repeat(4,1fr);}
+  .about-strip{padding:52px 48px !important;}
+  .about-content{padding:16px 0 !important;}
+  .media-section{padding:52px 48px !important;}
+  .about-features{grid-template-columns:repeat(4,1fr);margin-top:16px !important;}
+  .about-img img{height:190px;}
+  .about-img-tall img{height:210px !important;}
+  .about-img-sub .about-img img{height:190px;}
   .classes-grid{grid-template-columns:1fr 1fr 1fr;}
   .class-card{height:340px;}
   .plans-grid{grid-template-columns:1fr 1fr 1fr;}
@@ -2498,9 +2509,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 
 /* UNIFIED SIDEBAR ARCHITECTURE (NO TOP BAR) */
-.admin-top-bar {
-  display: none !important; /* KILL THE TOP BAR COMPLETELY */
-}
+/* REDUNDANT CLASSES REMOVED */
 
 #page-admin {
   padding-top: 50px !important; /* Reduced top padding */
@@ -2564,13 +2573,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 
 /* LOGO OUTSIDE SIDEBAR (WEBSITE STYLE) */
-.admin-global-logo {
-  position: fixed !important;
-  top: 30px !important;
-  left: 40px !important;
-  z-index: 2000 !important;
-  pointer-events: none;
-}
+/* REDUNDANT CLASSES REMOVED - USING .admin-global-header instead */
 
 .admin-sidebar-elite {
   top: 150px !important; /* Push sidebar down to clear the logo */
@@ -2614,12 +2617,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 
 /* ADMIN PORTAL TITLE NEXT TO LOGO */
-.admin-global-logo {
-  display: flex !important;
-  align-items: center !important;
-  gap: 20px !important;
-  pointer-events: auto !important; /* Allow interaction if needed */
-}
+/* REDUNDANT CLASSES REMOVED */
 
 .admin-portal-title {
   font-family: "Bebas Neue", sans-serif;
@@ -2695,16 +2693,7 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 
 
 @media (max-width: 1024px) {
-  .admin-global-logo {
-    top: 0 !important;
-    left: 0 !important;
-    padding: 15px !important;
-    background: rgba(10, 10, 10, 0.95) !important;
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    justify-content: center; /* Center logo on mobile */
-  }
+/* REDUNDANT CLASSES REMOVED */
 
   .admin-body-elite {
     padding-top: 130px !important; /* Space for the new solid header */
@@ -2900,12 +2889,36 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
 /* MOBILE HEADER & HAMBURGER FOR ADMIN PORTAL */
 .admin-global-header {
   position: fixed;
-  top: 30px;
-  left: 40px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
   z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 40px;
+  background: transparent;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.admin-global-header.scrolled {
+  background: rgba(10, 10, 10, 0.9) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-global-header.nav-hidden {
+  transform: translateY(-100%);
+}
+
+.admin-sidebar-elite {
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), top 0.4s ease;
+}
+
+.admin-global-header.nav-hidden ~ .admin-body-elite .admin-sidebar-elite {
+  transform: translateY(-100px); /* Move sidebar up when header hides */
 }
 
 .admin-portal-logo {
@@ -2954,8 +2967,8 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   .admin-sidebar-elite {
     display: none !important; 
     position: fixed !important;
-    top: 75px !important; /* Just below the header */
-    right: 15px !important; /* Align to the right under hamburger */
+    top: 100px !important; /* Just below the 100px header */
+    right: 0 !important; /* Align to the right edge */
     left: auto !important;
     width: 280px !important; /* Compact width */
     height: auto !important;

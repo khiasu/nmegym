@@ -21,7 +21,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
 
   if (!isOpen || !selectedPlan) return null;
 
-  const admissionFee = 1000;
+  const admissionFee = Number(settings?.admissionFee) || 1000;
   const planPrice = Number(selectedPlan.price);
   
   // Calculate discount
@@ -149,17 +149,12 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
                   </div>
                 )}
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <label style={{ color: 'var(--gray)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={isFirstTimer} 
-                      onChange={(e) => setIsFirstTimer(e.target.checked)}
-                    />
-                    First-Time Admission Fee
-                  </label>
-                  <span style={{ fontWeight: 'bold' }}>+ ₹{admissionFee}</span>
-                </div>
+                {isFirstTimer && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ color: 'var(--gray)', fontSize: '13px' }}>One-Time Admission Fee (New Member):</span>
+                    <span style={{ fontWeight: 'bold' }}>+ ₹{admissionFee.toLocaleString()}</span>
+                  </div>
+                )}
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
                   <span style={{ color: 'white', fontWeight: 'bold' }}>TOTAL TO PAY</span>

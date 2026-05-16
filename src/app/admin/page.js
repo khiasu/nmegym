@@ -26,7 +26,7 @@ export default async function AdminPage() {
   ] = await Promise.all([
     prisma.payment.findMany({
       where: { status: "PENDING_VERIFICATION" },
-      include: { user: { select: { firstName: true, lastName: true, email: true, phone: true, memberId: true, memberships: true } } },
+      include: { user: { select: { firstName: true, lastName: true, email: true, phone: true, memberId: true } } },
       orderBy: { createdAt: "desc" },
     }),
     prisma.settings.findFirst(),
@@ -40,7 +40,7 @@ export default async function AdminPage() {
     }),
     prisma.payment.findMany({
       where: { status: "VERIFIED" },
-      include: { user: { select: { firstName: true, lastName: true, memberId: true, memberships: true } } },
+      include: { user: { select: { firstName: true, lastName: true, memberId: true } } },
       orderBy: { updatedAt: "desc" },
     }),
     prisma.facility.findMany({ orderBy: { createdAt: "desc" } }),
@@ -58,13 +58,18 @@ export default async function AdminPage() {
     admissionFee: p.admissionFee ? Number(p.admissionFee) : 0,
   }));
 
+  const serializedSettings = settings ? {
+    ...settings,
+    updatedAt: settings.updatedAt.toISOString(),
+  } : null;
+
   return (
     <div className="admin-container">
       <AdminClient 
         newRegistrations={serialize(newRegistrations)}
         pendingPayments={serialize(pendingRenewals)}
         verifiedPayments={serialize(verifiedPayments)}
-        settings={settings}
+        settings={serializedSettings}
         trainers={trainers}
         plans={plans}
         offers={offers}

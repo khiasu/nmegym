@@ -1,7 +1,7 @@
-// src/app/api/admin/settings/route.js
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function POST(request) {
   try {
@@ -24,6 +24,7 @@ export async function POST(request) {
         upiId: data.upiId,
         upiQrUrl: data.upiQrUrl,
         aboutText: data.aboutText,
+        aboutText2: data.aboutText2,
         openingHours: data.openingHours,
         heroBackgroundUrl: data.heroBackgroundUrl,
         aboutImage1Url: data.aboutImage1Url,
@@ -32,6 +33,7 @@ export async function POST(request) {
         termsAndConditions: data.termsAndConditions,
         privacyPolicy: data.privacyPolicy,
         refundPolicy: data.refundPolicy,
+        admissionFee: parseInt(data.admissionFee) || 1000,
       },
       create: {
         id: 1,
@@ -44,6 +46,7 @@ export async function POST(request) {
         upiId: data.upiId,
         upiQrUrl: data.upiQrUrl,
         aboutText: data.aboutText,
+        aboutText2: data.aboutText2,
         openingHours: data.openingHours,
         heroBackgroundUrl: data.heroBackgroundUrl,
         aboutImage1Url: data.aboutImage1Url,
@@ -52,9 +55,11 @@ export async function POST(request) {
         termsAndConditions: data.termsAndConditions,
         privacyPolicy: data.privacyPolicy,
         refundPolicy: data.refundPolicy,
+        admissionFee: parseInt(data.admissionFee) || 1000,
       },
     });
 
+    revalidatePath("/");
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Settings update error:", error);

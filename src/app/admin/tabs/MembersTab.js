@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function MembersTab({ members: initialMembers, plans: availablePlans, requestConfirmation }) {
+export default function MembersTab({ members: initialMembers, plans: availablePlans, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [members, setMembers] = useState(initialMembers || []);
   const [search, setSearch] = useState("");
@@ -27,35 +27,47 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
   );
 
   async function saveMember() {
-    if (!formData.firstName || !formData.email) return alert("First Name and Email are required");
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/members", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-      if (res.ok) {
-        const newMember = await res.json();
-        setMembers([newMember, ...members]);
+    if (!formData.firstName || !formData.email) return showToast("First Name and Email are required");
+    
+    executeWithUndo({
+      message: "New member added. Syncing with database in 7s...",
+      executeFunction: async () => {
+        try {
+          const res = await fetch("/api/admin/members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+          });
+          if (res.ok) {
+            router.refresh();
+          }
+        } catch (err) {
+          showToast("Failed to sync member to database");
+        }
+      },
+      revertUI: () => {
+        // Optimistic UI update
+        const tempMember = { ...formData, id: 'temp-' + Date.now(), createdAt: new Date().toISOString(), memberships: [{ planTier: formData.planTier, status: "ACTIVE", endDate: null }] };
+        setMembers([tempMember, ...members]);
         setFormData({ firstName: "", lastName: "", phone: "", email: "", planTier: "STARTER", startDate: new Date().toISOString().split('T')[0] });
-        router.refresh();
-        alert("Member added successfully!");
       }
-    } catch (err) {
-      alert("Failed to save member");
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   function deleteMember(id) {
+    const memberToRemove = members.find(m => m.id === id);
     requestConfirmation({
       title: "DELETE MEMBER",
-      message: "Are you sure you want to permanently remove this member and their access? This cannot be undone.",
+      message: "Are you sure you want to permanently remove this member? This cannot be undone.",
       isCritical: true,
       onConfirm: async (password) => {
-        await executeDelete(id, password);
+        executeWithUndo({
+          message: "Member removed. Finalizing deletion in 7s...",
+          executeFunction: async () => await executeDelete(id, password),
+          revertUI: () => {
+            setMembers(members.filter(m => m.id !== id));
+          }
+        });
       }
     });
   }
@@ -70,11 +82,12 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
       if (res.ok) {
         setMembers(members.filter(m => m.id !== id));
         router.refresh();
+        showToast("Member removed");
       } else {
-        alert("Failed to delete. Incorrect password or server error.");
+        showToast("Failed to delete. Incorrect password or server error.");
       }
     } catch (err) {
-      alert("Failed to delete");
+      showToast("Failed to delete");
     }
   }
 

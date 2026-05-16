@@ -5,14 +5,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function TrainersTab({ initialTrainers, requestConfirmation, executeWithUndo }) {
+export default function TrainersTab({ initialTrainers, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [trainers, setTrainers] = useState(initialTrainers || []);
   const [newTrainer, setNewTrainer] = useState({ id: null, name: "", role: "", imageUrl: "", bio: "" });
   const [isEditing, setIsEditing] = useState(false);
 
   async function handleSaveTrainer() {
-    if (!newTrainer.name || !newTrainer.role) return alert("Name and role are required.");
+    if (!newTrainer.name || !newTrainer.role) return showToast("Name and role are required.");
     try {
       const res = await fetch("/api/admin/trainers", {
         method: "POST",
@@ -23,15 +23,15 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
         const saved = await res.json();
         if (newTrainer.id) {
           setTrainers(trainers.map(t => t.id === saved.id ? saved : t));
-          alert("Trainer updated!");
+          showToast("Trainer updated!");
         } else {
           setTrainers([saved, ...trainers]);
-          alert("Trainer added!");
+          showToast("Trainer added!");
         }
         router.refresh();
         resetForm();
       }
-    } catch (err) { alert("Error saving trainer."); }
+    } catch (err) { showToast("Error saving trainer."); }
   }
 
   function resetForm() {
@@ -49,25 +49,18 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
     requestConfirmation({
       title: "DELETE TRAINER",
       message: "Are you sure you want to permanently remove this trainer? This action cannot be undone.",
-      isCritical: true, // Demands Admin PW
+      isCritical: true,
       onConfirm: async (password) => {
-        
-        // Backup the trainer data before removing from UI
-        const trainerToRestore = trainers.find(t => t.id === id);
-        
         executeWithUndo({
-          message: "Trainer removed. Deleting from database in 10s...",
+          message: "Trainer removed. Deleting from database in 7s...",
           revertUI: () => {
-             // Revert the UI by instantly putting the trainer back
-             setTrainers(prev => [...prev, trainerToRestore]);
+            // Optimistic UI update — hide trainer immediately
+            setTrainers(prev => prev.filter(t => t.id !== id));
           },
           executeFunction: async () => {
-             await executeDelete(id, password);
+            await executeDelete(id, password);
           }
         });
-        
-        // Optimistic UI Update (Hide immediately)
-        setTrainers(trainers.filter(t => t.id !== id));
       }
     });
   }
@@ -83,12 +76,13 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
       if (res.ok) {
         setTrainers(trainers.filter(t => t.id !== id));
         router.refresh();
+        showToast("Trainer removed from database");
       } else {
-        alert("Failed to delete trainer. Incorrect password or server error.");
+        showToast("Failed to delete trainer. Incorrect password or server error.");
       }
     } catch (err) { 
       console.error(err);
-      alert("Error deleting trainer."); 
+      showToast("Error deleting trainer."); 
     }
   }
 
@@ -121,7 +115,7 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, showSkipCropButton: false, croppingAspectRatio: 1 }}
-                onSuccess={(res) => setNewTrainer({ ...newTrainer, imageUrl: res.info.secure_url })}
+                onSuccess={(res) => setNewTrainer(prev => ({ ...prev, imageUrl: res.info.secure_url }))}
               >
                 {({ open }) => (
                   <button type="button" onClick={() => open()} className="admin-btn-sm outline">

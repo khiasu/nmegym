@@ -191,6 +191,7 @@ model Settings {
   upiId           String?  @default("nme@upi")
   upiQrUrl        String?
   aboutText       String?  @db.Text
+  aboutText2      String?  @db.Text
   openingHours    String?  @default("MON-SAT: 5:30 AM - 10:00 PM | SUN: 7:00 AM - 1:00 PM")
   heroBackgroundUrl String?
   aboutImage1Url    String?
@@ -199,6 +200,7 @@ model Settings {
   termsAndConditions String? @db.Text
   privacyPolicy      String? @db.Text
   refundPolicy       String? @db.Text
+  admissionFee       Int      @default(1000)
   updatedAt       DateTime @updatedAt
 }
 

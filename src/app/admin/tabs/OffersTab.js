@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function OffersTab({ initialOffers, requestConfirmation }) {
+export default function OffersTab({ initialOffers, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [offers, setOffers] = useState(initialOffers || []);
   const [editing, setEditing] = useState(null);
@@ -12,45 +12,44 @@ export default function OffersTab({ initialOffers, requestConfirmation }) {
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!editing.title || !editing.badge) return alert("Title and Badge are required.");
+    if (!editing.title || !editing.badge) return showToast("Title and Badge are required.");
     
-    setSaving(true);
-    try {
-      const res = await fetch("/api/admin/offers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editing),
-      });
-
-      if (res.ok) {
-        const saved = await res.json();
-        if (editing.id) setOffers(offers.map(o => o.id === saved.id ? saved : o));
-        else setOffers([saved, ...offers]);
-        router.refresh();
+    executeWithUndo({
+      message: editing.id ? "Offer updated. Syncing in 7s..." : "New offer created. Syncing in 7s...",
+      executeFunction: async () => {
+        try {
+          const res = await fetch("/api/admin/offers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editing),
+          });
+          if (res.ok) router.refresh();
+        } catch (err) { showToast("Sync failed."); }
+      },
+      revertUI: () => {
+        if (editing.id) setOffers(offers.map(o => o.id === editing.id ? editing : o));
+        else setOffers([{...editing, id: 'temp-' + Date.now()}, ...offers]);
         setEditing(null);
-      } else {
-        const err = await res.json();
-        alert(err.error || "Failed to save offer.");
       }
-    } catch (err) { 
-      alert("Error saving offer."); 
-    } finally {
-      setSaving(false);
-    }
+    });
   }
 
   async function handleDelete(id) {
+    const offerToRemove = offers.find(o => o.id === id);
     requestConfirmation({
       title: "DELETE OFFER",
       message: "Are you sure you want to remove this promotional offer?",
       onConfirm: async () => {
-        try {
-          const res = await fetch(`/api/admin/offers?id=${id}`, { method: "DELETE" });
-          if (res.ok) {
-            setOffers(offers.filter(o => o.id !== id));
+        executeWithUndo({
+          message: "Offer removed. Deleting from database in 7s...",
+          executeFunction: async () => {
+            await fetch(`/api/admin/offers?id=${id}`, { method: "DELETE" });
             router.refresh();
+          },
+          revertUI: () => {
+            setOffers(offers.filter(o => o.id !== id));
           }
-        } catch (err) { alert("Error deleting offer."); }
+        });
       }
     });
   }

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function TestimonialsTab({ requestConfirmation }) {
+export default function TestimonialsTab({ requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,13 +24,23 @@ export default function TestimonialsTab({ requestConfirmation }) {
   }, []);
 
   const togglePublic = async (id, current) => {
-    await fetch(`/api/admin/testimonials/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isPublic: !current }),
+    executeWithUndo({
+      message: current ? "Review hidden. Syncing in 7s..." : "Review approved. Publishing in 7s...",
+      executeFunction: async () => {
+        try {
+          await fetch(`/api/admin/testimonials/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isPublic: !current }),
+          });
+          router.refresh();
+          fetchTestis();
+        } catch (err) { showToast("Moderation failed."); }
+      },
+      revertUI: () => {
+        setTestimonials(testimonials.map(t => t.id === id ? { ...t, isPublic: !current } : t));
+      }
     });
-    router.refresh();
-    fetchTestis();
   };
 
   const deleteTesti = async (id) => {
@@ -39,7 +49,17 @@ export default function TestimonialsTab({ requestConfirmation }) {
       message: "Are you sure you want to permanently delete this member review?",
       isCritical: false,
       onConfirm: async () => {
-        await executeDelete(id);
+        executeWithUndo({
+          message: "Review removed. Deleting from database in 7s...",
+          executeFunction: async () => {
+            await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+            router.refresh();
+            fetchTestis();
+          },
+          revertUI: () => {
+            setTestimonials(testimonials.filter(t => t.id !== id));
+          }
+        });
       }
     });
   };

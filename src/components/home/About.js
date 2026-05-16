@@ -3,8 +3,11 @@
 "use client";
 
 export default function About({ settings }) {
-  const defaultText = "Welcome to NME Gym — a community-focused fitness space dedicated to helping people of all ages achieve healthier and stronger lifestyles. More than just a gym, NME Gym is a place where discipline, confidence, and motivation grow together. We are especially committed to inspiring youth to stay active and focused through fitness while also supporting senior citizens in maintaining strength, mobility, and overall wellbeing. With an affordable, friendly, and motivating environment, our mission is to make fitness accessible and sustainable for everyone.";
-  const aboutText = settings?.aboutText || defaultText;
+  const defaultText1 = "Welcome to NME Gym — a community-focused fitness space dedicated to helping people of all ages achieve healthier and stronger lifestyles. More than just a gym, NME Gym is a place where discipline, confidence, and motivation grow together. We are especially committed to inspiring youth to stay active and focused through fitness while also supporting senior citizens in maintaining strength, mobility, and overall wellbeing. With an affordable, friendly, and motivating environment, our mission is to make fitness accessible and sustainable for everyone.";
+  const defaultText2 = "We are dedicated to inspiring youth through fitness and discipline while also supporting senior citizens in maintaining mobility and wellbeing. Our mission is to make fitness affordable, motivating, and accessible for everyone.";
+  
+  const aboutText1 = settings?.aboutText || defaultText1;
+  const aboutText2 = settings?.aboutText2 || defaultText2;
   
   return (
     <section className="about-strip" id="about">
@@ -14,20 +17,19 @@ export default function About({ settings }) {
         <div className="about-content">
           <div className="about-text">
             <p className="about-intro reveal">
-              {aboutText.split(" ").map((word, i) => (
+              {aboutText1.split(" ").map((word, i) => (
                 <span key={i} style={{ transitionDelay: `${i * 30}ms`, display: 'inline-block', marginRight: '0.3em' }}>{word}</span>
               ))}
             </p>
             <p className="about-mission reveal">
-              We are dedicated to inspiring youth through fitness and discipline while also supporting senior citizens in maintaining mobility and wellbeing. 
-              Our mission is to make fitness affordable, motivating, and accessible for everyone.
+              {aboutText2}
             </p>
           </div>
           <div className="about-img-grid reveal">
             <div className="about-img about-img-tall">
               <img src={settings?.aboutImage1Url || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80"} alt="NME Gym interior" />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="about-img-sub">
               <div className="about-img">
                 <img src={settings?.aboutImage2Url || "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80"} alt="Training" />
               </div>

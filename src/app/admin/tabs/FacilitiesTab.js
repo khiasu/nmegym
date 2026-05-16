@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function FacilitiesTab({ initialFacilities, requestConfirmation }) {
+export default function FacilitiesTab({ initialFacilities, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [facilities, setFacilities] = useState(initialFacilities || []);
   const [editing, setEditing] = useState({ id: null, name: "", description: "", mediaUrl: "", mediaType: "IMAGE" });
@@ -13,30 +13,27 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation }
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!editing.mediaUrl) return alert("Please upload an image or video.");
-    if (!editing.name) return alert("Name is required.");
+    if (!editing.mediaUrl) return showToast("Please upload an image or video.");
+    if (!editing.name) return showToast("Name is required.");
     
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/facilities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editing),
-      });
-      
-      if (res.ok) {
-        const saved = await res.json();
-        if (editing.id) setFacilities(facilities.map(f => f.id === saved.id ? saved : f));
-        else setFacilities([saved, ...facilities]);
+    executeWithUndo({
+      message: editing.id ? "Facility updated. Saving to database in 7s..." : "Facility added. Syncing in 7s...",
+      executeFunction: async () => {
+        try {
+          const res = await fetch("/api/admin/facilities", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editing),
+          });
+          if (res.ok) router.refresh();
+        } catch (err) { showToast("Failed to sync facility."); }
+      },
+      revertUI: () => {
+        if (editing.id) setFacilities(facilities.map(f => f.id === editing.id ? editing : f));
+        else setFacilities([{...editing, id: 'temp-' + Date.now()}, ...facilities]);
         resetForm();
-        router.refresh();
-        alert("Facility saved to database!");
       }
-    } catch (err) {
-      alert("Error saving facility.");
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
 
@@ -61,15 +58,18 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation }
   }
 
   async function executeDelete(id) {
-    try {
-      const res = await fetch(`/api/admin/facilities?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
+    executeWithUndo({
+      message: "Facility removed. Deleting from database in 7s...",
+      executeFunction: async () => {
+        try {
+          await fetch(`/api/admin/facilities?id=${id}`, { method: "DELETE" });
+          router.refresh();
+        } catch (err) { console.error(err); }
+      },
+      revertUI: () => {
         setFacilities(facilities.filter(f => f.id !== id));
-        router.refresh();
       }
-    } catch (err) {
-      alert("Error deleting facility.");
-    }
+    });
   }
 
   return (
@@ -145,7 +145,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation }
                   croppingAspectRatio: 1.5,
                   resourceType: editing.mediaType === "VIDEO" ? "video" : "image"
                 }}
-                onSuccess={(res) => setEditing({ ...editing, mediaUrl: res.info.secure_url })}
+                onSuccess={(res) => setEditing(prev => ({ ...prev, mediaUrl: res.info.secure_url }))}
               >
                 {({ open }) => (
                   <button type="button" onClick={() => open()} className="admin-btn-sm outline">

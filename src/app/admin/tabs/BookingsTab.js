@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function BookingsTab({ initialBookings, requestConfirmation }) {
+export default function BookingsTab({ initialBookings, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [bookings, setBookings] = useState(initialBookings || []);
   const [processing, setProcessing] = useState(null);
@@ -14,39 +14,40 @@ export default function BookingsTab({ initialBookings, requestConfirmation }) {
   const confirmed = bookings.filter(b => b.status === "CONFIRMED").length;
 
   async function updateStatus(id, status) {
-    setProcessing(id);
-    try {
-      const res = await fetch("/api/admin/bookings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status })
-      });
-      if (res.ok) {
-        setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
-        router.refresh();
+    const booking = bookings.find(b => b.id === id);
+    const originalStatus = booking?.status;
 
-        if (status === "CONFIRMED") {
-          const booking = bookings.find(b => b.id === id);
-          if (booking && booking.phone) {
-            const dateStr = new Date(booking.preferredDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-            const text = `Hello ${booking.name}! 🎉\n\nYour trial class booking for *${booking.interest}* on *${dateStr}* at *${booking.preferredTimeSlot}* is CONFIRMED.\n\nWe look forward to seeing you at NME GYM! 💪`;
-            const waUrl = `https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
-            
-            requestConfirmation({
-              title: "SEND CONFIRMATION?",
-              message: `Booking confirmed! Would you like to send the confirmation message to ${booking.name} via WhatsApp now?`,
-              onConfirm: () => {
-                window.open(waUrl, "_blank");
-              }
-            });
+    executeWithUndo({
+      message: status === "CONFIRMED" ? "Booking confirmed. Syncing in 7s..." : "Status updated. Syncing in 7s...",
+      executeFunction: async () => {
+        try {
+          const res = await fetch("/api/admin/bookings", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, status })
+          });
+          if (res.ok) {
+            router.refresh();
+            if (status === "CONFIRMED" && booking?.phone) {
+              const dateStr = new Date(booking.preferredDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+              const text = `Hello ${booking.name}! 🎉\n\nYour trial class booking for *${booking.interest}* on *${dateStr}* at *${booking.preferredTimeSlot}* is CONFIRMED.\n\nWe look forward to seeing you at NME GYM! 💪`;
+              const waUrl = `https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+              
+              requestConfirmation({
+                title: "SEND CONFIRMATION?",
+                message: `Booking confirmed! Would you like to send the confirmation message to ${booking.name} via WhatsApp now?`,
+                onConfirm: () => {
+                  window.open(waUrl, "_blank");
+                }
+              });
+            }
           }
-        }
+        } catch (err) { showToast("Sync failed."); }
+      },
+      revertUI: () => {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
       }
-    } catch (err) {
-      alert("Failed to update status");
-    } finally {
-      setProcessing(null);
-    }
+    });
   }
 
   function deleteBooking(id) {
@@ -55,7 +56,16 @@ export default function BookingsTab({ initialBookings, requestConfirmation }) {
       message: "Are you sure you want to remove this booking from the system?",
       isCritical: false,
       onConfirm: async () => {
-        await executeDelete(id);
+        executeWithUndo({
+          message: "Booking removed. Deleting from database in 7s...",
+          executeFunction: async () => {
+            await fetch(`/api/admin/bookings?id=${id}`, { method: "DELETE" });
+            router.refresh();
+          },
+          revertUI: () => {
+            setBookings(bookings.filter(b => b.id !== id));
+          }
+        });
       }
     });
   }

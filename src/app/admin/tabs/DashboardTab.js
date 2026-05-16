@@ -9,6 +9,19 @@ export default function DashboardTab({ members, verifiedPayments, pendingPayment
   const totalRevenue = verifiedPayments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
   const formattedRevenue = totalRevenue > 100000 ? `₹${(totalRevenue / 100000).toFixed(1)}L` : `₹${totalRevenue.toLocaleString()}`;
 
+  // Dynamic revenue by time period
+  const now = new Date();
+  const msPerDay = 86400000;
+  const rev12m = verifiedPayments?.filter(p => (now - new Date(p.updatedAt || p.createdAt)) < 365 * msPerDay).reduce((s, p) => s + Number(p.amount), 0) || 0;
+  const rev6m  = verifiedPayments?.filter(p => (now - new Date(p.updatedAt || p.createdAt)) < 183 * msPerDay).reduce((s, p) => s + Number(p.amount), 0) || 0;
+  const rev3m  = verifiedPayments?.filter(p => (now - new Date(p.updatedAt || p.createdAt)) < 91  * msPerDay).reduce((s, p) => s + Number(p.amount), 0) || 0;
+  const revBase = rev12m || 1; // avoid division by zero
+  const fmt = (v) => v > 100000 ? `₹${(v/100000).toFixed(1)}L` : `₹${v.toLocaleString()}`;
+
+  // Member growth this month
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const newThisMonth = members?.filter(m => new Date(m.createdAt) >= thisMonth)?.length || 0;
+
   const recentMembers = members?.slice(0, 5) || [];
 
   return (
@@ -19,12 +32,12 @@ export default function DashboardTab({ members, verifiedPayments, pendingPayment
         <div className="elite-stat-card">
           <div className="elite-stat-val">{members?.length || 0}</div>
           <div className="elite-stat-label">TOTAL MEMBERS</div>
-          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>↑ +18 THIS MONTH</div>
+          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{newThisMonth > 0 ? `↑ +${newThisMonth} THIS MONTH` : "NO NEW THIS MONTH"}</div>
         </div>
         <div className="elite-stat-card">
           <div className="elite-stat-val">{activeMembers}</div>
           <div className="elite-stat-label">ACTIVE MEMBERS</div>
-          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>↑ +6 vs LAST</div>
+          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{pendingPayments?.length || 0} PENDING PAYMENTS</div>
         </div>
         <div className="elite-stat-card">
           <div className="elite-stat-val">{formattedRevenue}</div>
@@ -121,19 +134,19 @@ export default function DashboardTab({ members, verifiedPayments, pendingPayment
             <span className="admin-section-card-title">Revenue Distribution</span>
           </div>
           <div className="admin-revenue-bar">
-            <span className="admin-revenue-bar-label">1 Year</span>
-            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: "72%"}}></div></div>
-            <span className="admin-revenue-bar-val">₹63.9k</span>
+            <span className="admin-revenue-bar-label">12 Months</span>
+            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: `${Math.round((rev12m / revBase) * 100)}%`}}></div></div>
+            <span className="admin-revenue-bar-val">{fmt(rev12m)}</span>
           </div>
           <div className="admin-revenue-bar">
             <span className="admin-revenue-bar-label">6 Months</span>
-            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: "48%"}}></div></div>
-            <span className="admin-revenue-bar-val">₹42.4k</span>
+            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: `${Math.round((rev6m / revBase) * 100)}%`}}></div></div>
+            <span className="admin-revenue-bar-val">{fmt(rev6m)}</span>
           </div>
           <div className="admin-revenue-bar">
             <span className="admin-revenue-bar-label">3 Months</span>
-            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: "35%"}}></div></div>
-            <span className="admin-revenue-bar-val">₹31.2k</span>
+            <div className="admin-revenue-bar-track"><div className="admin-revenue-bar-fill" style={{width: `${Math.round((rev3m / revBase) * 100)}%`}}></div></div>
+            <span className="admin-revenue-bar-val">{fmt(rev3m)}</span>
           </div>
         </div>
       </div>

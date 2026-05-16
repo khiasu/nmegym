@@ -23,6 +23,7 @@ export default function AdminClient(props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+  const [settings, setSettings] = useState(props.settings || {});
   
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -55,14 +56,14 @@ export default function AdminClient(props) {
   const [toastState, setToastState] = useState(null); // { message, executeData, timerId }
 
   const executeWithUndo = ({ message, executeFunction, revertUI }) => {
-    // 1. Immediately revert the UI to simulate completion
-    revertUI();
+    // 1. Immediately update the UI (optimistic update)
+    if (revertUI) revertUI();
     
-    // 2. Set a 10-second timer to actually execute the backend API
+    // 2. Set a 7-second timer to actually execute the backend API
     const timerId = setTimeout(() => {
       executeFunction();
       setToastState(null);
-    }, 10000);
+    }, 7000);
 
     // 3. Show the toast with the Undo callback
     setToastState({
@@ -70,15 +71,20 @@ export default function AdminClient(props) {
       onUndo: () => {
         clearTimeout(timerId); // Stop the API from firing
         setToastState(null);
-        // We do not need a reverse API call because it never hit the database!
-        // But we would need to refresh the tab data or pass a reverse UI function.
-        // For now, reloading the page or fetching data works, but ideally revertUI handles it.
+        // Reload to ensure state is clean and reverted to DB state
         window.location.reload(); 
       },
       onClose: () => {
-        // If it naturally closes, the timer has already fired the API
         setToastState(null);
       }
+    });
+  };
+  
+  const showToast = (message, duration = 4000) => {
+    setToastState({
+      message,
+      onUndo: null, // Simple toast has no undo
+      onClose: () => setToastState(null)
     });
   };
 
@@ -198,16 +204,16 @@ export default function AdminClient(props) {
         {/* MAIN CONTENT AREA */}
         <div className="admin-main-elite" key={activeTab}>
           {activeTab === "dashboard" && <DashboardTab {...props} setActiveTab={setActiveTab} />}
-          {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "payments" && <PaymentsTab pendingPayments={props.pendingPayments} verifiedPayments={props.verifiedPayments} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "plans" && <PlansTab initialPlans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "offers" && <OffersTab initialOffers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "trainers" && <TrainersTab initialTrainers={props.trainers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "facilities" && <FacilitiesTab initialFacilities={props.facilities} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "bookings" && <BookingsTab initialBookings={props.bookings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "settings" && <SettingsTab initialSettings={props.settings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
-          {activeTab === "testimonials" && <TestimonialsTab requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} />}
+          {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "payments" && <PaymentsTab pendingPayments={props.pendingPayments} verifiedPayments={props.verifiedPayments} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "plans" && <PlansTab initialPlans={props.plans} settings={settings} setSettings={setSettings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "offers" && <OffersTab initialOffers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "trainers" && <TrainersTab initialTrainers={props.trainers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "facilities" && <FacilitiesTab initialFacilities={props.facilities} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "bookings" && <BookingsTab initialBookings={props.bookings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "settings" && <SettingsTab initialSettings={settings} setSettings={setSettings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "testimonials" && <TestimonialsTab requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
         </div>
       </div>
 
@@ -232,7 +238,7 @@ export default function AdminClient(props) {
           message={toastState.message}
           onUndo={toastState.onUndo}
           onClose={toastState.onClose}
-          duration={10000}
+          duration={7000}
         />
       )}
 
