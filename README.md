@@ -1,129 +1,55 @@
-# NME GYM — Full Technical Documentation
+# NME GYM — Fitness Beyond Limits
 
-A premium, high-performance web platform for NME GYM. This project is built with a focus on cinematic aesthetics, robust administrative control, and automated member management.
-
----
-
-## 🚀 Tech Stack & Infrastructure
-*   **Framework:** Next.js 15+ (App Router, Server Actions where applicable)
-*   **Language:** JavaScript (ES6+)
-*   **Database:** Neon PostgreSQL (Serverless, hosted on AWS region `aws-ap-southeast-1`)
-*   **ORM:** Prisma 7.x (Client-side generation for type-safety)
-*   **Authentication:** NextAuth.js (JWT Strategy)
-*   **Media Hosting:** Cloudinary (CDN for images & payment screenshots)
-*   **Email:** Nodemailer (Transaction emails via Gmail SMTP)
-*   **Styling:** Vanilla CSS (Modular design tokens in `nme-gym.css`)
+This is the custom-built web platform for **NME GYM Nagaland**. It’s designed to be fast, premium, and zero-cost to run. No expensive payment gateways or subscription fees—just a direct, automated system for managing a modern gym.
 
 ---
 
-## 📂 Deep Directory Structure
-```bash
-├── prisma/
-│   └── schema.prisma        # Database models & relationships
-├── public/                  # Static assets & brand identity
-└── src/
-    ├── app/                 # Next.js App Router
-    │   ├── admin/           # Admin Portal (Secure)
-    │   │   ├── client/      # Admin UI wrappers & tab logic
-    │   │   └── tabs/        # Individual Admin Tabs (Registrations, Payments, Settings)
-    │   ├── api/             # RESTful API Endpoints
-    │   │   ├── admin/       # Protected Admin actions (Verify, Delete, Settings)
-    │   │   ├── auth/        # NextAuth configuration & callbacks
-    │   │   └── checkout/    # Plan selection & payment upload logic
-    │   ├── auth/            # Client-side Auth pages (Login, Register, Reset)
-    │   ├── dashboard/       # Member-only portal (Renewal, Status)
-    │   └── legal/           # Dynamic policy rendering engine
-    ├── components/
-    │   ├── home/            # Interactive Hero, Trainers, Contact sections
-    │   ├── providers/       # Auth & Theme context providers
-    │   └── ui/              # Reusable components (Modals, UploadArea, Notifications)
-    ├── lib/                 # Backend Utilities
-    │   ├── db.js            # Prisma Singleton Client
-    │   ├── mail.js          # SMTP Email Logic
-    │   └── data.js          # Shared Server-side Data Fetching
-    └── styles/
-        └── nme-gym.css      # 1000+ line bespoke design system
-```
+## ⚡ What it Does
+
+### 1. The Membership Flow (Automated)
+Instead of paying a 3% fee to Stripe or Razorpay, we use a custom UPI verification system:
+- **Join**: New members pick a plan, pay via your UPI QR code, and upload a screenshot.
+- **Verify**: You get an email notification, review the screenshot in the Admin Portal, and click "Approve."
+- **Onboard**: The system automatically creates their account, generates a Member ID, and emails them their login credentials instantly.
+
+### 2. Full Admin Control Panel
+You don't need to touch the code to update the site. The Admin Portal lets you:
+- Change the **Gym Logo** and **Favicon** across the whole site.
+- Update your **UPI ID** and **QR Code** for payments.
+- Add/Edit **Trainers**, **Facilities**, and **Offers**.
+- Manage **Memberships** (Track expiry, manual renewals, and deletions).
+- Edit **About Us** text and **Policies** in real-time.
+
+### 3. Mobile First
+The entire admin dashboard and member portal are optimized for mobile. You can manage the whole gym from your phone while you're on the floor.
 
 ---
 
-## 🏗️ Core System Logic
-
-### 1. Dynamic Admin Settings (Singleton Pattern)
-The site uses a singleton `Settings` model. All global variables (WhatsApp number, UPI ID, Address, Hero Image, etc.) are stored here.
-*   **Implementation:** The admin portal uses an `upsert` logic in `/api/admin/settings`.
-*   **Formatting Engine:** The `legal/page.js` component includes a custom parser that converts "Bold: Text" lines from the database into formatted headers automatically.
-
-### 2. Manual Payment Verification Workflow
-This system bypasses payment gateways to save costs:
-1.  **Selection:** User picks a plan (Admission fee added if new).
-2.  **Payment:** User pays via UPI and uploads a screenshot.
-3.  **Cloudinary:** The screenshot is uploaded to Cloudinary using an unsigned preset.
-4.  **Pending State:** A `User` record is created with `status: PENDING`.
-5.  **Admin Action:** Admin reviews the screenshot in `PaymentsTab.js`.
-6.  **Activation:** Upon "Approve," the system:
-    - Updates status to `ACTIVE`.
-    - Calculates `startDate` (now) and `endDate` (based on plan duration).
-    - Generates a 6-digit `memberId` (e.g., NME-101).
-    - Triggers `welcomeEmail` with login credentials.
-
-### 3. Admin Interaction Patterns
-*   **Request Confirmation:** Critical actions (deleting users, resetting passwords) use a custom `requestConfirmation` modal.
-*   **Undo Pattern:** Success actions (verifying payments) use an `executeWithUndo` pattern, allowing the admin to revert a mistake within a 5-second window.
-
-### 4. Authentication & Security
-*   **NextAuth:** Configured with `strategy: 'jwt'`.
-*   **Middleware:** Protected routes (`/admin/**`, `/dashboard/**`) are secured via server-side checks.
-*   **Role-Based:** Admin access is restricted to users with `role: ADMIN`.
+## 🛠 Tech Stack (The "Free" Engine)
+- **Framework**: Next.js 16 (App Router)
+- **Database**: Neon PostgreSQL (Free Tier)
+- **Auth**: NextAuth.js (Secure member logins)
+- **Images**: Cloudinary (Free hosting for photos and screenshots)
+- **Email**: Resend (Reliable automated emails)
+- **Styling**: Hand-written Vanilla CSS (Fast and clean)
 
 ---
 
-## 📡 API Endpoints
+## 🚀 Quick Start for Developers
 
-### Public
-*   `POST /api/auth/register`: Initial user registration and payment metadata capture.
-*   `POST /api/checkout`: Renewal payment submissions.
-
-### Admin (Protected)
-*   `GET /api/admin/users`: Fetch all members with filtering.
-*   `POST /api/admin/verify-payment`: Approves/Rejects a payment and activates membership.
-*   `PUT /api/admin/settings`: Updates global gym configuration.
-*   `DELETE /api/admin/users/[id]`: Securely removes a user and their history.
+1. **Setup Env**: Copy `.env.example` to `.env` and fill in your Neon and Cloudinary keys.
+2. **Install**: `npm install`
+3. **Sync DB**: `npx prisma db push`
+4. **Seed**: `npm run db:seed` (Creates the default admin: `nmegym.india@gmail.com` / `nme2026`)
+5. **Run**: `npm run dev`
 
 ---
 
-## 🛠️ Database Schema (Prisma)
-*   **User:** Core identity, roles, and membership status.
-*   **Plan:** Pricing tiers (Monthly, Quarterly, etc.).
-*   **Payment:** Ledger of all transactions, linked to users and Cloudinary URLs.
-*   **Settings:** Global site configuration.
-*   **Trainer:** Dynamic coaching profiles.
+## 💡 Important Notes
+
+- **Zero Cost Policy**: The project is built to stay within the free tiers of Vercel, Neon, Cloudinary, and Resend. Don't add paid plugins unless the client explicitly asks.
+- **Domain**: Keep an eye on **nmegym.in** renewal. If it expires, the emails and logins will stop working.
+- **Email**: Currently using **Resend**. If you hit the daily limit, check the logs in the Resend dashboard.
 
 ---
-
-## ⚙️ Maintenance & Future-Proofing
-
-### Local Setup
-1.  `npm install`
-2.  `npx prisma generate`
-3.  `npx prisma db push` (Syncs schema with Neon)
-4.  `npm run dev`
-
-### Domain Renewal
-*   Domain: **nmegym.in**
-*   Registrar: [User to fill]
-*   Renewal Frequency: Annual. **Critical:** If the domain expires, all API routes and authentication will fail.
-
-### Scaling
-*   **Cloudinary:** If storage hits limits, cleanup old payment screenshots (`status: VERIFIED`).
-*   **Database:** The free tier of Neon is sufficient for ~5,000 members. Beyond this, upgrade to the "Autoscale" tier.
-
----
-
-## 🎨 Styling Guidelines
-*   **Design Token System:** All colors are defined as CSS variables at the top of `nme-gym.css`.
-*   **Animations:** Uses a mix of `reveal` observers (custom JS) and CSS keyframes for cinematic transitions.
-*   **Responsiveness:** Grid-based layouts with specific breakpoints at `1024px`, `768px`, and `480px`.
-
----
-**Lead Developer Note:** The primary design goal was "Zero Operational Cost." Do not introduce paid dependencies (Stripe, Twilio, etc.) without consulting the client.
+**NME GYM — Forge Your Legacy.**
