@@ -4,19 +4,30 @@
 
 import "./globals.css";
 import AuthProvider from "@/components/providers/SessionProvider";
+import { getSettings } from "@/lib/data";
 
-export const metadata = {
-  title: "NME GYM — Forge Your Legacy",
-  description:
-    "Premium fitness center in Chumoukedima, Nagaland. Strength training, Zumba, Yoga, personal coaching & more. Join 200+ members transforming their lives.",
-  keywords: "gym, fitness, Nagaland, Chumoukedima, NME GYM, workout, training",
-  openGraph: {
-    title: "NME GYM — Forge Your Legacy",
-    description: "Premium fitness center in Chumoukedima, Nagaland.",
-    type: "website",
-    locale: "en_IN",
-  },
-};
+export async function generateMetadata() {
+  const settings = await getSettings();
+  const logo = settings?.logoUrl || "/newlogo.png";
+
+  return {
+    title: "NME GYM — FITNESS BEYOND LIMITS",
+    description:
+      "FITNESS BEYOND LIMITS at NME GYM, Nagaland's premium fitness center. Strength training, Zumba, Yoga, personal coaching & more. Join 200+ members transforming their lives.",
+    keywords: "gym, fitness, Nagaland, Chumoukedima, NME GYM, workout, training",
+    openGraph: {
+      title: "NME GYM — FITNESS BEYOND LIMITS",
+      description: "Premium fitness center in Chumoukedima, Nagaland.",
+      type: "website",
+      locale: "en_IN",
+    },
+    icons: {
+      icon: logo,
+      shortcut: logo,
+      apple: logo,
+    },
+  };
+}
 
 export default function RootLayout({ children }) {
   return (

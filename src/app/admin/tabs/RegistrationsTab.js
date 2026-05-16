@@ -142,12 +142,13 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
               <div key={reg.id} className="admin-section-card" style={{padding: 0, overflow: "hidden"}}>
                 {/* HEADER ROW */}
                 <div style={{
-                  padding: "20px 25px",
+                  padding: "15px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "20px",
+                  gap: "15px",
                   flexWrap: "wrap",
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  minWidth: 0
                 }} onClick={() => setExpandedRow(isExpanded ? null : reg.id)}>
                   {/* Status indicator */}
                   <div style={{
@@ -157,12 +158,12 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
                   }} />
                   
                   {/* Name */}
-                  <div style={{flex: "1 1 200px"}}>
-                    <div style={{fontWeight: "bold", fontSize: "16px", color: "white"}}>
+                  <div style={{flex: "1 1 180px", minWidth: 0}}>
+                    <div style={{fontWeight: "bold", fontSize: "16px", color: "white", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>
                       {reg.user?.firstName} {reg.user?.lastName}
                     </div>
                     <div style={{fontSize: "12px", color: "#888", marginTop: "3px"}}>
-                      {new Date(reg.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at {new Date(reg.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(reg.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </div>
                   </div>
 
@@ -204,7 +205,7 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
                     borderTop: "1px solid rgba(255,255,255,0.05)",
                     animation: "fadeIn 0.3s ease"
                   }}>
-                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px"}}>
+                    <div className="admin-form-grid" style={{marginTop: "20px"}}>
                       {/* Contact Details */}
                       <div>
                         <h4 style={{fontSize: "12px", color: "#666", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px"}}>Contact Details</h4>

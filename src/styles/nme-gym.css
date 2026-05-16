@@ -2796,7 +2796,41 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   font-size: 10px !important;
 }
 
-/* TABLE COMPRESSION */
+/* TACTICAL MOBILE OVERRIDES */
+@media (max-width: 768px) {
+  .elite-card, .admin-section-card {
+    padding: 15px !important;
+    border-radius: 12px !important;
+  }
+  
+  .admin-page-title {
+    font-size: 24px !important;
+  }
+
+  .elite-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .admin-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .elite-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .admin-input {
+    font-size: 16px !important; /* Prevents iOS zoom */
+  }
+}
+
+.elite-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
 .elite-table th, .elite-table td, 
 .admin-table th, .admin-table td {
   padding: 10px 8px !important;

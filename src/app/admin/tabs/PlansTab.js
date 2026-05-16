@@ -85,21 +85,21 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       </div>
 
       <div className="admin-section-card" style={{ marginBottom: '25px', borderLeft: '4px solid var(--red)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1 }}>
-            <label className="admin-label" style={{ marginBottom: '5px', display: 'block' }}>ONE-TIME ADMISSION FEE (₹)</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 300px' }}>
+            <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>ONE-TIME ADMISSION FEE (₹)</label>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <input 
                 type="number" 
                 className="admin-input" 
                 value={settings.admissionFee || 1000} 
                 onChange={(e) => setSettings({...settings, admissionFee: parseInt(e.target.value) || 0})}
-                style={{ maxWidth: '200px', margin: 0 }}
+                style={{ flex: '1 1 150px', maxWidth: '200px', margin: 0 }}
               />
-              <button className="admin-btn-sm" onClick={handleSaveAdmissionFee}>UPDATE FEE</button>
+              <button className="admin-btn-sm" onClick={handleSaveAdmissionFee} style={{ height: '40px' }}>UPDATE FEE</button>
             </div>
           </div>
-          <div style={{ flex: 2, background: 'rgba(255,255,255,0.03)', padding: '12px 15px', borderRadius: '6px' }}>
+          <div style={{ flex: '2 1 300px', background: 'rgba(255,255,255,0.03)', padding: '12px 15px', borderRadius: '6px' }}>
             <p style={{ margin: 0, fontSize: '11px', color: '#888', lineHeight: '1.4' }}>
               <strong style={{ color: 'var(--red)' }}>NOTE:</strong> This fee is automatically added to the total for all new member registrations. It does not affect plan renewals for existing members.
             </p>
@@ -108,31 +108,33 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       </div>
 
       <div className="admin-section-card">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Plan Name</th>
-              <th>Badge</th>
-              <th>Price</th>
-              <th style={{ textAlign: "right" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {plans.map(p => (
-              <tr key={p.id}>
-                <td><strong>{p.name.toUpperCase()}</strong></td>
-                <td><span className="status-badge" style={{background: "rgba(255,255,255,0.05)", color: "white"}}>{p.badge || "—"}</span></td>
-                <td><span style={{ color: "var(--red)", fontWeight: 800, fontSize: "16px" }}>₹{p.price}</span></td>
-                <td style={{ textAlign: "right" }}>
-                  <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                    <button className="admin-btn-sm outline" onClick={() => setEditing(p)}>EDIT</button>
-                    <button className="admin-btn-sm outline" style={{ color: "var(--red)" }} onClick={() => handleDelete(p.id)}>DEL</button>
-                  </div>
-                </td>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Plan Name</th>
+                <th>Badge</th>
+                <th>Price</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {plans.map(p => (
+                <tr key={p.id}>
+                  <td><strong>{p.name.toUpperCase()}</strong></td>
+                  <td><span className="status-badge" style={{background: "rgba(255,255,255,0.05)", color: "white"}}>{p.badge || "—"}</span></td>
+                  <td><span style={{ color: "var(--red)", fontWeight: 800, fontSize: "16px" }}>₹{p.price}</span></td>
+                  <td style={{ textAlign: "right" }}>
+                    <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                      <button className="admin-btn-sm outline" onClick={() => setEditing(p)}>EDIT</button>
+                      <button className="admin-btn-sm outline" style={{ color: "var(--red)" }} onClick={() => handleDelete(p.id)}>DEL</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editing && (
