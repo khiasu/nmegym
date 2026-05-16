@@ -18,25 +18,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
+          console.log(`[AUTH] Attempting login for: ${credentials.email}`);
           const user = await prisma.user.findUnique({
             where: { email: credentials.email.toLowerCase().trim() },
           });
-
+ 
           if (!user || !user.passwordHash) {
-            console.warn("Auth: User not found", credentials.email);
+            console.warn(`[AUTH] User not found or no password set for: ${credentials.email}`);
             return null;
           }
-
+ 
+          console.log(`[AUTH] User found: ${user.email}. Checking password...`);
           const isPasswordCorrect = await bcrypt.compare(
             credentials.password,
             user.passwordHash
           );
-
+ 
           if (!isPasswordCorrect) {
-            console.warn("Auth: Password mismatch for", credentials.email);
+            console.warn(`[AUTH] Password mismatch for: ${credentials.email}`);
             return null;
           }
-
+ 
+          console.log(`[AUTH] Login successful for: ${user.email} (${user.role})`);
           return {
             id: user.id,
             email: user.email,
@@ -44,7 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: user.role,
           };
         } catch (error) {
-          console.error("Auth: Authorize error", error);
+          console.error("[AUTH] Database or bcrypt error during authorize:", error);
           return null;
         }
       },

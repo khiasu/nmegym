@@ -26,22 +26,24 @@ export default function LoginForm({ settings }) {
     const password = formData.get("password");
 
     try {
-      const result = await signIn("credentials", {
+      // Safety timeout: if login takes > 8s, reset the button so user can try again
+      const timer = setTimeout(() => {
+        setLoading(false);
+        setFormError("Verification is taking longer than expected. Please check your connection and try again.");
+      }, 8000);
+
+      // Use redirect: true (default) to let next-auth handle the redirect robustly
+      await signIn("credentials", {
         email,
         password,
-        redirect: false,
         callbackUrl,
       });
-
-      if (result?.error) {
-        setFormError("Invalid email or password");
-        setLoading(false);
-      } else {
-        router.push(callbackUrl);
-        router.refresh();
-      }
+      
+      clearTimeout(timer);
+      // Note: With redirect: true, this code may not be reached if successful
     } catch (err) {
-      setFormError("An unexpected error occurred");
+      console.error("Login error:", err);
+      setFormError("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
   }
