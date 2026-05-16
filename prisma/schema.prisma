@@ -202,6 +202,13 @@ model Settings {
   privacyPolicy      String? @db.Text
   refundPolicy       String? @db.Text
   admissionFee       Int      @default(1000)
+  marqueeItem1      String?   @default("CARDIO SECTION")
+  marqueeItem2      String?   @default("WEIGHTS AREA")
+  marqueeItem3      String?   @default("POWER RACK ZONE")
+  marqueeItem4      String?   @default("RESISTANCE SECTION")
+  marqueeItem5      String?   @default("INDOOR TRACK")
+  marqueeItem6      String?   @default("ZUMBA CLASSES")
+  marqueeItem7      String?   @default("YOGA & FLEXIBILITY")
   updatedAt       DateTime @updatedAt
 }
 

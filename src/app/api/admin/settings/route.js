@@ -34,6 +34,13 @@ export async function POST(request) {
         privacyPolicy: data.privacyPolicy,
         refundPolicy: data.refundPolicy,
         admissionFee: parseInt(data.admissionFee) || 1000,
+        marqueeItem1: data.marqueeItem1,
+        marqueeItem2: data.marqueeItem2,
+        marqueeItem3: data.marqueeItem3,
+        marqueeItem4: data.marqueeItem4,
+        marqueeItem5: data.marqueeItem5,
+        marqueeItem6: data.marqueeItem6,
+        marqueeItem7: data.marqueeItem7,
       },
       create: {
         id: 1,
@@ -56,6 +63,13 @@ export async function POST(request) {
         privacyPolicy: data.privacyPolicy,
         refundPolicy: data.refundPolicy,
         admissionFee: parseInt(data.admissionFee) || 1000,
+        marqueeItem1: data.marqueeItem1,
+        marqueeItem2: data.marqueeItem2,
+        marqueeItem3: data.marqueeItem3,
+        marqueeItem4: data.marqueeItem4,
+        marqueeItem5: data.marqueeItem5,
+        marqueeItem6: data.marqueeItem6,
+        marqueeItem7: data.marqueeItem7,
       },
     });
 

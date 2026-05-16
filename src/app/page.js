@@ -29,7 +29,7 @@ export default async function HomePage() {
   return (
     <HomepageClient settings={settings}>
       <Hero offer={offer} settings={settings} />
-      <Marquee />
+      <Marquee settings={settings} />
       <About settings={settings} />
       <Facilities facilities={facilities} />
       <Trainers trainers={trainers} />

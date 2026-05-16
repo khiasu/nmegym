@@ -244,26 +244,30 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
         </div>
       </div>
 
-      {/* SECTION 4: PAYMENT SETTINGS */}
+      {/* SECTION 4: MARQUEE CONFIGURATION */}
       <div className="elite-card">
         <div className="admin-section-card-header">
-          <span className="admin-section-card-title">Payment Information</span>
+          <span className="admin-section-card-title">Marquee Configuration</span>
           <button className="admin-btn-sm" onClick={handleSaveSettings} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
         </div>
-        <div className="admin-form-grid">
-          <div className="admin-form-group">
-            <label className="admin-label">Business UPI ID</label>
-            <input className="admin-input" type="text" value={settings.upiId || ""} onChange={(e) => setSettings({...settings, upiId: e.target.value})} placeholder="e.g. nmegym@oksbi" />
-          </div>
-          <div className="admin-form-group">
-            <label className="admin-label">QR Configuration</label>
-            <div style={{background: "rgba(232,0,29,0.05)", padding: "15px", borderLeft: "3px solid var(--red)", borderRadius: "4px"}}>
-              <p style={{fontSize:"12px", color:"var(--red)", fontWeight:"bold", marginBottom: "5px"}}>DYNAMIC UPI QR ACTIVE</p>
-              <p style={{fontSize:"11px", color:"rgba(255,255,255,0.5)", lineHeight: "1.4"}}>QR codes are automatically generated for users using the UPI ID provided above. No manual QR upload needed.</p>
+        <p className="admin-page-sub" style={{marginBottom: "20px"}}>These 7 phrases will loop across the homepage marquee.</p>
+        <div className="admin-form-grid" style={{gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))"}}>
+          {[1, 2, 3, 4, 5, 6, 7].map(num => (
+            <div className="admin-form-group" key={num}>
+              <label className="admin-label">Phrase {num}</label>
+              <input 
+                className="admin-input" 
+                type="text" 
+                value={settings[`marqueeItem${num}`] || ""} 
+                onChange={(e) => setSettings({...settings, [`marqueeItem${num}`]: e.target.value})} 
+                placeholder={`Phrase ${num}...`} 
+              />
             </div>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* SECTION 5: PAYMENT SETTINGS */}
 
 
       {/* SECURITY */}

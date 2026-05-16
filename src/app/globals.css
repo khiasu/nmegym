@@ -106,3 +106,20 @@ html {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+@media (max-width: 768px) {
+  .marquee-section {
+    padding: 10px 0;
+  }
+  .marquee-text {
+    font-size: 20px;
+  }
+  .marquee-dot {
+    width: 6px;
+    height: 6px;
+    margin-left: 20px;
+  }
+  .marquee-item {
+    margin-right: 20px;
+  }
+}
