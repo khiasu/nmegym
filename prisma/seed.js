@@ -28,20 +28,20 @@ async function main() {
   console.log('🌱 Seeding NME GYM database (Neon PostgreSQL)...\n');
 
   // 1. Create Admin User
-  const adminHash = await bcrypt.hash('nme2025', 10);
+  const adminHash = await bcrypt.hash('nme2026', 10);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@nmegym.in' },
+    where: { email: 'nmegym.india@gmail.com' },
     update: {},
     create: {
       firstName: 'NME',
       lastName: 'Admin',
       phone: '+919863765861',
-      email: 'admin@nmegym.in',
+      email: 'nmegym.india@gmail.com',
       passwordHash: adminHash,
       role: 'ADMIN'
     }
   });
-  console.log('✅ Admin user created: admin@nmegym.in / nme2025');
+  console.log('✅ Admin user created: nmegym.india@gmail.com / nme2026');
 
   // 2. Create Sample Members
   const memberHash = await bcrypt.hash('member123', 10);
@@ -248,7 +248,7 @@ async function main() {
   console.log('✅ Default settings created');
 
   console.log('\n🎉 Seed complete! Database is ready.');
-  console.log('   Admin login: admin@nmegym.in / nme2025');
+  console.log('   Admin login: nmegym.india@gmail.com / nme2026');
 }
 
 main()
