@@ -152,6 +152,7 @@ model Facility {
   description String?  @db.Text
   mediaUrl    String
   mediaType   String   @default("IMAGE") // IMAGE, VIDEO
+  tag         String?  // New field for custom banners (e.g. "ELITE ZONE")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

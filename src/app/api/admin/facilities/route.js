@@ -10,19 +10,19 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id, name, description, mediaUrl, mediaType } = await request.json();
+    const { id, name, description, mediaUrl, mediaType, tag } = await request.json();
 
     if (id) {
       // It's a real ID (from DB)
       const updated = await prisma.facility.update({
         where: { id },
-        data: { name, description, mediaUrl, mediaType },
+        data: { name, description, mediaUrl, mediaType, tag },
       });
       return NextResponse.json(updated);
     } else {
       // Create
       const created = await prisma.facility.create({
-        data: { name, description, mediaUrl, mediaType },
+        data: { name, description, mediaUrl, mediaType, tag },
       });
       return NextResponse.json(created, { status: 201 });
     }

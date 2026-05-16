@@ -91,16 +91,16 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
           <div className="admin-form-group">
             <label className="admin-label">Gym Logo</label>
             <div style={{display:"flex", alignItems:"center", gap:"20px", flexWrap:"wrap"}}>
-              <div style={{width:"180px", height:"90px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "12px", position: "relative"}}>
+              <div style={{width:"120px", height:"120px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "12px", position: "relative", padding: "10px"}}>
                 <img src={settings.logoUrl || "/newlogo.png"} alt="Logo" style={{maxWidth:"100%", maxHeight:"100%", objectFit:"contain"}} />
                 {settings.logoUrl && (
-                  <button type="button" onClick={() => setSettings({...settings, logoUrl: ''})} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                  <button type="button" onClick={() => setSettings(prev => ({...prev, logoUrl: ''}))} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                 )}
               </div>
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: false }}
-                onSuccess={(res) => setSettings({...settings, logoUrl: res.info.secure_url})}
+                onSuccess={(res) => setSettings(prev => ({...prev, logoUrl: res.info.secure_url}))}
               >
                 {({ open }) => (
                   <button className="admin-btn-sm outline" onClick={() => open()}>Upload Logo</button>
@@ -127,7 +127,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
               <CldUploadWidget 
                 uploadPreset="nmegym_preset" 
                 options={{ cropping: true, croppingAspectRatio: 1.77 }}
-                onSuccess={(res) => setSettings({...settings, heroBackgroundUrl: res.info.secure_url})}
+                onSuccess={(res) => setSettings(prev => ({...prev, heroBackgroundUrl: res.info.secure_url}))}
               >
                 {({ open }) => (
                   <button className="admin-btn-sm outline" onClick={() => open()}>Upload Hero</button>
@@ -172,7 +172,14 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
               value={settings.aboutText || ""} 
               onChange={(e) => setSettings({...settings, aboutText: e.target.value})} 
               placeholder="Intro paragraph..."
+              maxLength={800}
             ></textarea>
+            <div style={{display: "flex", justifyContent: "space-between", marginTop: "5px"}}>
+              <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>Recommended: ~600 characters</span>
+              <span style={{fontSize: "10px", color: settings.aboutText?.length > 700 ? "var(--red)" : "rgba(255,255,255,0.5)"}}>
+                {settings.aboutText?.length || 0} / 800
+              </span>
+            </div>
           </div>
           <div className="admin-form-group">
             <label className="admin-label">About Paragraph 2 (Mission)</label>
@@ -182,7 +189,14 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
               value={settings.aboutText2 || ""} 
               onChange={(e) => setSettings({...settings, aboutText2: e.target.value})} 
               placeholder="Mission paragraph..."
+              maxLength={500}
             ></textarea>
+            <div style={{display: "flex", justifyContent: "space-between", marginTop: "5px"}}>
+              <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)"}}>Recommended: ~300 characters</span>
+              <span style={{fontSize: "10px", color: settings.aboutText2?.length > 400 ? "var(--red)" : "rgba(255,255,255,0.5)"}}>
+                {settings.aboutText2?.length || 0} / 500
+              </span>
+            </div>
           </div>
         </div>
 
@@ -196,7 +210,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
                 {settings.aboutImage1Url ? <img src={settings.aboutImage1Url} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"10px", color:"#444"}}>Photo 1 (Tall)</div>}
                 {settings.aboutImage1Url && <button onClick={() => setSettings({...settings, aboutImage1Url: ''})} style={{position:'absolute', top:5, right:5, background:'var(--red)', color:'white', border:'none', borderRadius:'50%', width:20, height:20, cursor:'pointer'}}>×</button>}
               </div>
-              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 0.6}} onSuccess={(res) => setSettings({...settings, aboutImage1Url: res.info.secure_url})}>
+              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 0.6}} onSuccess={(res) => setSettings(prev => ({...prev, aboutImage1Url: res.info.secure_url}))}>
                 {({ open }) => <button className="admin-btn-sm outline" style={{width:"100%"}} onClick={() => open()}>Upload 1</button>}
               </CldUploadWidget>
             </div>
@@ -206,7 +220,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
                 {settings.aboutImage2Url ? <img src={settings.aboutImage2Url} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"10px", color:"#444"}}>Photo 2 (Square)</div>}
                 {settings.aboutImage2Url && <button onClick={() => setSettings({...settings, aboutImage2Url: ''})} style={{position:'absolute', top:5, right:5, background:'var(--red)', color:'white', border:'none', borderRadius:'50%', width:20, height:20, cursor:'pointer'}}>×</button>}
               </div>
-              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 1}} onSuccess={(res) => setSettings({...settings, aboutImage2Url: res.info.secure_url})}>
+              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 1}} onSuccess={(res) => setSettings(prev => ({...prev, aboutImage2Url: res.info.secure_url}))}>
                 {({ open }) => <button className="admin-btn-sm outline" style={{width:"100%"}} onClick={() => open()}>Upload 2</button>}
               </CldUploadWidget>
             </div>
@@ -216,10 +230,16 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
                 {settings.aboutImage3Url ? <img src={settings.aboutImage3Url} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"10px", color:"#444"}}>Photo 3 (Square)</div>}
                 {settings.aboutImage3Url && <button onClick={() => setSettings({...settings, aboutImage3Url: ''})} style={{position:'absolute', top:5, right:5, background:'var(--red)', color:'white', border:'none', borderRadius:'50%', width:20, height:20, cursor:'pointer'}}>×</button>}
               </div>
-              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 1}} onSuccess={(res) => setSettings({...settings, aboutImage3Url: res.info.secure_url})}>
+              <CldUploadWidget uploadPreset="nmegym_preset" options={{cropping: true, croppingAspectRatio: 1}} onSuccess={(res) => setSettings(prev => ({...prev, aboutImage3Url: res.info.secure_url}))}>
                 {({ open }) => <button className="admin-btn-sm outline" style={{width:"100%"}} onClick={() => open()}>Upload 3</button>}
               </CldUploadWidget>
             </div>
+          </div>
+          
+          <div style={{marginTop: "30px", display: "flex", justifyContent: "flex-end"}}>
+            <button className="admin-btn-sm" onClick={handleSaveSettings} disabled={saving}>
+              {saving ? "Saving..." : "Save About Changes"}
+            </button>
           </div>
         </div>
       </div>

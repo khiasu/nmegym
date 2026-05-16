@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 
-export default function BookingModal({ isOpen, onClose }) {
+export default function BookingModal({ isOpen, onClose, settings }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -39,7 +39,7 @@ export default function BookingModal({ isOpen, onClose }) {
     <div className="modal-overlay open" id="bookingModal">
       <div className="modal">
         <div className="modal-header" style={{ flexDirection: "column", gap: "10px", alignItems: "center", padding: "30px 20px 20px 20px", background: "#0a0a0a", borderBottom: "1px solid #222" }}>
-          <img src="/newlogo.png" alt="NME GYM" style={{ height: "40px", objectFit: "contain", marginBottom: "5px" }} />
+          <img src={settings?.logoUrl || "/newlogo.png"} alt={settings?.gymName || "NME GYM"} style={{ height: "40px", objectFit: "contain", marginBottom: "5px" }} />
           <div style={{ display: "flex", width: "100%", justifyContent: "center", position: "relative" }}>
             <h3 style={{ margin: 0, fontSize: "20px", letterSpacing: "1px", color: "#888" }}>TRIAL BOOKING</h3>
             <button className="modal-close" onClick={onClose} style={{ position: "absolute", top: "-5px", right: "0", background: "none", border: "none", color: "#666", fontSize: "20px" }}>✕</button>

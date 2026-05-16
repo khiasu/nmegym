@@ -8,7 +8,7 @@ import { CldUploadWidget } from "next-cloudinary";
 export default function FacilitiesTab({ initialFacilities, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [facilities, setFacilities] = useState(initialFacilities || []);
-  const [editing, setEditing] = useState({ id: null, name: "", description: "", mediaUrl: "", mediaType: "IMAGE" });
+  const [editing, setEditing] = useState({ id: null, name: "", description: "", mediaUrl: "", mediaType: "IMAGE", tag: "" });
   const [loading, setLoading] = useState(false);
 
   async function handleSave(e) {
@@ -43,7 +43,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
   }
 
   function resetForm() {
-    setEditing({ id: null, name: "", description: "", mediaUrl: "", mediaType: "IMAGE" });
+    setEditing({ id: null, name: "", description: "", mediaUrl: "", mediaType: "IMAGE", tag: "" });
   }
 
   function handleDelete(id) {
@@ -98,6 +98,17 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
               required 
               value={editing.name}
               onChange={e => setEditing({...editing, name: e.target.value})}
+            />
+          </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Banner Tag (Optional)</label>
+            <input 
+              name="tag" 
+              className="admin-input" 
+              type="text" 
+              placeholder="e.g. ELITE ZONE" 
+              value={editing.tag || ""}
+              onChange={e => setEditing({...editing, tag: e.target.value})}
             />
           </div>
           <div className="admin-form-group">
@@ -162,7 +173,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
         <div className="admin-section-card-header"><span className="admin-section-card-title">Gallery Items</span></div>
         <table className="admin-table">
           <thead>
-            <tr><th>Name</th><th>Type</th><th>Description</th><th>Action</th></tr>
+            <tr><th>Name</th><th>Type</th><th>Banner</th><th>Description</th><th>Action</th></tr>
           </thead>
           <tbody>
             {facilities.map(f => (
@@ -178,6 +189,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
                   </div>
                 </td>
                 <td><span className={`status-badge ${f.mediaType === 'VIDEO' ? 'status-pending' : 'status-active'}`}>{f.mediaType}</span></td>
+                <td>{f.tag ? <span className="status-badge status-active" style={{background: "var(--red)"}}>{f.tag}</span> : '—'}</td>
                 <td className="admin-truncate-text">{f.description || '—'}</td>
                 <td>
                   <div style={{display: "flex", gap: "8px"}}>

@@ -3,13 +3,13 @@
 
 import Link from "next/link";
 
-export default function Footer() {
+export default function Footer({ settings }) {
   return (
     <footer>
       <div className="footer-grid max-w">
         <div className="footer-brand">
           <div className="logo-wrap">
-            <img src="/newlogo.png" alt="NME Gym Logo" className="nav-logo-img" style={{ height: "48px", width: "auto" }} />
+            <img src={settings?.logoUrl || "/newlogo.png"} alt="NME Gym Logo" className="nav-logo-img" style={{ height: "48px", width: "auto", objectFit: "contain" }} />
           </div>
           <p>No Mercy. No Excuses. Chumoukedima's most serious fitness destination.</p>
           <div className="footer-social">

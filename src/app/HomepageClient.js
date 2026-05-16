@@ -78,7 +78,7 @@ export default function HomepageClient({ children, settings }) {
     <>
       <Navbar onOpenBooking={() => setBookingOpen(true)} settings={settings} />
       {children}
-      <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
+      <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} settings={settings} />
     </>
   );
 }

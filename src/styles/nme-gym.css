@@ -467,7 +467,9 @@ h2.section-title .gray{color:var(--gray);}
   line-height: 1.8;
   color: rgba(255,255,255,0.65); /* Subtle grey */
   font-weight: 400; /* Explicitly unbolded */
-  max-width: 650px;
+  max-width: 550px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .about-intro span {
@@ -491,6 +493,7 @@ h2.section-title .gray{color:var(--gray);}
   padding-left: 24px;
   border-left: 1px solid var(--red);
   max-width: 550px;
+  word-break: break-word;
   opacity: 0;
   transform: translateX(-40px);
   transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);

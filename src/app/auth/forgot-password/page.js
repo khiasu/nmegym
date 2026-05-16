@@ -3,18 +3,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const settings = await prisma.settings.findFirst();
+  return <ForgotPasswordForm settings={settings} />;
+}
+
+function ForgotPasswordForm({ settings }) {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
+    setMessage("");
     setError("");
-
-    const email = e.currentTarget.email.value;
 
     try {
       const res = await fetch("/api/auth/forgot-password", {
@@ -23,11 +29,12 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        setSuccess(true);
+        setMessage("Password reset instructions sent to your email.");
       } else {
-        const data = await res.json();
-        setError(data.error || "Failed to send reset link");
+        setError(data.error || "Something went wrong");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -40,34 +47,32 @@ export default function ForgotPasswordPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/newlogo.png" alt="NME GYM" />
+          <img src={settings?.logoUrl || "/newlogo.png"} alt={settings?.gymName || "NME GYM"} />
         </div>
-
         <h1 className="auth-title">Reset Password</h1>
+        <p className="auth-subtitle">Enter your email and we'll send you instructions to reset your password.</p>
         
-        {success ? (
-          <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#00ff64", marginBottom: 20 }}>✓ Check your email for a password reset link.</p>
-            <Link href="/auth/login" className="auth-btn" style={{ display: "block", textDecoration: "none" }}>Back to Login</Link>
-          </div>
-        ) : (
-          <>
-            <p className="auth-subtitle">Enter your email and we'll send you a link to reset your password.</p>
-            {error && <div className="auth-error">{error}</div>}
-            <form className="auth-form" onSubmit={handleSubmit}>
-              <div className="auth-field">
-                <label>Email Address</label>
-                <input name="email" type="email" placeholder="you@example.com" required />
-              </div>
-              <button type="submit" className="auth-btn" disabled={loading}>
-                {loading ? "Sending..." : "Send Reset Link →"}
-              </button>
-            </form>
-          </>
-        )}
+        {message && <div style={{ background: "rgba(0,255,100,0.1)", border: "1px solid rgba(0,255,100,0.3)", color: "#00ff64", padding: 12, borderRadius: 8, width: "100%", textAlign: "center", fontSize: 14 }}>{message}</div>}
+        {error && <div className="auth-error">{error}</div>}
 
-        <p className="auth-note" style={{ marginTop: 20 }}>
-          <Link href="/auth/login" className="gray">← Back to Login</Link>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label>Email Address</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              placeholder="you@example.com" 
+              required 
+            />
+          </div>
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Link →"}
+          </button>
+        </form>
+
+        <p className="auth-note">
+          Remembered? <Link href="/auth/login" style={{ color: "var(--red)" }}>Back to Sign In</Link>
         </p>
       </div>
     </div>

@@ -16,12 +16,19 @@ export default function About({ settings }) {
         <h2 className="section-title reveal reveal-heading">NOT JUST A GYM.<br /><span className="gray">A MOVEMENT.</span></h2>
         <div className="about-content">
           <div className="about-text">
-            <p className="about-intro reveal">
-              {aboutText1.split(" ").map((word, i) => (
-                <span key={i} style={{ transitionDelay: `${i * 30}ms`, display: 'inline-block', marginRight: '0.3em' }}>{word}</span>
-              ))}
-            </p>
-            <p className="about-mission reveal">
+            <div className="about-intro reveal">
+              {aboutText1.split(/(\s+)/).map((token, i) => {
+                if (/\s+/.test(token)) {
+                  return <span key={i}>{token}</span>;
+                }
+                return (
+                  <span key={i} style={{ transitionDelay: `${i * 15}ms`, display: 'inline-block' }}>
+                    {token}
+                  </span>
+                );
+              })}
+            </div>
+            <p className="about-mission reveal" style={{ whiteSpace: 'pre-wrap' }}>
               {aboutText2}
             </p>
           </div>

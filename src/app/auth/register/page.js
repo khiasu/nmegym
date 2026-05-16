@@ -1,4 +1,3 @@
-// src/app/auth/register/page.js — Member "Join" (Payment Submission) Page
 "use client";
 
 import { useState } from "react";
@@ -6,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function JoinPage() {
+function JoinForm({ settings }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,10 +50,10 @@ export default function JoinPage() {
     <div className="auth-page">
       <div className="auth-card" style={{ maxWidth: 500 }}>
         <div className="auth-logo">
-          <img src="/newlogo.png" alt="NME GYM" />
+          <img src={settings?.logoUrl || "/newlogo.png"} alt={settings?.gymName || "NME GYM"} />
         </div>
 
-        <h1 className="auth-title">Join NME GYM</h1>
+        <h1 className="auth-title">Join {settings?.gymName || "NME GYM"}</h1>
         <p className="auth-subtitle">Pay fees via UPI and upload screenshot to get your Member ID.</p>
 
         {error && <div className="auth-error">{error}</div>}
@@ -92,7 +91,7 @@ export default function JoinPage() {
           </div>
 
           <div className="payment-guide" style={{ background: "#1a1a1a", padding: 15, borderRadius: 8, margin: "10px 0" }}>
-            <p style={{ fontSize: 12, margin: 0 }}>Pay to UPI ID: <strong style={{ color: "white" }}>nmegym@upi</strong></p>
+            <p style={{ fontSize: 12, margin: 0 }}>Pay to UPI ID: <strong style={{ color: "white" }}>{settings?.upiId || "nmegym@upi"}</strong></p>
             <p style={{ fontSize: 11, color: "#888", marginTop: 5 }}>After payment, upload the screenshot below.</p>
           </div>
 
@@ -124,7 +123,7 @@ export default function JoinPage() {
               style={{ width: "auto", marginTop: 4, cursor: "pointer" }}
             />
             <label htmlFor="terms" style={{ fontSize: 13, color: "#888", cursor: "pointer", userSelect: "none" }}>
-              I agree to the <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Terms and Conditions</Link> and <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Refund Policy</Link> of NME GYM.
+              I agree to the <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Terms and Conditions</Link> and <Link href="/legal" target="_blank" style={{ color: "var(--red)", textDecoration: "underline" }}>Refund Policy</Link> of {settings?.gymName || "NME GYM"}.
             </label>
           </div>
 
@@ -139,4 +138,11 @@ export default function JoinPage() {
       </div>
     </div>
   );
+}
+
+import prisma from "@/lib/prisma";
+
+export default async function RegisterPage() {
+  const settings = await prisma.settings.findFirst();
+  return <JoinForm settings={settings} />;
 }

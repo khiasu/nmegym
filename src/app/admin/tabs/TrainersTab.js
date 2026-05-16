@@ -125,7 +125,16 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
               </CldUploadWidget>
             </div>
           </div>
-          <div className="admin-form-group"><label className="admin-label">Short Bio</label><input className="admin-input" type="text" placeholder="Brief description..." value={newTrainer.bio} onChange={e => setNewTrainer({...newTrainer, bio: e.target.value})} /></div>
+          <div className="admin-form-group">
+            <label className="admin-label">Short Bio / Description</label>
+            <textarea 
+              className="admin-input" 
+              style={{height: "80px", width: "100%", padding: "10px"}} 
+              placeholder="Brief description of the trainer's expertise and experience..." 
+              value={newTrainer.bio} 
+              onChange={e => setNewTrainer({...newTrainer, bio: e.target.value})}
+            ></textarea>
+          </div>
         </div>
       </div>
 

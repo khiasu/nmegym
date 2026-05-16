@@ -25,6 +25,13 @@ export default function AdminClient(props) {
   const [navHidden, setNavHidden] = useState(false);
   const [settings, setSettings] = useState(props.settings || {});
   
+  // Sync state with props when server data refreshes
+  useEffect(() => {
+    if (props.settings) {
+      setSettings(props.settings);
+    }
+  }, [props.settings]);
+  
   useEffect(() => {
     let lastScrollY = window.scrollY;
 

@@ -4,8 +4,9 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { CldUploadWidget } from "next-cloudinary";
 
-function LoginForm() {
+function LoginForm({ settings }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -48,7 +49,7 @@ function LoginForm() {
   return (
     <div className="auth-card">
       <div className="auth-logo">
-        <img src="/newlogo.png" alt="NME GYM" />
+        <img src={settings?.logoUrl || "/newlogo.png"} alt={settings?.gymName || "NME GYM"} />
       </div>
 
       <h1 className="auth-title">{isAdmin ? "Admin Access" : "Member Sign In"}</h1>
@@ -112,11 +113,15 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+import prisma from "@/lib/prisma";
+
+export default async function LoginPage() {
+  const settings = await prisma.settings.findFirst();
+  
   return (
     <div className="auth-page">
       <Suspense fallback={<div className="auth-card">Loading...</div>}>
-        <LoginForm />
+        <LoginForm settings={settings} />
       </Suspense>
     </div>
   );

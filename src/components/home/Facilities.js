@@ -6,7 +6,8 @@ export default function Facilities({ facilities = [] }) {
         name: f.name,
         desc: f.description,
         img: f.mediaUrl,
-        type: f.mediaType || "IMAGE"
+        type: f.mediaType || "IMAGE",
+        tag: f.tag
       }))
     : [
       {
@@ -57,7 +58,7 @@ export default function Facilities({ facilities = [] }) {
               )}
               <div className="facility-unified-overlay"></div>
               <div className="facility-unified-content">
-                {(i === 0 || i === 3) && <span className="facility-unified-tag">ELITE ZONE</span>}
+                {f.tag && <span className="facility-unified-tag">{f.tag}</span>}
                 <h3>{f.name}</h3>
                 <p>{f.desc}</p>
               </div>

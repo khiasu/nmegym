@@ -56,10 +56,11 @@ export async function getAllOffers() {
 /** Fetch gym settings (name, logo, socials, etc.) */
 export async function getSettings() {
   try {
-    return await prisma.settings.findFirst();
+    const settings = await prisma.settings.findFirst();
+    return settings || { gymName: "NME GYM", logoUrl: "/newlogo.png", admissionFee: 1000 };
   } catch (e) {
     console.error("Failed to fetch settings:", e);
-    return null;
+    return { gymName: "NME GYM", logoUrl: "/newlogo.png", admissionFee: 1000 };
   }
 }
 
