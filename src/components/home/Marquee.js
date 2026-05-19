@@ -4,7 +4,7 @@
 export default function Marquee({ settings }) {
   const defaults = [
     "CARDIO SECTION", "WEIGHTS AREA", "POWER RACK ZONE", "RESISTANCE SECTION", "INDOOR TRACK",
-    "ZUMBA CLASSES", "YOGA & FLEXIBILITY"
+    "PERSONAL TRAINING", "YOGA & FLEXIBILITY"
   ];
 
   const items = [];

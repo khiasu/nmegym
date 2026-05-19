@@ -207,7 +207,7 @@ model Settings {
   marqueeItem3      String?   @default("POWER RACK ZONE")
   marqueeItem4      String?   @default("RESISTANCE SECTION")
   marqueeItem5      String?   @default("INDOOR TRACK")
-  marqueeItem6      String?   @default("ZUMBA CLASSES")
+  marqueeItem6      String?   @default("PERSONAL TRAINING")
   marqueeItem7      String?   @default("YOGA & FLEXIBILITY")
   updatedAt       DateTime @updatedAt
 }

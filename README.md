@@ -52,4 +52,4 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 - **Email**: Currently using **Resend**. If you hit the daily limit, check the logs in the Resend dashboard.
 
 ---
-**NME GYM — Forge Your Legacy.**
+**NME GYM — Fitness Beyond Limits.**

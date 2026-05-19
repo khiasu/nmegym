@@ -107,7 +107,7 @@ async function main() {
   // 3. Create Sample Bookings
   const bookings = [
     { name: 'Zhekuie Sema', phone: '+919800111222', interest: 'Weight Training', preferredTimeSlot: 'Morning' },
-    { name: 'Limatula Yaden', phone: '+919800133444', interest: 'Zumba', preferredTimeSlot: 'Evening' },
+    { name: 'Limatula Yaden', phone: '+919800133444', interest: 'Cardio', preferredTimeSlot: 'Evening' },
     { name: 'Imkong Jamir', phone: '+919800155666', interest: 'General Fitness', preferredTimeSlot: 'Morning' },
   ];
 
@@ -194,7 +194,7 @@ async function main() {
   // 7. Create Sample Facilities
   const facilities = [
     { name: 'Strength Area', description: 'Premium free weights and heavy-duty machines.', mediaUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80', mediaType: 'IMAGE' },
-    { name: 'Zumba Studio', description: 'Vibrant space for dance and group classes.', mediaUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80', mediaType: 'IMAGE' },
+    { name: 'Personal Training Area', description: 'Dedicated space for one-on-one coaching and body transformation.', mediaUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80', mediaType: 'IMAGE' },
     { name: 'Cardio Deck', description: 'Latest treadmills and rowers for endurance.', mediaUrl: 'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=800&q=80', mediaType: 'IMAGE' }
   ];
 
@@ -211,11 +211,11 @@ async function main() {
     { name: '1 Year', price: 7999, period: 'year', features: 'Everything in 6m,Personal Trainer (8 sessions),Monthly Analysis' }
   ];
 
-  for (const p of plans) {
+  for (const { features, ...planData } of plans) {
     await prisma.plan.upsert({
-      where: { name: p.name },
-      update: p,
-      create: p
+      where: { name: planData.name },
+      update: planData,
+      create: planData
     });
   }
   console.log('✅ Plans seeded');
