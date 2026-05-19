@@ -92,7 +92,7 @@ export default function Trainers({ trainers }) {
     <section className="squad-section" id="trainers" style={{ overflow: "hidden" }}>
       <div className="max-w">
         <div className="section-label reveal"><span>Trainers</span></div>
-        <h2 className="section-title reveal reveal-heading">ELITE<br /><span className="gray">COACHES.</span></h2>
+        <h2 className="section-title reveal reveal-heading">GYM<br /><span className="gray">TRAINERS.</span></h2>
         <p className="reveal" style={{
           color: 'rgba(255,255,255,0.5)',
           fontSize: '15px',
@@ -101,7 +101,7 @@ export default function Trainers({ trainers }) {
           marginTop: '10px',
           fontFamily: "'Barlow', sans-serif"
         }}>
-          Our certified coaches bring decades of combined experience. Every rep, every set — guided by expertise that transforms.
+          Our certified trainers bring decades of combined experience. Every rep, every set — guided by expertise that transforms.
         </p>
       </div>
 

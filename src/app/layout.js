@@ -166,7 +166,7 @@ export default function RootLayout({ children }) {
         "name": "Does NME Gym offer personal training?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, NME Gym offers professional personal training in Chumoukedima and Dimapur with expert fitness coaches to help you achieve your muscle-building, weight loss, and general wellness goals."
+          "text": "Yes, NME Gym offers professional personal training in Chumoukedima and Dimapur with expert fitness trainers to help you achieve your muscle-building, weight loss, and general wellness goals."
         }
       },
       {
