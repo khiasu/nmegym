@@ -10,19 +10,19 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id, name, role, bio, imageUrl } = await request.json();
+    const { id, name, role, bio, imageUrl, quote } = await request.json();
 
     if (id) {
       // Update
       const updated = await prisma.trainer.update({
         where: { id },
-        data: { name, role, bio, imageUrl },
+        data: { name, role, bio, imageUrl, quote },
       });
       return NextResponse.json(updated);
     } else {
       // Create
       const created = await prisma.trainer.create({
-        data: { name, role, bio, imageUrl },
+        data: { name, role, bio, imageUrl, quote },
       });
       return NextResponse.json(created, { status: 201 });
     }

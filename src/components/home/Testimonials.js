@@ -18,20 +18,11 @@ export default function Testimonials() {
       .catch(err => console.error("Failed to fetch testimonials", err));
   }, []);
 
-  const staticTestis = [
-    { name: "Vizo Yhome", role: "Lost 14 kg · 4 Months", text: "I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change." },
-    { name: "Keviseno Chishi", role: "Member · 8 Months", text: "As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both. The training sessions are incredible!" },
-    { name: "Theja Sumi", role: "Elite Member · 1 Year", text: "Best gym in Nagaland. No nonsense, clean equipment, and trainers who actually track your progress. Highly recommend the Elite plan." },
-    { name: "Thinuo Sangtam", role: "Strength Trainee", text: "I was nervous starting. Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight." },
-    { name: "Atola Longkumer", role: "Transformation · 6 Months", text: "The diet plans they gave me changed everything. Combined with the training, I'm in the best shape of my life at 32." },
-    { name: "Nzanthung Kikon", role: "Warrior Member · 9 Months", text: "NME is more than a gym — it's a community. Everyone pushes each other. The energy here is unlike anything in Nagaland." },
-  ];
-
-  const allTestis = [...staticTestis, ...dynamicTestis.map(t => ({
-    name: `${t.user.firstName} ${t.user.lastName}`,
-    role: t.user.memberships?.[0]?.planTier || "Member",
+  const allTestis = dynamicTestis.map(t => ({
+    name: `${t.user?.firstName || ""} ${t.user?.lastName || ""}`.trim(),
+    role: t.user?.memberships?.[0]?.planTier ? `${t.user.memberships[0].planTier} Member` : "Member",
     text: t.content
-  }))];
+  }));
 
   return (
     <section className="testimonials-section" id="testimonials">

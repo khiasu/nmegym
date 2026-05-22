@@ -8,7 +8,7 @@ import { CldUploadWidget } from "next-cloudinary";
 export default function TrainersTab({ initialTrainers, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [trainers, setTrainers] = useState(initialTrainers || []);
-  const [newTrainer, setNewTrainer] = useState({ id: null, name: "", role: "", imageUrl: "", bio: "" });
+  const [newTrainer, setNewTrainer] = useState({ id: null, name: "", role: "", imageUrl: "", bio: "", quote: "" });
   const [isEditing, setIsEditing] = useState(false);
 
   async function handleSaveTrainer() {
@@ -35,12 +35,12 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
   }
 
   function resetForm() {
-    setNewTrainer({ id: null, name: "", role: "", imageUrl: "", bio: "" });
+    setNewTrainer({ id: null, name: "", role: "", imageUrl: "", bio: "", quote: "" });
     setIsEditing(false);
   }
 
   function handleEdit(t) {
-    setNewTrainer(t);
+    setNewTrainer({ ...t, quote: t.quote || "" });
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -135,13 +135,23 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
               onChange={e => setNewTrainer({...newTrainer, bio: e.target.value})}
             ></textarea>
           </div>
+          <div className="admin-form-group">
+            <label className="admin-label">Trainer Quote</label>
+            <input 
+              className="admin-input" 
+              type="text" 
+              placeholder="e.g. Discipline is the bridge between goals and accomplishment." 
+              value={newTrainer.quote} 
+              onChange={e => setNewTrainer({...newTrainer, quote: e.target.value})}
+            />
+          </div>
         </div>
       </div>
 
       <div className="admin-section-card">
         <div className="admin-section-card-header"><span className="admin-section-card-title">Current Squad</span></div>
         <table className="admin-table">
-          <thead><tr><th>Image</th><th>Name</th><th>Role</th><th>Bio</th><th>Action</th></tr></thead>
+          <thead><tr><th>Image</th><th>Name</th><th>Role</th><th>Bio</th><th>Quote</th><th>Action</th></tr></thead>
           <tbody id="squadAdminBody">
             {trainers.map(t => (
               <tr key={t.id}>
@@ -149,6 +159,7 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
                 <td>{t.name}</td>
                 <td><span className="status-badge status-active">{t.role}</span></td>
                 <td className="admin-truncate-text">{t.bio || '—'}</td>
+                <td className="admin-truncate-text" style={{ maxWidth: '150px' }}>{t.quote || '—'}</td>
                 <td>
                   <div style={{display: "flex", gap: "8px"}}>
                     <button className="admin-toggle-btn" onClick={() => handleEdit(t)} title="Edit">
@@ -162,7 +173,7 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
               </tr>
             ))}
             {trainers.length === 0 && (
-              <tr><td colSpan="5" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No trainers found.</td></tr>
+              <tr><td colSpan="6" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No trainers found.</td></tr>
             )}
           </tbody>
         </table>

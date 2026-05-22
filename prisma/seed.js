@@ -104,6 +104,36 @@ async function main() {
   }
   console.log(`✅ ${sampleMembers.length} sample members created`);
 
+  // 2b. Seed Testimonials for Sample Members
+  const testimonialData = {
+    'vizo@email.com': "I lost 14 kg in 4 months. The trainers at NME didn't just give me a workout — they gave me a lifestyle change.",
+    'keviseno@email.com': "As a working woman in Chumoukedima, I needed flexible hours and real results. NME delivered both. The training sessions are incredible!",
+    'theja@email.com': "Best gym in Nagaland. No nonsense, clean equipment, and trainers who actually track your progress. Highly recommend the Elite plan.",
+    'thinuo@email.com': "I was nervous starting. Walked into NME and everyone was welcoming. Within 3 months I'm deadlifting twice my body weight.",
+    'atola@email.com': "The diet plans they gave me changed everything. Combined with the training, I'm in the best shape of my life at 32.",
+    'nzanthung@email.com': "NME is more than a gym — it's a community. Everyone pushes each other. The energy here is unlike anything in Nagaland.",
+  };
+
+  for (const [email, content] of Object.entries(testimonialData)) {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      const existing = await prisma.testimonial.findFirst({
+        where: { userId: user.id }
+      });
+      if (!existing) {
+        await prisma.testimonial.create({
+          data: {
+            userId: user.id,
+            content,
+            rating: 5,
+            isPublic: true
+          }
+        });
+      }
+    }
+  }
+  console.log('✅ Sample testimonials seeded');
+
   // 3. Create Sample Bookings
   const bookings = [
     { name: 'Zhekuie Sema', phone: '+919800111222', interest: 'Weight Training', preferredTimeSlot: 'Morning' },
@@ -182,14 +212,19 @@ async function main() {
 
   // 6. Create Sample Trainers
   const trainers = [
-    { name: 'Keneizetuo Angami', role: 'Head Coach', bio: 'Certified S&C specialist with 10+ years experience in bodybuilding.', imageUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
-    { name: 'Lhouvi-o', role: 'Strength Coach', bio: 'Expert in powerlifting and functional strength.', imageUrl: 'https://images.unsplash.com/photo-1549476464-37392f71752a?w=400&q=80' }
+    { name: 'Keneizetuo Angami', role: 'Head Coach', bio: 'Certified S&C specialist with 10+ years experience in bodybuilding.', quote: 'Discipline is the bridge between goals and accomplishment.', imageUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
+    { name: 'Lhouvi-o', role: 'Strength Coach', bio: 'Expert in powerlifting and functional strength.', quote: 'Be stronger than your excuses.', imageUrl: 'https://images.unsplash.com/photo-1549476464-37392f71752a?w=400&q=80' }
   ];
 
   for (const t of trainers) {
-    await prisma.trainer.create({ data: t }).catch(() => {});
+    const existing = await prisma.trainer.findFirst({ where: { name: t.name } });
+    if (!existing) {
+      await prisma.trainer.create({ data: t });
+    } else {
+      await prisma.trainer.update({ where: { id: existing.id }, data: t });
+    }
   }
-  console.log('✅ Trainers created');
+  console.log('✅ Trainers created/updated');
 
   // 7. Create Sample Facilities
   const facilities = [

@@ -18,7 +18,7 @@ export default function Trainers({ trainers }) {
     role: t.role,
     bio: t.bio,
     img: t.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop",
-    quote: "Discipline is the bridge between goals and accomplishment."
+    quote: t.quote || "Discipline is the bridge between goals and accomplishment."
   })) : [
     {
       name: "Keneizetuo Angami",
