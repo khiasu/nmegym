@@ -62,9 +62,9 @@ export async function generateMetadata() {
       images: [logo],
     },
     icons: {
-      icon: logo,
-      shortcut: logo,
-      apple: logo,
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
+      apple: "/favicon.ico",
     },
     robots: {
       index: true,
