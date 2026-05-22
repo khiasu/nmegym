@@ -17,7 +17,7 @@ export default function Hero({ offer, settings }) {
       <div className="hero-content page-entrance">
         <div className="hero-tag">
           <span></span>
-          <p>Now Open — Kenbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115</p>
+          <p>Now Open — Chumoukedima, Nagaland</p>
         </div>
         <h1 className="hero-title reveal reveal-heading">
           FITNESS<br />
