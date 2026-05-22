@@ -11,7 +11,7 @@ export async function generateMetadata() {
   const logo = settings?.logoUrl || "/newlogo.png";
   
   const title = "NME Gym — Fitness Beyond Limits | Best Gym in Dimapur & Chumoukedima";
-  const description = "NME Gym is a premium fitness center at kenbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115 offering modern workout equipment, expert training, cardio workouts, bodybuilding programs, and wellness-focused fitness solutions designed for all age groups and fitness levels.";
+  const description = "NME Gym is a premium fitness center at Kemnbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115 offering modern workout equipment, expert training, cardio workouts, bodybuilding programs, and wellness-focused fitness solutions designed for all age groups and fitness levels.";
   const keywords = [
     "NME Gym", "NME Gym Dimapur", "NME Gym Nagaland", "NME Gym Chumoukedima", "gym in Dimapur",
     "best gym in Dimapur", "gym in Chumoukedima", "fitness center in Dimapur", "fitness center in Chumoukedima",
@@ -19,7 +19,7 @@ export async function generateMetadata() {
     "best fitness center in Nagaland", "bodybuilding gym in Dimapur", "strength training gym", "cardio workout gym",
     "personal trainer Dimapur", "fitness transformation gym", "weight loss gym in Nagaland", "modern workout equipment",
     "beginner friendly gym", "gym for all ages", "family fitness center", "unisex gym in Dimapur", "wellness focused gym",
-    "professional fitness coaching", "student gym in Dimapur", "gym near Kenbay Hostel", "fitness center near Kenbay Hostel",
+    "professional fitness coaching", "student gym in Dimapur", "gym near Kemnbay Hostel", "fitness center near Kemnbay Hostel",
     "gym near me", "best gym near me", "fitness center near me", "top gym in Nagaland", "affordable gym in Dimapur",
     "premium workout experience", "healthy lifestyle gym", "fitness for all age groups", "muscle building gym",
     "body transformation gym", "gym with modern equipment", "fitness coaching in Dimapur", "cardio training Dimapur",
@@ -95,7 +95,7 @@ export default function RootLayout({ children }) {
     "priceRange": "INR",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "kenbay Hostel 5th Mile, Diphupar'B",
+      "streetAddress": "Kemnbay Hostel 5th Mile, Diphupar'B",
       "addressLocality": "Chumoukedima",
       "addressRegion": "Nagaland",
       "postalCode": "797115",
@@ -136,7 +136,7 @@ export default function RootLayout({ children }) {
     "priceRange": "INR",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "kenbay Hostel 5th Mile, Diphupar'B",
+      "streetAddress": "Kemnbay Hostel 5th Mile, Diphupar'B",
       "addressLocality": "Chumoukedima",
       "addressRegion": "Nagaland",
       "postalCode": "797115",
@@ -185,15 +185,15 @@ export default function RootLayout({ children }) {
         "name": "Where is NME Gym located?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "NME Gym is located at kenbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115."
+          "text": "NME Gym is located at Kemnbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115."
         }
       },
       {
         "@type": "Question",
-        "name": "Is NME Gym inside kenbay Hostel campus?",
+        "name": "Is NME Gym inside Kemnbay Hostel campus?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, NME Gym is located at kenbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115, making it highly accessible and convenient."
+          "text": "Yes, NME Gym is located at Kemnbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115, making it highly accessible and convenient."
         }
       },
       {

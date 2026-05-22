@@ -59,7 +59,7 @@ export default function Plans({ plans, onOpenBooking, settings, offers }) {
             </div>
             <div className="reveal" style={{ textAlign: 'center', marginTop: '30px' }}>
               <span className="plan-hostel-note">
-                *Plan prices differ for Kenbay hostellers. Contact management for details.
+                *Plan prices differ for Kemnbay hostellers. Contact management for details.
               </span>
             </div>
           </div>
