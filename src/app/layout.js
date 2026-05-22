@@ -39,6 +39,9 @@ export async function generateMetadata() {
     alternates: {
       canonical: "/",
     },
+    verification: {
+      google: "0hJgdNXRxhaBYs0QjE1BTFaH_Jp-q4L8DGxP4IVia-o",
+    },
     openGraph: {
       title,
       description,
