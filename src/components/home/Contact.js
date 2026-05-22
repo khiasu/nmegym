@@ -14,20 +14,10 @@ export default function Contact({ settings }) {
       {/* CONTACT + FOOTER (UNIFIED) — old index.html line 386 */}
       <section className="contact-section" id="contact" style={{ paddingBottom: '30px' }}>
         <div className="max-w">
-          <div className="contact-header-original reveal" style={{ display: 'flex', alignItems: 'flex-start', gap: '40px', flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
+          <div className="contact-header-original reveal" style={{ display: 'flex', alignItems: 'center', gap: '40px', flexWrap: 'nowrap', justifyContent: 'flex-start', marginBottom: '20px' }}>
             <div className="cho-left" style={{ flexShrink: 0 }}>
               <div className="section-label"><span>FIND US</span></div>
               <h2 className="section-title reveal reveal-heading" style={{ marginBottom: 0 }}>COME SAY<br /><span className="gray">HELLO.</span></h2>
-              <p className="reveal" style={{
-                color: 'rgba(255,255,255,0.5)',
-                fontSize: '15px',
-                maxWidth: '500px',
-                lineHeight: '1.7',
-                marginTop: '10px',
-                fontFamily: "'Barlow', sans-serif"
-              }}>
-                kenbay Hostel 5th Mile, Diphupar'B. Chumoukedima, Nagaland 797115
-              </p>
             </div>
 
             <div className="cho-static-timings reveal" style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "20px", marginTop: "15px" }}>
@@ -47,6 +37,18 @@ export default function Contact({ settings }) {
               </div>
             </div>
           </div>
+
+          <p className="reveal" style={{
+            color: 'rgba(255,255,255,0.5)',
+            fontSize: '15px',
+            lineHeight: '1.6',
+            marginTop: '0px',
+            marginBottom: '20px',
+            fontFamily: "'Barlow', sans-serif"
+          }}>
+            kenbay Hostel 5th Mile, Diphupar'B.<br />
+            Chumoukedima, Nagaland 797115
+          </p>
 
 
           <div className="contact-social-strip reveal">
