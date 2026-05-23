@@ -139,6 +139,7 @@ export default function Trainers({ trainers }) {
             <div className="trainer-slide-quote">
               <span className="quote-mark">&ldquo;</span>
               {t.quote}
+              <span className="quote-mark" style={{ marginLeft: "4px", marginRight: 0 }}>&rdquo;</span>
             </div>
           </div>
 

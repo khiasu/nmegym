@@ -10,7 +10,7 @@ Conduct: Members must follow staff instructions and maintain respectful behavior
 Liability: NME GYM is not liable for personal injuries or lost/stolen items on the premises.
 Termination: We reserve the right to cancel memberships for violation of safety or conduct rules without refund.`;
 
-  const defaultPrivacy = `Collection: We collect your name, phone, email, and payment screenshots for verification and account management.
+  const defaultPrivacy = `Collection: We collect your name, phone number, email, and payment screenshots for verification and account management.
 Usage: Data is used strictly for issuing Member IDs and sending status notifications via Email or WhatsApp.
 Storage: Payment proofs are stored securely on Cloudinary. Passwords are encrypted using industry-standard hashing.
 Sharing: We never sell your personal information to third-party marketing entities.`;
