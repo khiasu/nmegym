@@ -212,11 +212,11 @@ export default function AdminClient(props) {
         onClose={() => setAlertState({ isOpen: false, message: "" })} 
       />
 
-      {toastState && (
+      {toast.show && (
         <ToastNotification 
-          message={toastState.message}
-          onUndo={toastState.onUndo}
-          onClose={toastState.onClose}
+          message={toast.message}
+          onUndo={undoAction ? triggerUndo : null}
+          onClose={() => setToast({ show: false, message: "" })}
           duration={7000}
         />
       )}
