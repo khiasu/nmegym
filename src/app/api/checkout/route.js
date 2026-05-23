@@ -31,8 +31,10 @@ export async function POST(request) {
 
     let targetUserId = userId;
 
-    if (isFirstTimer && !userId) {
-      // First-timer: Create or find the user (find by email OR phone)
+    const isSessionPass = planName?.toLowerCase().includes("session") || planName?.toLowerCase().includes("daily") || planName?.toLowerCase().includes("pass");
+
+    if ((isFirstTimer || isSessionPass) && !userId) {
+      // Create or find the user (find by email OR phone)
       const existingUser = await prisma.user.findFirst({
         where: {
           OR: [

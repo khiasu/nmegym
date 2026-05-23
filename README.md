@@ -12,15 +12,22 @@ Instead of paying a 3% fee to Stripe or Razorpay, we use a custom UPI verificati
 - **Verify**: You get an email notification, review the screenshot in the Admin Portal, and click "Approve."
 - **Onboard**: The system automatically creates their account, generates a Member ID, and emails them their login credentials instantly.
 
-### 2. Full Admin Control Panel
+### 2. Pay Per Session (Daily Passes)
+Allows guests/non-registered visitors to purchase a 1-day pass:
+- **Zero Commitment**: Visitors select the Pay Per Session option on the home page and pay via the QR code.
+- **Instant Activation**: Upon admin verification, visitors receive a custom daily pass activation email instead of login credentials.
+- **WhatsApp Pre-filled Redirect**: Quick-click button to send pre-filled confirmation messages directly to the visitor's WhatsApp.
+- **Isolated Logging**: Daily pass metrics, revenue splits, pending verifications, and history logs are kept completely separate from registered members in the database and admin dashboard.
+
+### 3. Full Admin Control Panel
 You don't need to touch the code to update the site. The Admin Portal lets you:
 - Change the **Gym Logo** and **Favicon** across the whole site.
-- Update your **UPI ID** (which dynamically generates payment QR codes with exact checkout amounts).
+- Update your **UPI ID** and **WhatsApp Number** (which dynamically generates payment QR codes with exact checkout amounts and contact links).
 - Add/Edit **Trainers**, **Facilities**, and **Offers**.
 - Manage **Memberships** (Track expiry, manual renewals, and deletions).
 - Edit **About Us** text and **Policies** in real-time.
 
-### 3. Mobile First
+### 4. Mobile First
 The entire admin dashboard and member portal are optimized for mobile. You can manage the whole gym from your phone while you're on the floor.
 
 ---

@@ -251,3 +251,43 @@ export async function sendExpiryReminderEmail(email, name, daysLeft, endDate) {
   }
 }
 
+/**
+ * Send daily pass confirmation email to user after payment verification
+ */
+export async function sendDailyPassEmail(email, name, planName, amount) {
+  try {
+    await resend.emails.send({
+      from: 'NME GYM <onboarding@resend.dev>',
+      to: email,
+      subject: 'NME GYM — Daily Session Pass Active! ⚡',
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: auto; padding: 0; background: #0a0a0a; border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #e8001d, #b30017); padding: 40px 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 32px; letter-spacing: 3px;">NME GYM</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0; font-size: 14px; letter-spacing: 2px;">DAILY PASS ACTIVE</p>
+          </div>
+          
+          <div style="padding: 30px;">
+            <h2 style="color: #e8001d; margin: 0 0 15px;">Get Ready to Train, ${name}!</h2>
+            <p style="color: #ccc; line-height: 1.6;">Your payment of <strong>₹${amount}</strong> for the <strong>${planName}</strong> has been verified.</p>
+            
+            <div style="background: #1a1a1a; padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 4px solid #e8001d; text-align: center;">
+              <p style="margin: 0; color: #fff; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">YOUR PASS IS ACTIVE FOR 1 DAY</p>
+              <p style="margin: 10px 0 0; color: #888; font-size: 13px;">Show this email to the gym trainer or receptionist when you arrive.</p>
+            </div>
+
+            <p style="color: #888; font-size: 14px;">Thank you for training with us today. Push your limits!</p>
+            
+            <hr style="border: none; border-top: 1px solid #222; margin: 25px 0;" />
+            <p style="font-size: 12px; color: #666; text-align: center;">
+              If you have any questions, contact us on WhatsApp at +91 98637 65861
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send daily pass email:", error);
+  }
+}
+

@@ -98,9 +98,13 @@ export async function POST(request) {
         });
       }
 
-      // --- Generate password for first-timers (users without a password) ---
+      // Determine duration based on plan name
+      const planLower = (payment.planName || "").toLowerCase();
+      const isSessionPass = planLower.includes("session") || planLower.includes("daily") || planLower.includes("pass");
+
+      // --- Generate password for first-timers (users without a password, excluding session passes) ---
       let initialPassword = null;
-      if (!user.passwordHash) {
+      if (!user.passwordHash && !isSessionPass) {
         initialPassword = generatePassword();
         const hashedPw = await bcrypt.hash(initialPassword, 10);
         await prisma.user.update({
@@ -113,9 +117,9 @@ export async function POST(request) {
       const startDate = new Date();
       const endDate = new Date();
       
-      // Determine duration based on plan name
-      const planLower = (payment.planName || "").toLowerCase();
-      if (planLower.includes("year") || planLower.includes("12")) {
+      if (isSessionPass) {
+        endDate.setDate(startDate.getDate() + 1);
+      } else if (planLower.includes("year") || planLower.includes("12")) {
         endDate.setFullYear(startDate.getFullYear() + 1);
       } else if (planLower.includes("6")) {
         endDate.setMonth(startDate.getMonth() + 6);
@@ -151,7 +155,11 @@ export async function POST(request) {
       }
 
       // --- Send emails ---
-      if (initialPassword) {
+      if (isSessionPass) {
+        // Send daily pass confirmation email
+        const { sendDailyPassEmail } = await import("@/lib/mail");
+        await sendDailyPassEmail(user.email, user.firstName, payment.planName, Number(payment.amount));
+      } else if (initialPassword) {
         // New member: send welcome email with credentials
         const { sendWelcomeEmail } = await import("@/lib/mail");
         await sendWelcomeEmail(user.email, user.firstName, memberId, initialPassword);
@@ -170,8 +178,9 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         memberId,
-        isNewMember: !!initialPassword,
-        initialPassword,
+        isNewMember: !!initialPassword && !isSessionPass,
+        isSessionPass,
+        initialPassword: isSessionPass ? null : initialPassword,
         userPhone: user.phone,
         userName: user.firstName,
         planName: payment.planName,

@@ -10,6 +10,12 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
   const [processing, setProcessing] = useState(null); // Track which payment is processing
   const [previewImg, setPreviewImg] = useState(null); // Screenshot preview modal
 
+  const sessionPending = pendingPayments.filter(p => p.planName?.toLowerCase().includes("session"));
+  const memberPending = pendingPayments.filter(p => !p.planName?.toLowerCase().includes("session"));
+  
+  const sessionVerified = verifiedPayments?.filter(p => p.planName?.toLowerCase().includes("session")) || [];
+  const memberVerified = verifiedPayments?.filter(p => !p.planName?.toLowerCase().includes("session")) || [];
+
   async function handleVerify(paymentId, status) {
     if (!requestConfirmation || !executeWithUndo) {
       await executeVerify(paymentId, status);
@@ -46,9 +52,11 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         console.log(`Payment ${status}: ${data.memberId || ''}`);
         if (status === "VERIFIED" && data.userPhone) {
           const loginUrl = `${window.location.origin}/auth/login`;
-          const text = data.isNewMember
-            ? `Welcome to NME GYM, ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan is verified and your membership is ACTIVE.\n\n*Your Login Credentials:*\nMember ID: ${data.memberId}\nInitial Password: ${data.initialPassword}\n\nPlease login here to access your dashboard: ${loginUrl}`
-            : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
+          const text = data.isSessionPass
+            ? `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Daily Pass'} has been verified!\n\nYour 1-day pass is now ACTIVE. Enjoy your workout at NME GYM! 💪`
+            : (data.isNewMember
+              ? `Welcome to NME GYM, ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan is verified and your membership is ACTIVE.\n\n*Your Login Credentials:*\nMember ID: ${data.memberId}\nInitial Password: ${data.initialPassword}\n\nPlease login here to access your dashboard: ${loginUrl}`
+              : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`);
           
           const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
           requestConfirmation({
@@ -88,10 +96,10 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
         <div className="admin-stat-card"><div className="admin-stat-val">0</div><div className="admin-stat-label">Overdue</div></div>
       </div>
 
-      {/* PENDING PAYMENTS */}
+      {/* PENDING PAYMENTS (MEMBERSHIP PLANS) */}
       <div className="admin-section-card">
         <div className="admin-section-card-header">
-          <span className="admin-section-card-title">Pending Verification ({pendingPayments.length})</span>
+          <span className="admin-section-card-title">Pending Verification (Membership Plans) ({memberPending.length})</span>
         </div>
         <div className="elite-table-wrapper">
           <table className="admin-table">
@@ -109,7 +117,7 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
               </tr>
             </thead>
             <tbody>
-              {pendingPayments.map(pay => {
+              {memberPending.map(pay => {
                 const isProcessingThis = processing === pay.id;
                 return (
                   <tr key={pay.id}>
@@ -164,24 +172,98 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                   </tr>
                 );
               })}
-              {pendingPayments.length === 0 && (
-                <tr><td colSpan="9" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending verifications. All caught up! 🎉</td></tr>
+              {memberPending.length === 0 && (
+                <tr><td colSpan="9" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending member payments.</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* VERIFIED PAYMENTS */}
-      <div className="admin-section-card">
-        <div className="admin-section-card-header"><span className="admin-section-card-title">Verified Payments</span></div>
+      {/* PENDING PAYMENTS (DAILY SESSION PASSES) */}
+      <div className="admin-section-card" style={{ marginTop: "25px" }}>
+        <div className="admin-section-card-header">
+          <span className="admin-section-card-title">Pending Verification (Daily Session Passes) ({sessionPending.length})</span>
+        </div>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Visitor</th>
+                <th>Contact</th>
+                <th>Pass Type</th>
+                <th>Amount</th>
+                <th>Screenshot</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessionPending.map(pay => {
+                const isProcessingThis = processing === pay.id;
+                return (
+                  <tr key={pay.id}>
+                    <td><strong>{pay.user?.firstName} {pay.user?.lastName}</strong></td>
+                    <td>
+                      <span style={{fontSize: "11px"}}>{pay.user?.email}</span><br />
+                      <span style={{ opacity: 0.5, fontSize: "11px" }}>{pay.user?.phone}</span>
+                    </td>
+                    <td>{pay.planName || "Daily Pass"}</td>
+                    <td style={{fontWeight: "bold", color: "var(--red)"}}>₹{pay.amount}</td>
+                    <td>
+                      {pay.screenshotUrl ? (
+                        <img 
+                          src={pay.screenshotUrl} 
+                          alt="Payment Screenshot" 
+                          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", border: "1px solid #333" }}
+                          onClick={() => setPreviewImg(pay.screenshotUrl)}
+                        />
+                      ) : (
+                        <span style={{color: "#666", fontSize: "11px"}}>No image</span>
+                      )}
+                    </td>
+                    <td>{new Date(pay.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
+                    <td>
+                      <div style={{display: "flex", gap: "6px"}}>
+                        <button 
+                          className="admin-btn-sm" 
+                          onClick={() => handleVerify(pay.id, "VERIFIED")} 
+                          disabled={isProcessingThis}
+                          style={{background: "rgba(0,255,100,0.1)", color: "#00ff64", border: "1px solid #00ff64"}}
+                        >
+                          {isProcessingThis ? "..." : "✓ Verify"}
+                        </button>
+                        <button 
+                          className="admin-btn-sm" 
+                          onClick={() => handleVerify(pay.id, "REJECTED")} 
+                          disabled={isProcessingThis}
+                          style={{background: "rgba(255,0,0,0.1)", color: "#ff4444", border: "1px solid #ff4444"}}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {sessionPending.length === 0 && (
+                <tr><td colSpan="7" style={{textAlign: "center", padding: "30px", color: "var(--gray)"}}>No pending daily passes.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* VERIFIED PAYMENTS (MEMBERSHIP PLANS) */}
+      <div className="admin-section-card" style={{ marginTop: "30px" }}>
+        <div className="admin-section-card-header"><span className="admin-section-card-title">Verified Payments (Membership Plans) ({memberVerified.length})</span></div>
         <div className="elite-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr><th>Member</th><th>Plan</th><th>Promo</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr>
             </thead>
             <tbody>
-              {verifiedPayments?.map(pay => {
+              {memberVerified.map(pay => {
                 return (
                   <tr key={pay.id}>
                     <td>{pay.user?.firstName} {pay.user?.lastName}</td>
@@ -194,8 +276,37 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
                   </tr>
                 );
               })}
-              {(!verifiedPayments || verifiedPayments.length === 0) && (
-                <tr><td colSpan="7" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No verified payments yet.</td></tr>
+              {memberVerified.length === 0 && (
+                <tr><td colSpan="7" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No verified member payments.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* VERIFIED PAYMENTS (DAILY SESSION PASSES) */}
+      <div className="admin-section-card" style={{ marginTop: "30px" }}>
+        <div className="admin-section-card-header"><span className="admin-section-card-title">Verified Daily Session Passes ({sessionVerified.length})</span></div>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr><th>Visitor</th><th>Pass Type</th><th>Amount</th><th>Method</th><th>Date Visited</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {sessionVerified.map(pay => {
+                return (
+                  <tr key={pay.id}>
+                    <td>{pay.user?.firstName} {pay.user?.lastName}</td>
+                    <td>{pay.planName || "Daily Pass"}</td>
+                    <td>₹{pay.amount}</td>
+                    <td>{pay.paymentMethod}</td>
+                    <td>{new Date(pay.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
+                    <td><span className="status-badge status-active">Verified</span></td>
+                  </tr>
+                );
+              })}
+              {sessionVerified.length === 0 && (
+                <tr><td colSpan="6" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No verified daily session passes.</td></tr>
               )}
             </tbody>
           </table>

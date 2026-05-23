@@ -2,11 +2,23 @@
 "use client";
 
 export default function DashboardTab({ members, verifiedPayments, pendingPayments, newRegistrations, setActiveTab }) {
-  const activeMembers = members?.filter(m => m.memberships?.some(ms => ms.status === "ACTIVE"))?.length || 0;
+  const registeredMembers = members?.filter(m => !m.memberships?.some(ms => ms.planTier?.toLowerCase().includes("session"))) || [];
+  const activeMembers = registeredMembers?.filter(m => m.memberships?.some(ms => ms.status === "ACTIVE"))?.length || 0;
   const regCount = newRegistrations?.length || 0;
   
-  const totalRevenue = verifiedPayments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+  // Revenue calculations
+  const memberRevenue = verifiedPayments?.filter(p => !p.planName?.toLowerCase().includes("session"))?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+  const sessionRevenue = verifiedPayments?.filter(p => p.planName?.toLowerCase().includes("session"))?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+  const totalRevenue = memberRevenue + sessionRevenue;
+  
   const formattedRevenue = totalRevenue > 100000 ? `₹${(totalRevenue / 100000).toFixed(1)}L` : `₹${totalRevenue.toLocaleString()}`;
+  const formattedMemberRev = memberRevenue > 100000 ? `₹${(memberRevenue / 100000).toFixed(1)}L` : `₹${memberRevenue.toLocaleString()}`;
+  const formattedSessionRev = sessionRevenue > 100000 ? `₹${(sessionRevenue / 100000).toFixed(1)}L` : `₹${sessionRevenue.toLocaleString()}`;
+
+  // Session Pass statistics
+  const sessionPassCount = verifiedPayments?.filter(p => p.planName?.toLowerCase().includes("session"))?.length || 0;
+  const pendingSessionCount = pendingPayments?.filter(p => p.planName?.toLowerCase().includes("session"))?.length || 0;
+  const pendingMemberCount = pendingPayments?.filter(p => !p.planName?.toLowerCase().includes("session"))?.length || 0;
 
   // Dynamic revenue by time period
   const now = new Date();
@@ -19,29 +31,34 @@ export default function DashboardTab({ members, verifiedPayments, pendingPayment
 
   // Member growth this month
   const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const newThisMonth = members?.filter(m => new Date(m.createdAt) >= thisMonth)?.length || 0;
+  const newThisMonth = registeredMembers?.filter(m => new Date(m.createdAt) >= thisMonth)?.length || 0;
 
-  const recentMembers = members?.slice(0, 5) || [];
+  const recentMembers = registeredMembers?.slice(0, 5) || [];
 
   return (
     <div className="admin-tab-content active">
       <div className="admin-page-title">DASHBOARD</div>
       <div className="admin-page-sub">Live metrics, network status, and high-level gym operations</div>
-      <div className="elite-stat-grid">
+      <div className="elite-stat-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
         <div className="elite-stat-card">
-          <div className="elite-stat-val">{members?.length || 0}</div>
-          <div className="elite-stat-label">TOTAL MEMBERS</div>
+          <div className="elite-stat-val">{registeredMembers.length}</div>
+          <div className="elite-stat-label">REGISTERED MEMBERS</div>
           <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{newThisMonth > 0 ? `↑ +${newThisMonth} THIS MONTH` : "NO NEW THIS MONTH"}</div>
         </div>
         <div className="elite-stat-card">
           <div className="elite-stat-val">{activeMembers}</div>
           <div className="elite-stat-label">ACTIVE MEMBERS</div>
-          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{pendingPayments?.length || 0} PENDING PAYMENTS</div>
+          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{pendingMemberCount} PENDING VERIFY</div>
+        </div>
+        <div className="elite-stat-card">
+          <div className="elite-stat-val">{sessionPassCount}</div>
+          <div className="elite-stat-label">DAILY SESSION PASSES</div>
+          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{pendingSessionCount} PENDING VERIFY</div>
         </div>
         <div className="elite-stat-card">
           <div className="elite-stat-val">{formattedRevenue}</div>
           <div className="elite-stat-label">TOTAL REVENUE</div>
-          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>↑ +12.4% GROWTH</div>
+          <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>MEMBERS: {formattedMemberRev} | PASSES: {formattedSessionRev}</div>
         </div>
       </div>
 

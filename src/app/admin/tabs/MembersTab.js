@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function MembersTab({ members: initialMembers, plans: availablePlans, requestConfirmation, executeWithUndo, showToast }) {
+export default function MembersTab({ members: initialMembers, plans: availablePlans, settings, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
   const [members, setMembers] = useState(initialMembers || []);
   const [search, setSearch] = useState("");
@@ -20,7 +20,10 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
     startDate: new Date().toISOString().split('T')[0]
   });
 
-  const filteredMembers = members.filter(m => 
+  const registeredMembers = members.filter(m => !m.memberships?.some(ms => ms.planTier?.toLowerCase().includes("session")));
+  const dailyMembers = members.filter(m => m.memberships?.some(ms => ms.planTier?.toLowerCase().includes("session")));
+
+  const filteredMembers = registeredMembers.filter(m => 
     `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     m.phone?.includes(search) || 
     m.email?.toLowerCase().includes(search.toLowerCase())
@@ -181,6 +184,51 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                   </tr>
                 );
               })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* DAILY SESSION PASS RECORDS */}
+      <div className="admin-section-card" style={{ marginTop: "30px" }}>
+        <div className="admin-section-card-header">
+          <span className="admin-section-card-title">Daily Session Pass Records ({dailyMembers.length})</span>
+        </div>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Contact</th><th>Pass Price</th><th>Date Visited</th><th>Expiry</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              {dailyMembers.map(m => {
+                const membership = m.memberships?.[0];
+                const plan = membership?.planTier || "Pay Per Session";
+                const isActive = membership?.status === "ACTIVE" && new Date(membership.endDate) > new Date();
+                const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
+                return (
+                  <tr key={m.id}>
+                    <td><strong>{m.firstName} {m.lastName}</strong></td>
+                    <td><span style={{fontSize: "11px"}}>{m.email}</span><br /><span style={{ opacity: 0.5, fontSize: "11px" }}>{m.phone}</span></td>
+                    <td><span style={{ fontWeight: 700, color: "var(--red)" }}>₹{settings?.payPerSessionPrice || 200}</span></td>
+                    <td>{joinDate}</td>
+                    <td>{expiresDate}</td>
+                    <td>
+                      <span className={`status-badge ${isActive ? 'status-active' : 'status-expired'}`}>
+                        {isActive ? 'Active Today' : 'Expired'}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="admin-toggle-btn" onClick={() => deleteMember(m.id)}>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {dailyMembers.length === 0 && (
+                <tr><td colSpan="7" style={{textAlign: "center", padding: "20px", color: "var(--gray)"}}>No daily session pass records.</td></tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -185,7 +185,7 @@ export default function AdminClient(props) {
         <div className="admin-main-elite" key={activeTab}>
           {activeTab === "dashboard" && <DashboardTab {...props} setActiveTab={setActiveTab} />}
           {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
-          {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} settings={settings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "payments" && <PaymentsTab pendingPayments={props.pendingPayments} verifiedPayments={props.verifiedPayments} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "plans" && <PlansTab initialPlans={props.plans} settings={settings} setSettings={setSettings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "offers" && <OffersTab initialOffers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
