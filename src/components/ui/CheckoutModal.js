@@ -21,13 +21,14 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
 
   if (!isOpen || !selectedPlan) return null;
 
+  const isSessionPass = selectedPlan.id === 'pay-per-session' || selectedPlan.name === 'Pay Per Session' || selectedPlan.period === 'session';
   const admissionFee = Number(settings?.admissionFee) || 1000;
   const planPrice = Number(selectedPlan.price);
   
   // Calculate discount
   const discountAmount = appliedOffer ? Math.floor(planPrice * (appliedOffer.discount / 100)) : 0;
   const finalPlanPrice = planPrice - discountAmount;
-  const totalAmount = isFirstTimer ? finalPlanPrice + admissionFee : finalPlanPrice;
+  const totalAmount = isSessionPass ? finalPlanPrice : (isFirstTimer ? finalPlanPrice + admissionFee : finalPlanPrice);
 
   // Generate UPI URI
   const upiId = settings?.upiId || "nmegym@upi";
@@ -64,10 +65,10 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
           ...formData,
           planName: selectedPlan.name,
           planPrice,
-          admissionFee: isFirstTimer ? admissionFee : 0,
+          admissionFee: isSessionPass ? 0 : (isFirstTimer ? admissionFee : 0),
           totalAmount,
           screenshotUrl,
-          isFirstTimer,
+          isFirstTimer: isSessionPass ? false : isFirstTimer,
           userId: session?.user?.id,
           promoCode: appliedOffer ? promoCode : null
         }),
@@ -102,7 +103,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
               <h4 style={{ fontFamily: 'Bebas Neue', fontSize: '28px' }}>PAYMENT SUBMITTED</h4>
               <p style={{ color: 'var(--gray)', fontSize: '14px', marginTop: '10px', marginBottom: '20px' }}>
                 Your payment is pending verification by our team. <br/>
-                {isFirstTimer && "Once verified, your login credentials will be emailed to you."}
+                {!isSessionPass && isFirstTimer && "Once verified, your login credentials will be emailed to you."}
               </p>
               
               <a 
@@ -149,7 +150,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
                   </div>
                 )}
                 
-                {isFirstTimer && (
+                {isFirstTimer && !isSessionPass && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <span style={{ color: 'var(--gray)', fontSize: '13px' }}>One-Time Admission Fee (New Member):</span>
                     <span style={{ fontWeight: 'bold' }}>+ ₹{admissionFee.toLocaleString()}</span>

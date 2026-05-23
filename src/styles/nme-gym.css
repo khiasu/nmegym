@@ -2918,8 +2918,9 @@ html.no-scroll, body.no-scroll{overflow:hidden;height:100vh;touch-action:none;}
   border: 1px solid rgba(255,255,255,0.05);
 }
 
-.elite-table {
-  min-width: 500px; /* Force table to stay wide so it scrolls instead of squishing */
+.elite-table-wrapper table {
+  min-width: 750px !important; /* Force table to stay wide so it scrolls instead of squishing */
+  width: 100% !important;
 }
 
 

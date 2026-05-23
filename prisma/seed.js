@@ -134,26 +134,7 @@ async function main() {
   }
   console.log('✅ Sample testimonials seeded');
 
-  // 3. Create Sample Bookings
-  const bookings = [
-    { name: 'Zhekuie Sema', phone: '+919800111222', interest: 'Weight Training', preferredTimeSlot: 'Morning' },
-    { name: 'Limatula Yaden', phone: '+919800133444', interest: 'Cardio', preferredTimeSlot: 'Evening' },
-    { name: 'Imkong Jamir', phone: '+919800155666', interest: 'General Fitness', preferredTimeSlot: 'Morning' },
-  ];
 
-  for (const b of bookings) {
-    await prisma.booking.create({
-      data: {
-        name: b.name,
-        phone: b.phone,
-        interest: b.interest,
-        preferredDate: new Date(Date.now() + Math.floor(Math.random() * 7) * 86400000),
-        preferredTimeSlot: b.preferredTimeSlot,
-        status: Math.random() > 0.5 ? 'CONFIRMED' : 'PENDING'
-      }
-    }).catch(() => {});
-  }
-  console.log('✅ Sample bookings created');
 
   // 4. Create Sample Posts
   const posts = [
@@ -277,7 +258,8 @@ async function main() {
       address: 'Chumoukedima, Nagaland',
       whatsappNumber: '+91 98637 65861',
       email: 'nmegym.india@gmail.com',
-      instagramUrl: 'https://www.instagram.com/nme_gym'
+      instagramUrl: 'https://www.instagram.com/nme_gym',
+      payPerSessionPrice: 200
     }
   });
   console.log('✅ Default settings created');

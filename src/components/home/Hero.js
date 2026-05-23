@@ -37,7 +37,7 @@ export default function Hero({ offer, settings }) {
 
         <p className="hero-sub">START TODAY, FEEL IT TOMORROW</p>
         <div className="hero-actions">
-          <a href="#" className="btn-primary" id="heroBookTrial">Book Free Trial</a>
+          <a href="#plans" className="btn-primary" id="heroBookTrial">Join Now</a>
           <a href="#plans" className="btn-outline">See Plans</a>
         </div>
       </div>

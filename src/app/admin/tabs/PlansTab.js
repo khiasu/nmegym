@@ -85,25 +85,35 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       </div>
 
       <div className="admin-section-card" style={{ marginBottom: '25px', borderLeft: '4px solid var(--red)' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 300px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+          <div>
             <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>ONE-TIME ADMISSION FEE (₹)</label>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <input 
-                type="number" 
-                className="admin-input" 
-                value={settings.admissionFee || 1000} 
-                onChange={(e) => setSettings({...settings, admissionFee: parseInt(e.target.value) || 0})}
-                style={{ flex: '1 1 150px', maxWidth: '200px', margin: 0 }}
-              />
-              <button className="admin-btn-sm" onClick={handleSaveAdmissionFee} style={{ height: '40px' }}>UPDATE FEE</button>
-            </div>
+            <input 
+              type="number" 
+              className="admin-input" 
+              value={settings.admissionFee || 1000} 
+              onChange={(e) => setSettings({...settings, admissionFee: parseInt(e.target.value) || 0})}
+              style={{ width: '100%', margin: '0 0 10px 0' }}
+            />
           </div>
-          <div style={{ flex: '2 1 300px', background: 'rgba(255,255,255,0.03)', padding: '12px 15px', borderRadius: '6px' }}>
-            <p style={{ margin: 0, fontSize: '11px', color: '#888', lineHeight: '1.4' }}>
-              <strong style={{ color: 'var(--red)' }}>NOTE:</strong> This fee is automatically added to the total for all new member registrations. It does not affect plan renewals for existing members.
-            </p>
+          <div>
+            <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>PAY PER SESSION PRICE (₹)</label>
+            <input 
+              type="number" 
+              className="admin-input" 
+              value={settings.payPerSessionPrice || 200} 
+              onChange={(e) => setSettings({...settings, payPerSessionPrice: parseInt(e.target.value) || 0})}
+              style={{ width: '100%', margin: '0 0 10px 0' }}
+            />
           </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '10px' }}>
+            <button className="admin-btn-sm" onClick={handleSaveAdmissionFee} style={{ height: '40px', width: '100%' }}>UPDATE PRICING PARAMETERS</button>
+          </div>
+        </div>
+        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 15px', borderRadius: '6px', marginTop: '15px' }}>
+          <p style={{ margin: 0, fontSize: '11px', color: '#888', lineHeight: '1.4' }}>
+            <strong style={{ color: 'var(--red)' }}>NOTE:</strong> The Admission Fee applies to new memberships. The Pay Per Session Price applies to the daily pass card on the home page. Both are stored globally.
+          </p>
         </div>
       </div>
 

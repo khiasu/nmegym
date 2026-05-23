@@ -22,7 +22,7 @@ export default async function AdminPage() {
   // Fetch all management data in parallel
   const [
     allPendingPayments, settings, trainers, plans, offers,
-    members, verifiedPayments, facilities, bookings
+    members, verifiedPayments, facilities
   ] = await Promise.all([
     prisma.payment.findMany({
       where: { status: "PENDING_VERIFICATION" },
@@ -44,7 +44,6 @@ export default async function AdminPage() {
       orderBy: { updatedAt: "desc" },
     }),
     prisma.facility.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.booking.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   // Split pending payments: new registrations vs existing member renewals
@@ -75,7 +74,6 @@ export default async function AdminPage() {
         offers={offers}
         members={members}
         facilities={facilities}
-        bookings={bookings}
       />
     </div>
   );

@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function Navbar({ onOpenBooking, settings }) {
+export default function Navbar({ settings }) {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -56,8 +56,8 @@ export default function Navbar({ onOpenBooking, settings }) {
           <a href="#trainers">Trainers</a>
           <a href="#contact">Contact</a>
           <Link href="/auth/login" className="nav-member-btn">Member Login</Link>
-          <a href="#" className="nav-cta" onClick={(e) => { e.preventDefault(); onOpenBooking?.(); }}>
-            Book Free Trial
+          <a href="#plans" className="nav-cta" onClick={(e) => { e.preventDefault(); document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }); }}>
+            Join Now
           </a>
         </div>
         <div
@@ -96,11 +96,11 @@ export default function Navbar({ onOpenBooking, settings }) {
             MEMBER LOGIN
           </Link>
           <a
-            href="#"
+            href="#plans"
             className="mm-cta"
-            onClick={(e) => { e.preventDefault(); closeMobile(); onOpenBooking?.(); }}
+            onClick={(e) => { e.preventDefault(); closeMobile(); document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }); }}
           >
-            BOOK FREE TRIAL
+            JOIN NOW
           </a>
           
           <div className="mm-socials">

@@ -1,15 +1,12 @@
 // src/app/HomepageClient.js — Client wrapper for the homepage
-// Handles: Navbar, BookingModal, ScrollReveal, Plan glow
+// Handles: Navbar, ScrollReveal, Plan glow
 // Matches nmegym-main/public/assets/js/main.js behaviors
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import BookingModal from "@/components/ui/BookingModal";
 
 export default function HomepageClient({ children, settings }) {
-  const [bookingOpen, setBookingOpen] = useState(false);
-
   // ScrollReveal observer — matches old main.js lines 70-77
   useEffect(() => {
     // Increase timeout to ensure all DOM elements and styles are fully loaded/applied
@@ -43,25 +40,6 @@ export default function HomepageClient({ children, settings }) {
     };
   }, []);
 
-  // Wire up booking buttons by ID — matches old main.js openModal()
-  useEffect(() => {
-    const heroBtn = document.getElementById("heroBookTrial");
-    const trialBtn = document.getElementById("trialBookBtn");
-    const footerLink = document.getElementById("footerTrialLink");
-
-    const openBooking = (e) => { e.preventDefault(); setBookingOpen(true); };
-
-    [heroBtn, trialBtn, footerLink].forEach((btn) => {
-      if (btn) btn.addEventListener("click", openBooking);
-    });
-
-    return () => {
-      [heroBtn, trialBtn, footerLink].forEach((btn) => {
-        if (btn) btn.removeEventListener("click", openBooking);
-      });
-    };
-  }, []);
-
   // Plan card glow effect — matches old main.js lines 239-244
   useEffect(() => {
     const cards = document.querySelectorAll(".plan-mini");
@@ -76,9 +54,8 @@ export default function HomepageClient({ children, settings }) {
 
   return (
     <>
-      <Navbar onOpenBooking={() => setBookingOpen(true)} settings={settings} />
+      <Navbar settings={settings} />
       {children}
-      <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} settings={settings} />
     </>
   );
 }

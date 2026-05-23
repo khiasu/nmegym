@@ -1,9 +1,8 @@
 // src/app/admin/tabs/DashboardTab.js
 "use client";
 
-export default function DashboardTab({ members, verifiedPayments, pendingPayments, newRegistrations, bookings, setActiveTab }) {
+export default function DashboardTab({ members, verifiedPayments, pendingPayments, newRegistrations, setActiveTab }) {
   const activeMembers = members?.filter(m => m.memberships?.some(ms => ms.status === "ACTIVE"))?.length || 0;
-  const pendingBookings = bookings?.filter(b => b.status === "PENDING")?.length || 0;
   const regCount = newRegistrations?.length || 0;
   
   const totalRevenue = verifiedPayments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
@@ -43,11 +42,6 @@ export default function DashboardTab({ members, verifiedPayments, pendingPayment
           <div className="elite-stat-val">{formattedRevenue}</div>
           <div className="elite-stat-label">TOTAL REVENUE</div>
           <div style={{ color: "var(--elite-red)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>↑ +12.4% GROWTH</div>
-        </div>
-        <div className="elite-stat-card">
-          <div className="elite-stat-val">{bookings?.length || 0}</div>
-          <div className="elite-stat-label">TRIAL BOOKINGS</div>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "10px", marginTop: "10px", fontWeight: "700" }}>{pendingBookings} PENDING</div>
         </div>
       </div>
 

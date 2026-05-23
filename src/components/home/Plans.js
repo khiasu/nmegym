@@ -24,12 +24,23 @@ export default function Plans({ plans, onOpenBooking, settings, offers }) {
 
 
         <div className="membership-layout reveal">
-          {/* Trial Card (Primary) */}
+          {/* Pay Per Session Card (Primary) */}
           <div className="membership-trial-card">
-            <div className="mtc-tag">NEW MEMBER SPECIAL</div>
-            <h3 className="mtc-title">FIRST SESSION<br /><span className="red">IS ON US.</span></h3>
-            <p className="mtc-desc">Experience the energy, the equipment, and the culture. Claim your free 1-day pass now.</p>
-            <button className="btn-primary" id="trialBookBtn">BOOK 1-DAY TRIAL</button>
+            <div className="mtc-tag">DAILY WORKOUT PASS</div>
+            <h3 className="mtc-title">PAY PER<br /><span className="red">SESSION.</span></h3>
+            <p className="mtc-desc">No long-term commitment. Get full access to the gym, weights, and cardio section for a single day.</p>
+            <button 
+              className="btn-primary" 
+              id="trialBookBtn"
+              onClick={() => setCheckoutPlan({ 
+                id: 'pay-per-session', 
+                name: 'Pay Per Session', 
+                price: settings?.payPerSessionPrice || 200, 
+                period: 'session' 
+              })}
+            >
+              BUY DAILY PASS — ₹{settings?.payPerSessionPrice || 200}
+            </button>
           </div>
 
           {/* Plans Grid (2x2) */}

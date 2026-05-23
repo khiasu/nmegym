@@ -72,7 +72,6 @@ model User {
   memberships   Membership[]
   payments      Payment[]    @relation("UserPayments")
   verifiedPayments Payment[] @relation("AdminVerifiedPayments")
-  bookings      Booking[]
   testimonials  Testimonial[]
 }
 
@@ -108,21 +107,7 @@ model Payment {
   updatedAt      DateTime @updatedAt
 }
 
-model Booking {
-  id                String   @id @default(cuid())
-  name              String?
-  phone             String?
-  age               Int?
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  interest          String
-  preferredDate     DateTime
-  preferredTimeSlot String
-  status            String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
-  message           String?  @db.Text
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-}
+
 
 model Post {
   id          String   @id @default(cuid())
@@ -203,6 +188,7 @@ model Settings {
   privacyPolicy      String? @db.Text
   refundPolicy       String? @db.Text
   admissionFee       Int      @default(1000)
+  payPerSessionPrice Int      @default(200)
   marqueeItem1      String?   @default("CARDIO SECTION")
   marqueeItem2      String?   @default("WEIGHTS AREA")
   marqueeItem3      String?   @default("POWER RACK ZONE")

@@ -50,7 +50,7 @@ export default function Footer({ settings }) {
             <a href="#classes">Classes</a>
             <a href="#plans">Membership</a>
             <a href="#trainers">Trainers</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); document.getElementById('trialBookBtn')?.click(); }}>Free Trial</a>
+            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }); }}>Pay Per Session</a>
           </div>
           <div className="footer-col">
             <h5>Support</h5>

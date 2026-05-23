@@ -65,37 +65,39 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
       </div>
 
       <div className="admin-section-card">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Offer Title</th>
-              <th>Code</th>
-              <th>Discount</th>
-              <th>Status</th>
-              <th style={{ textAlign: "right" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {offers.map(o => (
-              <tr key={o.id}>
-                <td><strong>{o.title}</strong></td>
-                <td><code style={{ color: "var(--red)", background: "rgba(232,0,29,0.1)", padding: "2px 6px", borderRadius: "4px" }}>{o.promoCode || "—"}</code></td>
-                <td><span style={{ fontWeight: 700 }}>{o.discount ? `${o.discount}%` : "—"}</span></td>
-                <td>
-                  <span className={`status-badge ${o.isActive ? "status-active" : "status-expired"}`}>
-                     {o.isActive ? "VISIBLE" : "HIDDEN"}
-                  </span>
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                    <button className="admin-btn-sm outline" onClick={() => setEditing(o)}>EDIT</button>
-                    <button className="admin-btn-sm outline" style={{ color: "var(--red)" }} onClick={() => handleDelete(o.id)}>DEL</button>
-                  </div>
-                </td>
+        <div className="elite-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Offer Title</th>
+                <th>Code</th>
+                <th>Discount</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {offers.map(o => (
+                <tr key={o.id}>
+                  <td><strong>{o.title}</strong></td>
+                  <td><code style={{ color: "var(--red)", background: "rgba(232,0,29,0.1)", padding: "2px 6px", borderRadius: "4px" }}>{o.promoCode || "—"}</code></td>
+                  <td><span style={{ fontWeight: 700 }}>{o.discount ? `${o.discount}%` : "—"}</span></td>
+                  <td>
+                    <span className={`status-badge ${o.isActive ? "status-active" : "status-expired"}`}>
+                       {o.isActive ? "VISIBLE" : "HIDDEN"}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                      <button className="admin-btn-sm outline" onClick={() => setEditing(o)}>EDIT</button>
+                      <button className="admin-btn-sm outline" style={{ color: "var(--red)" }} onClick={() => handleDelete(o.id)}>DEL</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editing && (
