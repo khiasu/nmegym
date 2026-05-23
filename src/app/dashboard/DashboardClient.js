@@ -296,7 +296,7 @@ export default function DashboardClient({ user, plans, settings, offers }) {
                   </p>
                   
                   <a 
-                    href={`https://wa.me/917005310568?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${lastPayment.amount} for the ${lastPayment.planName} plan (Renewal).\n\n*My Details:*\nName: ${user.firstName} ${user.lastName}\nEmail: ${user.email}\nPhone: ${user.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                    href={`https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${lastPayment.amount} for the ${lastPayment.planName} plan (Renewal).\n\n*My Details:*\nName: ${user.firstName} ${user.lastName}\nEmail: ${user.email}\nPhone: ${user.phone}\n\nPlease verify my payment. Thank you!`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{

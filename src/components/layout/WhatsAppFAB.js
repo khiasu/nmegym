@@ -1,10 +1,11 @@
 // src/components/layout/WhatsAppFAB.js
 "use client";
 
-export default function WhatsAppFAB() {
+export default function WhatsAppFAB({ whatsappNumber }) {
+  const cleanNumber = (whatsappNumber || "917005310568").replace(/\D/g, "");
   return (
     <a
-      href="https://wa.me/917005310568"
+      href={`https://wa.me/${cleanNumber}?text=Hi%20NME%20Gym!%20I%20need%20some%20assistance.`}
       className="wa-float"
       target="_blank"
       rel="noopener noreferrer"

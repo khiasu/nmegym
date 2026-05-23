@@ -56,12 +56,12 @@ export default function Footer({ settings }) {
             <h5>Support</h5>
             <Link href="/legal">Legal Policy</Link>
             <a href="#contact">Contact</a>
-            <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a href={`https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </div>
           <div className="footer-col">
             <h5>Contact</h5>
-            <a href="tel:+917005310568">+91 70053 10568</a>
-            <a href="mailto:nmegym.india@gmail.com">nmegym.india@gmail.com</a>
+            <a href={`tel:${settings?.whatsappNumber || "+917005310568"}`}>{settings?.whatsappNumber || "+91 70053 10568"}</a>
+            <a href={`mailto:${settings?.email || "nmegym.india@gmail.com"}`}>{settings?.email || "nmegym.india@gmail.com"}</a>
             <a href="https://maps.app.goo.gl/9egiUnvKSZbBp9jc9?g_st=ac" target="_blank" rel="noopener noreferrer">View on Maps</a>
             <Link href="/admin" style={{ color: "#333", fontSize: "10px", marginTop: "10px" }}>Admin</Link>
           </div>

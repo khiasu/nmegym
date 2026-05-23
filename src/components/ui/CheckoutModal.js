@@ -107,7 +107,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
               </p>
               
               <a 
-                href={`https://wa.me/919863765861?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                href={`https://wa.me/${(settings?.whatsappNumber || "919863765861").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
