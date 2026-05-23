@@ -51,10 +51,10 @@ export async function generateMetadata() {
       type: "website",
       images: [
         {
-          url: logo,
-          width: 500,
-          height: 500,
-          alt: "NME Gym Logo",
+          url: "https://nmegym.in/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "NME Gym — Fitness Beyond Limits | Best Gym in Dimapur & Chumoukedima",
         },
       ],
     },
@@ -62,7 +62,7 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title,
       description,
-      images: [logo],
+      images: ["https://nmegym.in/og-image.png"],
     },
     icons: {
       icon: "/favicon.ico?v=2",

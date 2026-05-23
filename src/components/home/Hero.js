@@ -36,9 +36,8 @@ export default function Hero({ offer, settings }) {
         </div>
 
         <p className="hero-sub">START TODAY, FEEL IT TOMORROW</p>
-        <div className="hero-actions">
-          <a href="#plans" className="btn-primary" id="heroBookTrial">Join Now</a>
-          <a href="#plans" className="btn-outline">See Plans</a>
+        <div className="hero-actions" style={{ justifyContent: 'center' }}>
+          <a href="#plans" className="btn-primary" id="heroSeePlans">See Plans</a>
         </div>
       </div>
       <div className="hero-scroll">
