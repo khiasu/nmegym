@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function ToastNotification({ message, onUndo, onClose, duration = 10000 }) {
   const [progress, setProgress] = useState(100);
+  const onCloseRef = useRef(onClose);
+
+  // Keep ref up to date with the latest onClose callback
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!message) return;
@@ -15,12 +21,12 @@ export default function ToastNotification({ message, onUndo, onClose, duration =
       setProgress(remaining);
       if (remaining === 0) {
         clearInterval(interval);
-        onClose();
+        onCloseRef.current();
       }
     }, 50);
 
     return () => clearInterval(interval);
-  }, [message, duration, onClose]);
+  }, [message, duration]);
 
   if (!message) return null;
 

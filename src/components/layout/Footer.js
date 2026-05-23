@@ -13,7 +13,7 @@ export default function Footer({ settings }) {
           </div>
           <p>No Mercy. No Excuses. Chumoukedima's most serious fitness destination.</p>
           <div className="footer-social">
-            <a href="https://www.instagram.com/nme_gym?igsh=MWwzeXJ5aDVwa3o1aA==" target="_blank" rel="noopener noreferrer">
+            <a href={settings?.instagramUrl || "https://www.instagram.com/nme_gym"} target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -27,13 +27,13 @@ export default function Footer({ settings }) {
                 <circle cx="17.5" cy="6.5" r="1.2" fill="white" />
               </svg>
             </a>
-            <a href="https://wa.me/917005310568" target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="12" fill="#25D366" />
                 <path d="M17.5 6.5A7.4 7.4 0 0 0 12 4.2a7.4 7.4 0 0 0-6.3 11.2L4.2 19.8l4.5-1.2a7.4 7.4 0 0 0 3.3.8 7.4 7.4 0 0 0 7.4-7.4 7.4 7.4 0 0 0-2-5zm-5.5 11.4a6.1 6.1 0 0 1-3.1-.8l-.2-.1-2.5.7.7-2.5-.2-.2A6.1 6.1 0 1 1 12 17.9zm3.3-4.6c-.2-.1-1-.5-1.2-.6-.2-.1-.3-.1-.4.1-.1.2-.5.6-.6.7-.1.1-.2.1-.4 0-.2-.1-.8-.3-1.5-.9-.5-.5-.9-1-.9-1.2-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.3c-.1-.2-.5-1-.6-1.4-.1-.4-.3-.3-.4-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.8s.8 2.1.9 2.3c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .2 1.3.1.4-.1 1.2-.5 1.4-1 .2-.4.2-.9.1-.9-.1-.1-.2-.1-.4-.2z" fill="white" />
               </svg>
             </a>
-            <a href="mailto:nmegym.india@gmail.com">
+            <a href={`mailto:${settings?.email || "nmegym.india@gmail.com"}`}>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="24" height="24" rx="4" fill="#444" />
                 <path d="M4 8l8 5 8-5" stroke="white" strokeWidth="1.5" fill="none" />

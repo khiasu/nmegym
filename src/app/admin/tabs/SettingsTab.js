@@ -267,9 +267,6 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
         </div>
       </div>
 
-      {/* SECTION 5: PAYMENT SETTINGS */}
-
-
       {/* SECURITY */}
       <div className="elite-card">
         <div className="admin-section-card-header">

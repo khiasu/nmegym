@@ -14,13 +14,20 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
   // Direct immediate save — no undo delay for pricing parameters
   async function handleSaveAdmissionFee() {
     setPricingSaving(true);
+    const payload = {
+      ...settings,
+      admissionFee: settings.admissionFee === "" ? 0 : parseInt(settings.admissionFee) || 0,
+      payPerSessionPrice: settings.payPerSessionPrice === "" ? 0 : parseInt(settings.payPerSessionPrice) || 0,
+    };
     try {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
+        const updatedSettings = await res.json();
+        setSettings(updatedSettings);
         showToast("✅ Pricing parameters saved successfully!");
         router.refresh();
       } else {
@@ -36,7 +43,14 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!editing.name || !editing.price) return showToast("Name and Price are required.");
+    if (!editing.name || editing.price === "" || editing.price === undefined || editing.price === null) {
+      return showToast("Name and Price are required.");
+    }
+    
+    const parsedEditing = {
+      ...editing,
+      price: parseInt(editing.price) || 0
+    };
     
     executeWithUndo({
       message: editing.id ? "Plan changes saved. Updating database in 7s..." : "New plan created. Syncing in 7s...",
@@ -45,15 +59,15 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
           const res = await fetch("/api/admin/plans", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(editing),
+            body: JSON.stringify(parsedEditing),
           });
           if (res.ok) router.refresh();
         } catch (err) { showToast("Database sync failed."); }
       },
       revertUI: () => {
         // Optimistic UI
-        if (editing.id) setPlans(plans.map(p => p.id === editing.id ? editing : p));
-        else setPlans([...plans, { ...editing, id: 'temp-' + Date.now() }]);
+        if (editing.id) setPlans(plans.map(p => p.id === editing.id ? parsedEditing : p));
+        else setPlans([...plans, { ...parsedEditing, id: 'temp-' + Date.now() }]);
         setEditing(null);
       }
     });
@@ -90,14 +104,14 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       </div>
 
       <div className="admin-section-card" style={{ marginBottom: '25px', borderLeft: '4px solid var(--red)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
           <div>
             <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>ONE-TIME ADMISSION FEE (₹)</label>
             <input 
               type="number" 
               className="admin-input" 
-              value={settings.admissionFee || 1000} 
-              onChange={(e) => setSettings({...settings, admissionFee: parseInt(e.target.value) || 0})}
+              value={settings.admissionFee !== undefined && settings.admissionFee !== null ? settings.admissionFee : ""} 
+              onChange={(e) => setSettings({...settings, admissionFee: e.target.value})}
               style={{ width: '100%', margin: '0 0 10px 0' }}
             />
           </div>
@@ -106,9 +120,20 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
             <input 
               type="number" 
               className="admin-input" 
-              value={settings.payPerSessionPrice || 200} 
-              onChange={(e) => setSettings({...settings, payPerSessionPrice: parseInt(e.target.value) || 0})}
+              value={settings.payPerSessionPrice !== undefined && settings.payPerSessionPrice !== null ? settings.payPerSessionPrice : ""} 
+              onChange={(e) => setSettings({...settings, payPerSessionPrice: e.target.value})}
               style={{ width: '100%', margin: '0 0 10px 0' }}
+            />
+          </div>
+          <div>
+            <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>UPI ID FOR PAYMENTS</label>
+            <input 
+              type="text" 
+              className="admin-input" 
+              value={settings.upiId || ""} 
+              onChange={(e) => setSettings({...settings, upiId: e.target.value})}
+              style={{ width: '100%', margin: '0 0 10px 0' }}
+              placeholder="e.g. gymname@upi"
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '10px' }}>
@@ -118,7 +143,7 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
               disabled={pricingSaving}
               style={{ height: '40px', width: '100%', opacity: pricingSaving ? 0.7 : 1 }}
             >
-              {pricingSaving ? "SAVING..." : "UPDATE PRICING PARAMETERS"}
+              {pricingSaving ? "SAVING..." : "UPDATE PARAMETERS"}
             </button>
           </div>
         </div>
@@ -194,8 +219,8 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
                   <input 
                     name="price" 
                     type="number" 
-                    value={editing.price} 
-                    onChange={e => setEditing({...editing, price: parseInt(e.target.value) || 0})}
+                    value={editing.price !== undefined && editing.price !== null ? editing.price : ""} 
+                    onChange={e => setEditing({...editing, price: e.target.value})}
                     className="admin-input" 
                     required 
                   />

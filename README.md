@@ -15,7 +15,7 @@ Instead of paying a 3% fee to Stripe or Razorpay, we use a custom UPI verificati
 ### 2. Full Admin Control Panel
 You don't need to touch the code to update the site. The Admin Portal lets you:
 - Change the **Gym Logo** and **Favicon** across the whole site.
-- Update your **UPI ID** and **QR Code** for payments.
+- Update your **UPI ID** (which dynamically generates payment QR codes with exact checkout amounts).
 - Add/Edit **Trainers**, **Facilities**, and **Offers**.
 - Manage **Memberships** (Track expiry, manual renewals, and deletions).
 - Edit **About Us** text and **Policies** in real-time.
@@ -49,7 +49,7 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 
 - **Zero Cost Policy**: The project is built to stay within the free tiers of Vercel, Neon, Cloudinary, and Resend. Don't add paid plugins unless the client explicitly asks.
 - **Domain**: Keep an eye on **nmegym.in** renewal. If it expires, the emails and logins will stop working.
-- **Email**: Currently using **Resend**. If you hit the daily limit, check the logs in the Resend dashboard.
+- **Email Delivery (Resend Sandbox)**: In testing, Resend's default onboarding domain (`onboarding@resend.dev`) will only deliver emails to the email address registered to the Resend account. For production handoff, verify the gym's custom domain (e.g., `nmegym.in`) in the Resend dashboard and update `EMAIL_FROM` in `.env` to route emails to any member's address.
 
 ---
 **NME GYM — Fitness Beyond Limits.**

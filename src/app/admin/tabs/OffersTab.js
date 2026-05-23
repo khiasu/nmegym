@@ -14,6 +14,11 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
     e.preventDefault();
     if (!editing.title || !editing.badge) return showToast("Title and Badge are required.");
     
+    const parsedEditing = {
+      ...editing,
+      discount: editing.discount === "" ? 0 : parseInt(editing.discount) || 0
+    };
+    
     executeWithUndo({
       message: editing.id ? "Offer updated. Syncing in 7s..." : "New offer created. Syncing in 7s...",
       executeFunction: async () => {
@@ -21,14 +26,14 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
           const res = await fetch("/api/admin/offers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(editing),
+            body: JSON.stringify(parsedEditing),
           });
           if (res.ok) router.refresh();
         } catch (err) { showToast("Sync failed."); }
       },
       revertUI: () => {
-        if (editing.id) setOffers(offers.map(o => o.id === editing.id ? editing : o));
-        else setOffers([{...editing, id: 'temp-' + Date.now()}, ...offers]);
+        if (editing.id) setOffers(offers.map(o => o.id === editing.id ? parsedEditing : o));
+        else setOffers([{...parsedEditing, id: 'temp-' + Date.now()}, ...offers]);
         setEditing(null);
       }
     });
@@ -146,8 +151,8 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
                     <input 
                       type="number" 
                       name="discount" 
-                      value={editing.discount || ""} 
-                      onChange={e => setEditing({...editing, discount: parseInt(e.target.value) || 0})}
+                      value={editing.discount !== undefined && editing.discount !== null ? editing.discount : ""} 
+                      onChange={e => setEditing({...editing, discount: e.target.value})}
                       className="admin-input" 
                       placeholder="10" 
                     />
