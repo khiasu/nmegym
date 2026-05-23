@@ -1,6 +1,5 @@
 // src/lib/mail.js — Email utility using Resend
 import { Resend } from 'resend';
-import prisma from '@/lib/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,7 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendWelcomeEmail(email, name, memberId, password) {
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
+      from: 'NME GYM <onboarding@resend.dev>',
       to: email,
       subject: 'Welcome to NME GYM — Your Account is Active!',
       html: `
@@ -57,16 +56,8 @@ export async function sendWelcomeEmail(email, name, memberId, password) {
 /**
  * Send email notification to admin when a new payment is pending verification
  */
-export async function sendAdminNotificationEmail({ memberName, email, phone, planName, totalAmount, isFirstTimer, paymentId }) {
-  let adminEmail = process.env.ADMIN_EMAIL || 'nmegym.india@gmail.com';
-  try {
-    const settings = await prisma.settings.findFirst();
-    if (settings?.email) {
-      adminEmail = settings.email;
-    }
-  } catch (err) {
-    console.error("Failed to fetch admin email from settings, using fallback:", err);
-  }
+export async function sendAdminNotificationEmail({ memberName, email, phone, planName, totalAmount, isFirstTimer, paymentId, adminEmail }) {
+  const recipientEmail = adminEmail || process.env.ADMIN_EMAIL || 'nmegym.india@gmail.com';
   const subjectPrefix = isFirstTimer ? '🆕 New Registration' : '🔄 Payment Verification';
   const headerTitle = isFirstTimer ? '⚡ NEW REGISTRATION REQUEST' : '⚡ RENEWAL PAYMENT REQUEST';
   const headerSub = isFirstTimer ? 'A new member is waiting for approval' : 'An existing member payment requires verification';
@@ -74,8 +65,8 @@ export async function sendAdminNotificationEmail({ memberName, email, phone, pla
   
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
-      to: adminEmail,
+      from: 'NME GYM <onboarding@resend.dev>',
+      to: recipientEmail,
       subject: `${subjectPrefix} — ${memberName}`,
       html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: auto; padding: 0; background: #0a0a0a; border-radius: 12px; overflow: hidden;">
@@ -118,7 +109,7 @@ export async function sendAdminNotificationEmail({ memberName, email, phone, pla
 export async function sendUserPendingNotificationEmail(email, name, planName) {
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
+      from: 'NME GYM <onboarding@resend.dev>',
       to: email,
       subject: 'Registration Received — Waiting for Admin Confirmation',
       html: `
@@ -154,7 +145,7 @@ export async function sendUserPendingNotificationEmail(email, name, planName) {
 export async function sendPaymentConfirmationEmail(email, name, planName, amount, memberId) {
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
+      from: 'NME GYM <onboarding@resend.dev>',
       to: email,
       subject: 'Payment Verified — NME GYM Membership Renewed!',
       html: `
@@ -199,7 +190,7 @@ export async function sendPasswordResetEmail(email, token) {
   
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
+      from: 'NME GYM <onboarding@resend.dev>',
       to: email,
       subject: 'Reset Your NME GYM Password',
       html: `
@@ -231,7 +222,7 @@ export async function sendExpiryReminderEmail(email, name, daysLeft, endDate) {
   
   try {
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>',
+      from: 'NME GYM <onboarding@resend.dev>',
       to: email,
       subject: `Action Required: Membership Expires in ${daysLeft} Day${daysLeft > 1 ? 's' : ''}`,
       html: `

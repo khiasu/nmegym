@@ -110,6 +110,9 @@ export async function POST(request) {
       },
     });
 
+    // Fetch settings to get dynamic admin email
+    const settings = await prisma.settings.findFirst().catch(() => null);
+
     // Send notification emails
     try {
       await Promise.allSettled([
@@ -121,6 +124,7 @@ export async function POST(request) {
           totalAmount,
           isFirstTimer,
           paymentId: payment.id,
+          adminEmail: settings?.email || undefined,
         }),
         import("@/lib/mail").then(({ sendUserPendingNotificationEmail }) => 
           sendUserPendingNotificationEmail(email, firstName, planName)
