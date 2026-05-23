@@ -76,6 +76,7 @@ export async function POST(request) {
     });
 
     revalidatePath("/");
+    revalidatePath("/admin");
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Settings update error:", error);

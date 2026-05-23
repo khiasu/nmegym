@@ -9,24 +9,29 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
   const [plans, setPlans] = useState(initialPlans || []);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [pricingSaving, setPricingSaving] = useState(false);
 
+  // Direct immediate save — no undo delay for pricing parameters
   async function handleSaveAdmissionFee() {
-    executeWithUndo({
-      message: "Admission fee updated. Syncing in 7s...",
-      executeFunction: async () => {
-        try {
-          const res = await fetch("/api/admin/settings", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(settings),
-          });
-          if (res.ok) router.refresh();
-        } catch (err) { showToast("Sync failed."); }
-      },
-      revertUI: () => {
-        // No local state change needed here as we just want to show the toast
+    setPricingSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+      if (res.ok) {
+        showToast("✅ Pricing parameters saved successfully!");
+        router.refresh();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast("❌ Save failed: " + (err.error || res.statusText));
       }
-    });
+    } catch (err) {
+      showToast("❌ Network error — could not save pricing.");
+    } finally {
+      setPricingSaving(false);
+    }
   }
 
   async function handleSave(e) {
@@ -107,7 +112,14 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '10px' }}>
-            <button className="admin-btn-sm" onClick={handleSaveAdmissionFee} style={{ height: '40px', width: '100%' }}>UPDATE PRICING PARAMETERS</button>
+            <button 
+              className="admin-btn-sm" 
+              onClick={handleSaveAdmissionFee} 
+              disabled={pricingSaving}
+              style={{ height: '40px', width: '100%', opacity: pricingSaving ? 0.7 : 1 }}
+            >
+              {pricingSaving ? "SAVING..." : "UPDATE PRICING PARAMETERS"}
+            </button>
           </div>
         </div>
         <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 15px', borderRadius: '6px', marginTop: '15px' }}>
