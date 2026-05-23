@@ -47,7 +47,7 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 1. **Setup Env**: Copy `.env.example` to `.env` and fill in your Neon and Cloudinary keys.
 2. **Install**: `npm install`
 3. **Sync DB**: `npx prisma db push`
-4. **Seed**: `npm run db:seed` (Creates the default admin: `nmegym.india@gmail.com` / `nme2026`)
+4. **Seed**: `npm run db:seed` (Creates the default admin: `yourgymmailid@gmail.com` / 'password`)
 5. **Run**: `npm run dev`
 
 ---
@@ -55,7 +55,6 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 ## 💡 Important Notes
 
 - **Zero Cost Policy**: The project is built to stay within the free tiers of Vercel, Neon, Cloudinary, and Resend. Don't add paid plugins unless the client explicitly asks.
-- **Domain**: Keep an eye on **nmegym.in** renewal. If it expires, the emails and logins will stop working.
 - **Email Delivery (Resend Sandbox)**: In testing, Resend's default onboarding domain (`onboarding@resend.dev`) will only deliver emails to the email address registered to the Resend account. For production handoff, verify the gym's custom domain (e.g., `nmegym.in`) in the Resend dashboard and update `EMAIL_FROM` in `.env` to route emails to any member's address.
 
 ---
