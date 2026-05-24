@@ -5,12 +5,16 @@ export const metadata = {
   description: "A magic sign-in link has been sent to your email.",
 };
 
-export default function VerifyPage() {
+import prisma from "@/lib/prisma";
+
+export default async function VerifyPage() {
+  const settings = await prisma.settings.findFirst().catch(() => null);
+
   return (
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/newlogo.png" alt="NME GYM" />
+          <img src={settings?.logoUrl || "/newlogo.png"} alt="NME GYM" />
         </div>
 
         <div className="auth-verify-icon">📬</div>
