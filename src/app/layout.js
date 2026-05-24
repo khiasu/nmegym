@@ -65,9 +65,9 @@ export async function generateMetadata() {
       images: ["https://nmegym.in/og-image.png"],
     },
     icons: {
-      icon: "/favicon.ico?v=2",
-      shortcut: "/favicon.ico?v=2",
-      apple: "/favicon.ico?v=2",
+      icon: "/favicon_black.png?v=3",
+      shortcut: "/favicon_black.png?v=3",
+      apple: "/favicon_black.png?v=3",
     },
     robots: {
       index: true,

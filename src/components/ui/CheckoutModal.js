@@ -79,6 +79,9 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
         throw new Error(data.error || "Checkout failed");
       }
 
+      const waUrl = `https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`;
+      localStorage.setItem("nme_pending_whatsapp_url", waUrl);
+
       setSuccess(true);
       setScreenshotUrl("");
     } catch (err) {
@@ -89,11 +92,11 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
   };
 
   return (
-    <div className={`modal-overlay open`} onClick={onClose}>
+    <div className={`modal-overlay open`} onClick={() => { if (!success) onClose(); }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', padding: '0' }}>
         <div className="modal-header" style={{ padding: '20px 30px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <h3 style={{ fontSize: '24px', margin: 0 }}>SECURE CHECKOUT</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
+          {!success && <button className="modal-close" onClick={onClose}>×</button>}
         </div>
         
         <div className="modal-body" style={{ padding: '30px', maxHeight: '70vh', overflowY: 'auto' }}>
@@ -107,7 +110,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
               </p>
               
               <a 
-                href={`https://wa.me/${(settings?.whatsappNumber || "919863765861").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`}
+                href={`https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a payment of ₹${totalAmount} for the ${selectedPlan.name} plan.\n\n*My Details:*\nName: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nPlease verify my payment. Thank you!`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -123,8 +126,11 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
                   boxShadow: '0 4px 15px rgba(37,211,102,0.3)',
                 }}
                 onClick={(e) => {
-                  // Don't auto-close if they click the WhatsApp button
                   e.stopPropagation();
+                  localStorage.removeItem("nme_pending_whatsapp_url");
+                  setTimeout(() => {
+                    onClose();
+                  }, 1000);
                 }}
               >
                 💬 Notify Admin via WhatsApp

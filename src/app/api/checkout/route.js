@@ -33,7 +33,16 @@ export async function POST(request) {
 
     const isSessionPass = planName?.toLowerCase().includes("session") || planName?.toLowerCase().includes("daily") || planName?.toLowerCase().includes("pass");
 
-    if ((isFirstTimer || isSessionPass) && !userId) {
+    // Force guest checkout if first-timer, session pass, or if the logged-in user is an ADMIN
+    let isGuestCheckout = isFirstTimer || isSessionPass;
+    if (userId) {
+      const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (dbUser && dbUser.role === "ADMIN") {
+        isGuestCheckout = true;
+      }
+    }
+
+    if (isGuestCheckout) {
       // Create or find the user (find by email OR phone)
       const existingUser = await prisma.user.findFirst({
         where: {

@@ -36,6 +36,18 @@ export default function JoinForm({ settings }) {
       const result = await res.json();
 
       if (res.ok) {
+        const amountMap = { "MONTHLY": 999, "3_MONTHS": 2499, "6_MONTHS": 4499, "ANNUAL": 7999 };
+        const planNameMap = {
+          "MONTHLY": "Monthly Plan",
+          "3_MONTHS": "3 Months Plan",
+          "6_MONTHS": "6 Months Plan",
+          "ANNUAL": "1 Year Plan",
+        };
+        const totalAmount = amountMap[data.plan] || 0;
+        const planName = planNameMap[data.plan] || "Membership Plan";
+        const waUrl = `https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a registration payment of ₹${totalAmount} for the ${planName}.\n\n*My Details:*\nName: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nPhone: ${data.phone}\n\nPlease verify my payment. Thank you!`)}`;
+        localStorage.setItem("nme_pending_whatsapp_url", waUrl);
+
         router.push("/auth/register/success");
       } else {
         setError(result.error || "Submission failed");

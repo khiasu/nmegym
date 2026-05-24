@@ -57,10 +57,37 @@ export default function RegistrationsTab({ newRegistrations: initialRegs, reques
             : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`;
           
           const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+          
+          // Add to pending WhatsApp tasks list
+          try {
+            const pendingTasks = JSON.parse(localStorage.getItem("nme_admin_pending_wa") || "[]");
+            if (!pendingTasks.some(t => t.paymentId === paymentId)) {
+              pendingTasks.push({
+                paymentId,
+                memberName: data.userName,
+                planName: data.planName || 'Plan',
+                waUrl
+              });
+              localStorage.setItem("nme_admin_pending_wa", JSON.stringify(pendingTasks));
+            }
+          } catch (e) {
+            console.error("Storage error:", e);
+          }
+
           requestConfirmation({
             title: "SEND WELCOME MESSAGE?",
             message: "Registration verified successfully! Would you like to send the welcome details via WhatsApp to the member now?",
             onConfirm: () => {
+              try {
+                const currentTasks = JSON.parse(localStorage.getItem("nme_admin_pending_wa") || "[]");
+                const updatedTasks = currentTasks.filter(t => t.paymentId !== paymentId);
+                localStorage.setItem("nme_admin_pending_wa", JSON.stringify(updatedTasks));
+                if (window.dispatchEvent) {
+                  window.dispatchEvent(new Event("nme_admin_wa_update"));
+                }
+              } catch (e) {
+                console.error("Storage error:", e);
+              }
               window.open(waUrl, "_blank");
             }
           });

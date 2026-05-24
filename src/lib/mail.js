@@ -2,6 +2,7 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const SENDER = process.env.EMAIL_FROM || 'NME GYM <onboarding@resend.dev>';
 
 /**
  * Send welcome email to new member with login credentials
@@ -9,7 +10,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendWelcomeEmail(email, name, memberId, password) {
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: 'Welcome to NME GYM — Your Account is Active!',
       html: `
@@ -65,7 +66,7 @@ export async function sendAdminNotificationEmail({ memberName, email, phone, pla
   
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: recipientEmail,
       subject: `${subjectPrefix} — ${memberName}`,
       html: `
@@ -109,7 +110,7 @@ export async function sendAdminNotificationEmail({ memberName, email, phone, pla
 export async function sendUserPendingNotificationEmail(email, name, planName) {
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: 'Registration Received — Waiting for Admin Confirmation',
       html: `
@@ -145,7 +146,7 @@ export async function sendUserPendingNotificationEmail(email, name, planName) {
 export async function sendPaymentConfirmationEmail(email, name, planName, amount, memberId) {
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: 'Payment Verified — NME GYM Membership Renewed!',
       html: `
@@ -190,7 +191,7 @@ export async function sendPasswordResetEmail(email, token) {
   
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: 'Reset Your NME GYM Password',
       html: `
@@ -222,7 +223,7 @@ export async function sendExpiryReminderEmail(email, name, daysLeft, endDate) {
   
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: `Action Required: Membership Expires in ${daysLeft} Day${daysLeft > 1 ? 's' : ''}`,
       html: `
@@ -257,7 +258,7 @@ export async function sendExpiryReminderEmail(email, name, daysLeft, endDate) {
 export async function sendDailyPassEmail(email, name, planName, amount) {
   try {
     await resend.emails.send({
-      from: 'NME GYM <onboarding@resend.dev>',
+      from: SENDER,
       to: email,
       subject: 'NME GYM — Daily Session Pass Active! ⚡',
       html: `

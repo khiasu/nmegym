@@ -23,6 +23,24 @@ export default function AdminClient(props) {
   const [scrolled, setScrolled] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const [settings, setSettings] = useState(props.settings || {});
+  const [waTasks, setWaTasks] = useState([]);
+
+  useEffect(() => {
+    const loadTasks = () => {
+      try {
+        const tasks = JSON.parse(localStorage.getItem("nme_admin_pending_wa") || "[]");
+        setWaTasks(tasks);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadTasks();
+    
+    window.addEventListener("nme_admin_wa_update", loadTasks);
+    return () => {
+      window.removeEventListener("nme_admin_wa_update", loadTasks);
+    };
+  }, []);
   
   // Sync state with props when server data refreshes
   useEffect(() => {
@@ -183,6 +201,59 @@ export default function AdminClient(props) {
 
         {/* MAIN CONTENT AREA */}
         <div className="admin-main-elite" key={activeTab}>
+          {waTasks.length > 0 && (
+            <div style={{
+              background: "rgba(232,0,29,0.08)",
+              border: "1px solid var(--elite-red, #e8001d)",
+              borderRadius: "8px",
+              padding: "12px 18px",
+              marginBottom: "20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              fontFamily: "'Inter', sans-serif"
+            }}>
+              <div style={{fontWeight: "bold", fontSize: "13px", color: "white", display: "flex", alignItems: "center", gap: "6px"}}>
+                <span style={{color: "#ffc800"}}>⚠️</span> PENDING WHATSAPP ALERTS ({waTasks.length})
+              </div>
+              <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
+                {waTasks.map(task => (
+                  <div key={task.paymentId} style={{display: "flex", justifyContent: "space-between", alignItems: "center", background: "#111", padding: "8px 12px", borderRadius: "6px", flexWrap: "wrap", gap: "8px"}}>
+                    <span style={{fontSize: "12px", color: "#ccc"}}>
+                      Send verification confirmation message to <strong>{task.memberName}</strong> ({task.planName})
+                    </span>
+                    <div style={{display: "flex", gap: "8px"}}>
+                      <a 
+                        href={task.waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          const updated = waTasks.filter(t => t.paymentId !== task.paymentId);
+                          localStorage.setItem("nme_admin_pending_wa", JSON.stringify(updated));
+                          setWaTasks(updated);
+                        }}
+                        className="admin-btn-sm"
+                        style={{background: "#25D366", color: "white", textDecoration: "none", fontSize: "11px", fontWeight: "bold", padding: "6px 12px", borderRadius: "4px"}}
+                      >
+                        💬 Send WhatsApp
+                      </a>
+                      <button
+                        onClick={() => {
+                          const updated = waTasks.filter(t => t.paymentId !== task.paymentId);
+                          localStorage.setItem("nme_admin_pending_wa", JSON.stringify(updated));
+                          setWaTasks(updated);
+                        }}
+                        style={{background: "transparent", border: "none", color: "#666", fontSize: "11px", cursor: "pointer"}}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {activeTab === "dashboard" && <DashboardTab {...props} setActiveTab={setActiveTab} />}
           {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} settings={settings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
