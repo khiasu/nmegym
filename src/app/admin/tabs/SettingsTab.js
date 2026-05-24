@@ -136,6 +136,33 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
             </div>
             <p style={{fontSize:"10px", color:"rgba(255,255,255,0.3)", marginTop:"8px"}}>16:9 ASPECT RATIO RECOMMENDED</p>
           </div>
+
+          {/* UPI QR Code */}
+          <div className="admin-form-group">
+            <label className="admin-label">Custom UPI QR Code (Optional)</label>
+            <div style={{display:"flex", alignItems:"center", gap:"20px", flexWrap:"wrap"}}>
+              <div style={{width:"120px", height:"120px", border:"1px solid var(--elite-border)", display:"flex", alignItems:"center", justifyContent:"center", background:"#000", overflow:"hidden", borderRadius: "12px", position: "relative", padding: "10px"}}>
+                {settings.upiQrUrl ? (
+                  <img src={settings.upiQrUrl} alt="UPI QR Code" style={{maxWidth:"100%", maxHeight:"100%", objectFit:"contain"}} />
+                ) : (
+                  <span style={{fontSize: "10px", color: "rgba(255,255,255,0.3)", textAlign: "center"}}>Generated Automatically</span>
+                )}
+                {settings.upiQrUrl && (
+                  <button type="button" onClick={() => setSettings(prev => ({...prev, upiQrUrl: ''}))} style={{ position: 'absolute', top: 5, right: 5, background: 'var(--red)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                )}
+              </div>
+              <CldUploadWidget 
+                uploadPreset="nmegym_preset" 
+                options={{ cropping: false }}
+                onSuccess={(res) => setSettings(prev => ({...prev, upiQrUrl: res.info.secure_url}))}
+              >
+                {({ open }) => (
+                  <button className="admin-btn-sm outline" onClick={() => open()}>Upload QR Code</button>
+                )}
+              </CldUploadWidget>
+            </div>
+            <p style={{fontSize:"10px", color:"rgba(255,255,255,0.3)", marginTop:"8px"}}>UPLOADING A QR OVERRIDES DYNAMIC QR GENERATION</p>
+          </div>
         </div>
       </div>
 
@@ -151,6 +178,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
           <div className="admin-form-group"><label className="admin-label">Email Address</label><input className="admin-input" type="email" value={settings.email || ""} onChange={(e) => setSettings({...settings, email: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Gym Address</label><input className="admin-input" type="text" value={settings.address || ""} onChange={(e) => setSettings({...settings, address: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Instagram URL</label><input className="admin-input" type="url" value={settings.instagramUrl || ""} onChange={(e) => setSettings({...settings, instagramUrl: e.target.value})} /></div>
+          <div className="admin-form-group"><label className="admin-label">UPI ID for Payments</label><input className="admin-input" type="text" value={settings.upiId || ""} onChange={(e) => setSettings({...settings, upiId: e.target.value})} /></div>
           <div className="admin-form-group"><label className="admin-label">Opening Hours</label><input className="admin-input" type="text" value={settings.openingHours || ""} onChange={(e) => setSettings({...settings, openingHours: e.target.value})} /></div>
         </div>
       </div>

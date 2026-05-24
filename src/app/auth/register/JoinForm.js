@@ -6,11 +6,30 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CldUploadWidget } from "next-cloudinary";
 
-export default function JoinForm({ settings }) {
+export default function JoinForm({ settings, plans }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [screenshotUrl, setScreenshotUrl] = useState("");
+
+  const displayPlans = plans && plans.length > 0 ? plans : [
+    { id: 'MONTHLY', name: 'Monthly', price: 999 },
+    { id: '3_MONTHS', name: '3 Months', price: 2499 },
+    { id: '6_MONTHS', name: '6 Months', price: 4499 },
+    { id: 'ANNUAL', name: '1 Year', price: 7999 }
+  ];
+
+  const [selectedPlanId, setSelectedPlanId] = useState(displayPlans[0]?.id || "");
+
+  const selectedPlanObj = displayPlans.find(p => p.id === selectedPlanId) || displayPlans[0];
+  const planPrice = selectedPlanObj ? Number(selectedPlanObj.price) : 0;
+  const admissionFee = Number(settings?.admissionFee) || 1000;
+  const totalAmount = planPrice + admissionFee;
+
+  const upiId = settings?.upiId || "nmegym@upi";
+  const upiName = settings?.gymName || "NMEGym";
+  const upiUri = `upi://pay?pa=${upiId}&pn=${upiName}&am=${totalAmount}&cu=INR`;
+  const qrCodeUrl = settings?.upiQrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,6 +44,7 @@ export default function JoinForm({ settings }) {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     data.screenshotUrl = screenshotUrl;
+    data.plan = selectedPlanId;
 
     try {
       const res = await fetch("/api/auth/join", {
@@ -36,15 +56,7 @@ export default function JoinForm({ settings }) {
       const result = await res.json();
 
       if (res.ok) {
-        const amountMap = { "MONTHLY": 999, "3_MONTHS": 2499, "6_MONTHS": 4499, "ANNUAL": 7999 };
-        const planNameMap = {
-          "MONTHLY": "Monthly Plan",
-          "3_MONTHS": "3 Months Plan",
-          "6_MONTHS": "6 Months Plan",
-          "ANNUAL": "1 Year Plan",
-        };
-        const totalAmount = amountMap[data.plan] || 0;
-        const planName = planNameMap[data.plan] || "Membership Plan";
+        const planName = selectedPlanObj?.name || "Membership Plan";
         const waUrl = `https://wa.me/${(settings?.whatsappNumber || "917005310568").replace(/\D/g, "")}?text=${encodeURIComponent(`Hello NME GYM Admin! 👋\n\nI have just submitted a registration payment of ₹${totalAmount} for the ${planName}.\n\n*My Details:*\nName: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nPhone: ${data.phone}\n\nPlease verify my payment. Thank you!`)}`;
         localStorage.setItem("nme_pending_whatsapp_url", waUrl);
 
@@ -95,17 +107,21 @@ export default function JoinForm({ settings }) {
 
           <div className="auth-field">
             <label>Select Plan</label>
-            <select name="plan" required>
-              <option value="MONTHLY">Monthly — ₹999</option>
-              <option value="3_MONTHS">3 Months — ₹2,499</option>
-              <option value="6_MONTHS">6 Months — ₹4,499</option>
-              <option value="ANNUAL">1 Year — ₹7,999</option>
+            <select name="plan" value={selectedPlanId} onChange={(e) => setSelectedPlanId(e.target.value)} required>
+              {displayPlans.map(p => (
+                <option key={p.id} value={p.id}>{p.name} — ₹{p.price}</option>
+              ))}
             </select>
           </div>
 
-          <div className="payment-guide" style={{ background: "#1a1a1a", padding: 15, borderRadius: 8, margin: "10px 0" }}>
-            <p style={{ fontSize: 12, margin: 0 }}>Pay to UPI ID: <strong style={{ color: "white" }}>{settings?.upiId || "nmegym@upi"}</strong></p>
-            <p style={{ fontSize: 11, color: "#888", marginTop: 5 }}>After payment, upload the screenshot below.</p>
+          {/* QR PAYMENT */}
+          <div style={{ textAlign: 'center', margin: '20px 0', padding: '20px', background: 'rgba(232, 0, 29, 0.05)', border: '1px dashed var(--red, #e8001d)', borderRadius: '8px' }}>
+            <p style={{ fontSize: '11px', color: '#888', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>SCAN TO PAY VIA ANY UPI APP</p>
+            <img src={qrCodeUrl} alt="UPI QR Code" style={{ width: '150px', height: '150px', borderRadius: '10px', background: 'white', padding: '10px', display: 'inline-block' }} />
+            <p style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '15px', fontFamily: 'monospace', color: 'white', marginBottom: '5px' }}>{upiId}</p>
+            <p style={{ fontSize: '12px', color: '#ccc', margin: 0 }}>
+              Plan Price: ₹{planPrice} + Admission Fee: ₹{admissionFee} = <strong style={{ color: '#00ff64' }}>₹{totalAmount}</strong>
+            </p>
           </div>
 
           <div className="auth-field">

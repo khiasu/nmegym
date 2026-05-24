@@ -5,6 +5,9 @@ import JoinForm from "./JoinForm";
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
-  const settings = await prisma.settings.findFirst();
-  return <JoinForm settings={settings} />;
+  const [settings, plans] = await Promise.all([
+    prisma.settings.findFirst(),
+    prisma.plan.findMany({ orderBy: { price: "asc" } }),
+  ]);
+  return <JoinForm settings={settings} plans={plans} />;
 }

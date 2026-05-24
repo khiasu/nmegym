@@ -94,7 +94,7 @@ export default function DashboardClient({ user, plans, settings, offers }) {
     ? `upi://pay?pa=${upiId}&pn=${upiName}&am=${paymentAmount}&cu=INR`
     : "";
   const qrCodeUrl = selectedPlan
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`
+    ? (settings?.upiQrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`)
     : "";
 
   const handleApplyPromo = () => {

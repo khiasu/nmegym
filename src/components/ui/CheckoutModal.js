@@ -34,7 +34,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
   const upiId = settings?.upiId || "nmegym@upi";
   const upiName = settings?.gymName || "NMEGym";
   const upiUri = `upi://pay?pa=${upiId}&pn=${upiName}&am=${totalAmount}&cu=INR`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`;
+  const qrCodeUrl = settings?.upiQrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUri)}`;
 
   const handleApplyPromo = () => {
     setPromoError("");
