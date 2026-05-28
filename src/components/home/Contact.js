@@ -46,8 +46,8 @@ export default function Contact({ settings }) {
             marginBottom: '20px',
             fontFamily: "'Barlow', sans-serif"
           }}>
-            Kemnbay Hostel 5th Mile, Diphupar B.<br />
-            Chumoukedima, Nagaland 797115
+            Kemnbay Hostel, 5th Mile, Diphupar 'B',<br />
+            Chumoukedima , Nagaland 797115
           </p>
 
 

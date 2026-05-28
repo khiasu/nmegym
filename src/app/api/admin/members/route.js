@@ -35,30 +35,76 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { firstName, lastName, email, phone, planTier, startDate } = body;
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      phone, 
+      planTier, 
+      startDate, 
+      endDate, 
+      customPlanName, 
+      customPlanPrice, 
+      notes, 
+      status 
+    } = body;
 
-    // 1. Create or Update User
-    const user = await prisma.user.upsert({
-      where: { email },
-      update: { firstName, lastName, phone, role: "MEMBER" },
-      create: { firstName, lastName, email, phone, role: "MEMBER" }
-    });
+    if (!firstName || !phone) {
+      return new NextResponse("First Name and Phone are required", { status: 400 });
+    }
+
+    // 1. Find or Create User
+    // If email is provided, prioritize looking up by email, otherwise look up by phone.
+    let user = null;
+    if (email) {
+      user = await prisma.user.findUnique({ where: { email } });
+    }
+    if (!user && phone) {
+      user = await prisma.user.findUnique({ where: { phone } });
+    }
+
+    if (user) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          firstName,
+          lastName,
+          email: email || user.email,
+          phone,
+          role: "MEMBER"
+        }
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          firstName,
+          lastName,
+          email: email || null,
+          phone,
+          role: "MEMBER"
+        }
+      });
+    }
 
     // 2. Create Membership
     const start = startDate ? new Date(startDate) : new Date();
-    const end = new Date(start);
-    
-    // Simple logic for duration based on planTier (if we want to automate)
-    // For now just 1 month default if not specified
-    end.setMonth(end.getMonth() + 1);
+    let end = endDate ? new Date(endDate) : new Date(start);
+    if (!endDate) {
+      // Default: 1 month if no end date provided
+      end.setMonth(end.getMonth() + 1);
+    }
+
+    // Custom Plan / Normal Plan tier name
+    const finalPlanTier = customPlanName ? `${customPlanName} (₹${customPlanPrice || 0})` : planTier;
 
     await prisma.membership.create({
       data: {
         userId: user.id,
-        planTier,
-        status: "ACTIVE",
+        planTier: finalPlanTier || "STARTER",
+        status: status || "ACTIVE",
         startDate: start,
-        endDate: end
+        endDate: end,
+        notes: notes || null
       }
     });
 

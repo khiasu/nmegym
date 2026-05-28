@@ -65,7 +65,7 @@ export default function About({ settings }) {
               </svg>
             </div>
             <div className="feature-title">Expert Trainers</div>
-            <div className="feature-desc">Certified trainers who are invested in YOUR results.</div>
+            <div className="feature-desc">Trainers who are invested in YOUR results.</div>
           </div>
           {/* Feature 3 — Flexible Hours (clock SVG) */}
           <div className="feature-item">

@@ -155,24 +155,26 @@ export async function POST(request) {
       }
 
       // --- Send emails ---
-      if (isSessionPass) {
-        // Send daily pass confirmation email
-        const { sendDailyPassEmail } = await import("@/lib/mail");
-        await sendDailyPassEmail(user.email, user.firstName, payment.planName, Number(payment.amount));
-      } else if (initialPassword) {
-        // New member: send welcome email with credentials
-        const { sendWelcomeEmail } = await import("@/lib/mail");
-        await sendWelcomeEmail(user.email, user.firstName, memberId, initialPassword);
-      } else {
-        // Existing member: send payment confirmation email
-        const { sendPaymentConfirmationEmail } = await import("@/lib/mail");
-        await sendPaymentConfirmationEmail(
-          user.email,
-          user.firstName,
-          payment.planName,
-          Number(payment.amount),
-          memberId
-        );
+      if (user.email) {
+        if (isSessionPass) {
+          // Send daily pass confirmation email
+          const { sendDailyPassEmail } = await import("@/lib/mail");
+          await sendDailyPassEmail(user.email, user.firstName, payment.planName, Number(payment.amount));
+        } else if (initialPassword) {
+          // New member: send welcome email with credentials
+          const { sendWelcomeEmail } = await import("@/lib/mail");
+          await sendWelcomeEmail(user.email, user.firstName, memberId, initialPassword);
+        } else {
+          // Existing member: send payment confirmation email
+          const { sendPaymentConfirmationEmail } = await import("@/lib/mail");
+          await sendPaymentConfirmationEmail(
+            user.email,
+            user.firstName,
+            payment.planName,
+            Number(payment.amount),
+            memberId
+          );
+        }
       }
 
       return NextResponse.json({

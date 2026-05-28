@@ -54,7 +54,7 @@ model User {
   firstName     String?
   lastName      String?
   phone         String?      @unique
-  email         String       @unique
+  email         String?      @unique
   emailVerified DateTime?
   passwordHash  String?
   resetToken    String?      @unique
@@ -83,6 +83,7 @@ model Membership {
   status     String     @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
   startDate  DateTime?
   endDate    DateTime?
+  notes      String?    @db.Text
   reminder5DaySent Boolean @default(false)
   reminder1DaySent Boolean @default(false)
   createdAt  DateTime   @default(now())
