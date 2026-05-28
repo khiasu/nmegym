@@ -101,7 +101,7 @@ export default function Trainers({ trainers }) {
           marginTop: '10px',
           fontFamily: "'Barlow', sans-serif"
         }}>
-          Our trainers bring decades of experience. Every rep, every set guided by expertise that drives real transformation.
+          Our professional trainers bring decades of experience. Every rep, every set guided by expertise that drives real transformation.
         </p>
       </div>
 
