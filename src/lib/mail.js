@@ -237,12 +237,12 @@ export async function sendExpiryReminderEmail(email, name, daysLeft, endDate) {
               This is a quick reminder that your NME GYM membership is scheduled to expire in <strong style="color: ${urgencyColor};">${daysLeft} day${daysLeft > 1 ? 's' : ''}</strong> on <strong>${expiryDate}</strong>.
             </p>
             <p style="color: #ccc; line-height: 1.6;">
-              Please renew your membership to maintain uninterrupted access to the gym. You can log in to your dashboard to complete the renewal process.
+              Please renew your membership plan or annual renewal fee to maintain uninterrupted access to the gym. You can log in to your dashboard to complete the renewal process.
             </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXTAUTH_URL}/auth/login" style="display: inline-block; background: #e8001d; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; font-weight: bold;">RENEW MEMBERSHIP</a>
+              <a href="${process.env.NEXTAUTH_URL}/auth/login" style="display: inline-block; background: #e8001d; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; font-weight: bold;">RENEW MEMBERSHIP / ANNUAL FEE</a>
             </div>
-            <p style="color: #888; font-size: 13px;">If you've already renewed, please ignore this email while we verify your payment.</p>
+            <p style="color: #888; font-size: 13px;">If you've already renewed your plan and annual fee, please ignore this email while we verify your payment.</p>
           </div>
         </div>
       `,

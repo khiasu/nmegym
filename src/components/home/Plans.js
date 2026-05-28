@@ -46,7 +46,7 @@ export default function Plans({ plans, onOpenBooking, settings, offers }) {
           {/* Plans Grid (2x2) */}
           <div className="membership-plans">
             <div className="admission-banner reveal">
-              <span className="ab-dot"></span> ₹<span id="dynamicAdmissionFee">{(settings?.admissionFee || 1000).toLocaleString()}</span> ONE-TIME ADMISSION FEE APPLIES TO ALL PLANS
+              <span className="ab-dot"></span> ₹<span id="dynamicAdmissionFee">{(settings?.admissionFee || 1000).toLocaleString()}</span> ANNUAL RENEWAL ADMISSION FEE APPLIES TO ALL PLANS
             </div>
             <div className="plans-2x2-grid">
               {displayPlans.map((plan, i) => {

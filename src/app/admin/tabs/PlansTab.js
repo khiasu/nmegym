@@ -106,7 +106,7 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       <div className="admin-section-card" style={{ marginBottom: '25px', borderLeft: '4px solid var(--red)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
           <div>
-            <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>ONE-TIME ADMISSION FEE (₹)</label>
+            <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>ANNUAL RENEWAL ADMISSION FEE (₹)</label>
             <input 
               type="number" 
               className="admin-input" 

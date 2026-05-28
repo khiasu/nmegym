@@ -158,7 +158,7 @@ export default function CheckoutModal({ isOpen, onClose, selectedPlan, session, 
                 
                 {isFirstTimer && !isSessionPass && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <span style={{ color: 'var(--gray)', fontSize: '13px' }}>One-Time Admission Fee (New Member):</span>
+                    <span style={{ color: 'var(--gray)', fontSize: '13px' }}>Annual Admission Fee (New or Renewing Member):</span>
                     <span style={{ fontWeight: 'bold' }}>+ ₹{admissionFee.toLocaleString()}</span>
                   </div>
                 )}
