@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import DashboardTab from "./tabs/DashboardTab";
 import MembersTab from "./tabs/MembersTab";
@@ -18,7 +19,16 @@ import AlertModal from "@/components/ui/AlertModal";
 import ToastNotification from "@/components/ui/ToastNotification";
 
 export default function AdminClient(props) {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const urlTab = new URLSearchParams(window.location.search).get('tab');
+      if (urlTab && ['dashboard','registrations','members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(urlTab)) {
+        return urlTab;
+      }
+    }
+    return "dashboard";
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
@@ -48,6 +58,14 @@ export default function AdminClient(props) {
       setSettings(props.settings);
     }
   }, [props.settings]);
+  
+  // Sync tab with URL query param (e.g. /admin?tab=members)
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['dashboard','registrations','members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
   
   useEffect(() => {
     let lastScrollY = window.scrollY;

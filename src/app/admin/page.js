@@ -2,6 +2,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { Suspense } from "react";
 import AdminClient from "./AdminClient";
 
 export const dynamic = "force-dynamic";
@@ -64,17 +65,19 @@ export default async function AdminPage() {
 
   return (
     <div className="admin-container">
-      <AdminClient 
-        newRegistrations={serialize(newRegistrations)}
-        pendingPayments={serialize(pendingRenewals)}
-        verifiedPayments={serialize(verifiedPayments)}
-        settings={serializedSettings}
-        trainers={trainers}
-        plans={plans}
-        offers={offers}
-        members={members}
-        facilities={facilities}
-      />
+      <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050505' }}></div>}>
+        <AdminClient 
+          newRegistrations={serialize(newRegistrations)}
+          pendingPayments={serialize(pendingRenewals)}
+          verifiedPayments={serialize(verifiedPayments)}
+          settings={serializedSettings}
+          trainers={trainers}
+          plans={plans}
+          offers={offers}
+          members={members}
+          facilities={facilities}
+        />
+      </Suspense>
     </div>
   );
 }

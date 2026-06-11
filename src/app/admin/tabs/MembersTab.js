@@ -1,7 +1,7 @@
 // src/app/admin/tabs/MembersTab.js
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function MembersTab({ members: initialMembers, plans: availablePlans, settings, requestConfirmation, executeWithUndo, showToast }) {
@@ -252,8 +252,8 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=Hi%20${m.firstName},%20this%20is%20NME%20Gym.%20We%20wanted%20to%20update%20you%20on%20your%20membership.` : null;
 
                 return (
-                  <>
-                    <tr key={m.id}>
+                  <React.Fragment key={m.id}>
+                    <tr>
                       <td><span style={{fontFamily: 'monospace', color: 'var(--red)', fontSize: '11px'}}>{m.memberId || '—'}</span></td>
                       <td><strong>{m.firstName} {m.lastName}</strong></td>
                       <td>
@@ -307,7 +307,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>

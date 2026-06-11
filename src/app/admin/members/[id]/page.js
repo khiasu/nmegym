@@ -48,7 +48,8 @@ export default async function MemberProfilePage({ params }) {
   const plans = await prisma.plan.findMany({ orderBy: { price: "asc" } });
 
   // Fetch settings for gym name
-  const settings = await prisma.settings.findFirst();
+  const rawSettings = await prisma.settings.findFirst();
+  const settings = rawSettings ? { ...rawSettings, updatedAt: rawSettings.updatedAt.toISOString() } : null;
 
   // Serialize Decimal fields from payments
   const serializedMember = {
