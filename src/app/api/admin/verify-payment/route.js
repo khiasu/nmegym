@@ -6,38 +6,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-
-/**
- * Generate a sequential human-readable member ID like NME-001, NME-002, etc.
- */
-async function generateMemberId() {
-  const lastUser = await prisma.user.findFirst({
-    where: { memberId: { not: null } },
-    orderBy: { memberId: "desc" },
-  });
-
-  let nextNumber = 1;
-  if (lastUser?.memberId) {
-    const match = lastUser.memberId.match(/NME-(\d+)/);
-    if (match) {
-      nextNumber = parseInt(match[1], 10) + 1;
-    }
-  }
-
-  return `NME-${String(nextNumber).padStart(3, "0")}`;
-}
-
-/**
- * Generate a random 8-character password
- */
-function generatePassword() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-  let password = "";
-  for (let i = 0; i < 8; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
+import { generateMemberId, generatePassword } from "@/lib/member-utils";
 
 export async function POST(request) {
   try {

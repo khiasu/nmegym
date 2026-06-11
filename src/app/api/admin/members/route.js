@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
+import { generateMemberId, generatePassword } from "@/lib/member-utils";
 
 export async function GET() {
   const session = await auth();
@@ -86,6 +87,34 @@ export async function POST(req) {
       });
     }
 
+    // Custom Plan / Normal Plan tier name
+    const finalPlanTier = customPlanName ? `${customPlanName} (₹${customPlanPrice || 0})` : planTier;
+    const planLower = (finalPlanTier || "").toLowerCase();
+    const isSessionPass = planLower.includes("session") || planLower.includes("daily") || planLower.includes("pass");
+
+    // Generate Member ID and temporary password if it's not a session pass
+    let memberId = user.memberId;
+    let initialPassword = null;
+
+    if (!isSessionPass) {
+      if (!memberId) {
+        memberId = await generateMemberId();
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { memberId }
+        });
+      }
+
+      if (!user.passwordHash) {
+        initialPassword = generatePassword();
+        const hashedPw = await bcrypt.hash(initialPassword, 10);
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { passwordHash: hashedPw }
+        });
+      }
+    }
+
     // 2. Create Membership
     const start = startDate ? new Date(startDate) : new Date();
     let end = endDate ? new Date(endDate) : new Date(start);
@@ -93,9 +122,6 @@ export async function POST(req) {
       // Default: 1 month if no end date provided
       end.setMonth(end.getMonth() + 1);
     }
-
-    // Custom Plan / Normal Plan tier name
-    const finalPlanTier = customPlanName ? `${customPlanName} (₹${customPlanPrice || 0})` : planTier;
 
     await prisma.membership.create({
       data: {
@@ -108,7 +134,12 @@ export async function POST(req) {
       }
     });
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      ...user,
+      initialPassword,
+      memberId,
+      isNewMember: !!initialPassword
+    });
   } catch (error) {
     console.error("MEMBER_CREATE_ERROR", error);
     return new NextResponse("Internal Error", { status: 500 });

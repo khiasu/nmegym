@@ -18,9 +18,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          console.log(`[AUTH] Attempting login for: ${credentials.email}`);
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email.toLowerCase().trim() },
+          const loginInput = credentials.email.trim();
+          console.log(`[AUTH] Attempting login for input: ${loginInput}`);
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { email: loginInput.toLowerCase() },
+                { memberId: loginInput.toUpperCase() },
+                { memberId: loginInput }
+              ]
+            }
           });
  
           if (!user || !user.passwordHash) {

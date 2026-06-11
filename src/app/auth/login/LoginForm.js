@@ -67,12 +67,12 @@ export default function LoginForm({ settings }) {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-field">
-          <label htmlFor="email">{isAdmin ? "Admin Email / ID" : "Email Address"}</label>
+          <label htmlFor="email">{isAdmin ? "Admin Email / ID" : "Email Address or Member ID"}</label>
           <input
             id="email"
             name="email"
-            type="email"
-            placeholder={isAdmin ? "admin@nmegym.in" : "you@example.com"}
+            type="text"
+            placeholder={isAdmin ? "admin@nmegym.in" : "you@example.com or NME-001"}
             required
           />
         </div>
@@ -101,7 +101,7 @@ export default function LoginForm({ settings }) {
 
       {!isAdmin && (
         <p className="auth-note">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/auth/register" style={{ color: "var(--red)", fontWeight: 600 }}>
             Register Now
           </Link>
