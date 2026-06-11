@@ -269,6 +269,59 @@ export default function DashboardClient({ user, plans, settings, offers }) {
               </div>
 
 
+              {/* Membership History Card */}
+              {user.memberships?.length > 1 && (
+                <div className="db-card" style={{gridColumn: "span 2"}}>
+                  <h3>Membership History</h3>
+                  <div className="db-table-desktop" style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table className="db-table" style={{ minWidth: '500px' }}>
+                      <thead>
+                        <tr>
+                          <th>Plan</th>
+                          <th>Start</th>
+                          <th>End</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {user.memberships.map((ms, idx) => (
+                          <tr key={ms.id} style={{ background: idx === 0 ? "rgba(232,0,29,0.05)" : "transparent" }}>
+                            <td style={{ fontWeight: idx === 0 ? "700" : "400", color: idx === 0 ? "white" : "#888" }}>
+                              {ms.planTier}
+                              {idx === 0 && <span style={{ marginLeft: "8px", fontSize: "9px", background: "var(--red)", color: "white", padding: "2px 6px", borderRadius: "10px", verticalAlign: "middle" }}>CURRENT</span>}
+                            </td>
+                            <td>{ms.startDate ? new Date(ms.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</td>
+                            <td>{ms.endDate ? new Date(ms.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</td>
+                            <td>
+                              <span className={`tag-${ms.status?.toLowerCase()}`}>
+                                {ms.status === "ACTIVE" ? "✓ Active" : ms.status === "EXPIRED" ? "Expired" : ms.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Mobile view */}
+                  <div className="db-mobile-list">
+                    {user.memberships.map((ms, idx) => (
+                      <div key={ms.id} className="payment-card" style={{ textAlign: 'center', padding: '20px 15px', borderLeft: idx === 0 ? "3px solid var(--red)" : "3px solid #333" }}>
+                        <div style={{ fontSize: '16px', fontWeight: '700', color: idx === 0 ? 'white' : '#888', marginBottom: '6px', fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '1px' }}>
+                          {ms.planTier}
+                          {idx === 0 && <span style={{ marginLeft: "8px", fontSize: "9px", background: "var(--red)", color: "white", padding: "2px 6px", borderRadius: "10px" }}>CURRENT</span>}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+                          {ms.startDate ? new Date(ms.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"} → {ms.endDate ? new Date(ms.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}
+                        </div>
+                        <span className={`tag-${ms.status?.toLowerCase()}`}>
+                          {ms.status === "ACTIVE" ? "✓ Active" : ms.status === "EXPIRED" ? "Expired" : ms.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Pending Payments */}
               {user.payments?.some(p => p.status === "PENDING_VERIFICATION") && (
                 <div className="db-card" style={{gridColumn: "span 2", borderLeft: "3px solid #ffc800"}}>
@@ -690,6 +743,9 @@ export default function DashboardClient({ user, plans, settings, offers }) {
         
         .tag-pending-verification, .tag-pending_verification { color: #888; }
         .tag-verified { color: #00ff64; }
+        .tag-active { color: #00ff64; }
+        .tag-expired { color: #888; }
+        .tag-cancelled { color: var(--red); }
         .tag-rejected { color: var(--red); }
         
         .testi-form-container { width: 100%; max-width: 800px; margin: 0 auto; text-align: left; }

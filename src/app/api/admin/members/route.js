@@ -115,14 +115,20 @@ export async function POST(req) {
       }
     }
 
-    // 2. Create Membership
+    // 2. Expire any currently active memberships (preserves history)
+    await prisma.membership.updateMany({
+      where: { userId: user.id, status: "ACTIVE" },
+      data: { status: "EXPIRED" },
+    });
+
+    // 3. Calculate dates
     const start = startDate ? new Date(startDate) : new Date();
     let end = endDate ? new Date(endDate) : new Date(start);
     if (!endDate) {
-      // Default: 1 month if no end date provided
       end.setMonth(end.getMonth() + 1);
     }
 
+    // 4. Create new Membership record
     await prisma.membership.create({
       data: {
         userId: user.id,

@@ -99,29 +99,24 @@ export async function POST(request) {
         endDate.setMonth(startDate.getMonth() + 1);
       }
 
-      const existingMembership = await prisma.membership.findFirst({
-        where: { userId: user.id },
-        orderBy: { createdAt: "desc" },
-      });
-
       const planTier = payment.planName || "MEMBER";
 
-      if (existingMembership) {
-        await prisma.membership.update({
-          where: { id: existingMembership.id },
-          data: { status: "ACTIVE", planTier, startDate, endDate },
-        });
-      } else {
-        await prisma.membership.create({
-          data: {
-            userId: user.id,
-            status: "ACTIVE",
-            planTier,
-            startDate,
-            endDate,
-          },
-        });
-      }
+      // Expire any currently active memberships (preserves history)
+      await prisma.membership.updateMany({
+        where: { userId: user.id, status: "ACTIVE" },
+        data: { status: "EXPIRED" },
+      });
+
+      // Always create a new membership record for full history tracking
+      await prisma.membership.create({
+        data: {
+          userId: user.id,
+          status: "ACTIVE",
+          planTier,
+          startDate,
+          endDate,
+        },
+      });
 
       // --- Send emails ---
       if (user.email) {

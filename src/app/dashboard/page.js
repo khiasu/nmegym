@@ -18,7 +18,6 @@ export default async function DashboardPage() {
     include: {
       memberships: {
         orderBy: { createdAt: "desc" },
-        take: 1,
       },
       payments: {
         orderBy: { createdAt: "desc" },
