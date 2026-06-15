@@ -241,7 +241,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 const membership = m.memberships?.[0];
                 const plan = membership?.planTier || "N/A";
                 const isActive = membership?.status === "ACTIVE";
-                const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const joinDate = new Date(membership?.startDate || m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                 const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
                 const hasNotes = !!membership?.notes;
                 const isExpanded = !!expandedNotes[m.id];
@@ -327,7 +327,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
               {dailyMembers.map(m => {
                 const membership = m.memberships?.[0];
                 const isActive = membership?.status === "ACTIVE" && new Date(membership.endDate) > new Date();
-                const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const joinDate = new Date(membership?.startDate || m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                 const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
                 
                 const cleanPhone = (m.phone || "").replace(/\D/g, "");
