@@ -36,7 +36,7 @@ export default async function AdminPage() {
     prisma.offer.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.user.findMany({
       where: { role: "MEMBER" },
-      include: { memberships: true },
+      include: { memberships: { orderBy: { createdAt: "desc" } } },
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.findMany({
