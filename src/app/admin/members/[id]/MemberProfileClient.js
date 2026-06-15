@@ -11,6 +11,68 @@ export default function MemberProfileClient({ member, plans, settings }) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [isCustomPlan, setIsCustomPlan] = useState(false);
   const [actionType, setActionType] = useState("correct"); // "correct" or "renew"
+  const [showCredsModal, setShowCredsModal] = useState(false);
+  const [savedCreds, setSavedCreds] = useState(null);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function handleResetCredentials() {
+    try {
+      const res = await fetch("/api/admin/reset-credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: member.id })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedCreds(data);
+        setShowCredsModal(true);
+      } else {
+        const txt = await res.text();
+        alert("Error resetting credentials: " + txt);
+      }
+    } catch (err) {
+      alert("Failed to reset credentials");
+    }
+  }
+
+  async function handleSendEmailCreds() {
+    if (!savedCreds || !savedCreds.email) return;
+    setEmailSending(true);
+    setEmailSent(false);
+    try {
+      const res = await fetch("/api/admin/send-credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: savedCreds.email,
+          name: `${savedCreds.firstName} ${savedCreds.lastName || ""}`.trim(),
+          memberId: savedCreds.memberId,
+          password: savedCreds.initialPassword
+        })
+      });
+      if (res.ok) {
+        setEmailSent(true);
+      } else {
+        alert("Failed to send email credentials");
+      }
+    } catch (err) {
+      alert("Error sending email credentials");
+    } finally {
+      setEmailSending(false);
+    }
+  }
+
+  function handleCopyCreds() {
+    if (!savedCreds) return;
+    const loginUrl = `${window.location.origin}/auth/login`;
+    const text = `Hi ${savedCreds.firstName}, your account at ${settings?.gymName || "NME GYM"} is active.\n\nLogin URL: ${loginUrl}\nUsername (Member ID/Email/Phone): ${savedCreds.memberId}\nTemporary Password: ${savedCreds.initialPassword || "(already set)"}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   const [formData, setFormData] = useState({
     planTier: plans?.[0]?.name || "STARTER",
     customPlanName: "",
@@ -265,12 +327,23 @@ export default function MemberProfileClient({ member, plans, settings }) {
                 No valid WhatsApp number
               </div>
             )}
-            <button
+             <button
               className="admin-btn-sm"
               style={{ background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.3)", color: "#00c8ff", padding: "12px", flex: 1 }}
               onClick={toggleEditForm}
             >
               {showEditForm ? "✕ CANCEL" : "✎ EDIT PLAN"}
+            </button>
+            <button
+              className="admin-btn-sm"
+              style={{ background: "rgba(255,190,0,0.1)", border: "1px solid rgba(255,190,0,0.3)", color: "#ffbe00", padding: "12px", flex: 1 }}
+              onClick={() => {
+                if(confirm("Are you sure you want to reset this member's login credentials? This will generate a new temporary password and force them to change it on their next login.")) {
+                  handleResetCredentials();
+                }
+              }}
+            >
+              🔑 RESET CREDS
             </button>
           </div>
         </div>
@@ -533,6 +606,171 @@ export default function MemberProfileClient({ member, plans, settings }) {
                 disabled={deleting}
               >
                 {deleting ? "DELETING..." : "DELETE RECORD"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CREDENTIALS SHARE MODAL */}
+      {showCredsModal && savedCreds && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(0,0,0,0.85)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 99999
+        }}>
+          <div className="elite-card" style={{
+            padding: "30px",
+            width: "90%",
+            maxWidth: "450px",
+            textAlign: "center",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "12px",
+            background: "rgba(20,20,20,0.95)",
+            animation: "slideDownFade 0.2s ease-out forwards",
+            margin: 0
+          }}>
+            <div style={{ fontSize: "40px", color: "#25D366", marginBottom: "15px" }}>✓</div>
+            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "24px", color: "white", marginBottom: "10px", letterSpacing: "1.5px" }}>
+              CREDENTIALS RESET SUCCESSFULLY
+            </h3>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginBottom: "20px" }}>
+              The member's login credentials have been reset. Share their details below:
+            </p>
+
+            <div style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "8px",
+              padding: "16px",
+              textAlign: "left",
+              marginBottom: "24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px"
+            }}>
+              <div>
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", display: "block" }}>Name</span>
+                <strong style={{ fontSize: "14px", color: "white" }}>{savedCreds.firstName} {savedCreds.lastName || ""}</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", display: "block" }}>Member ID</span>
+                  <span style={{ fontFamily: "monospace", fontSize: "14px", color: "var(--red)", fontWeight: "bold" }}>
+                    {savedCreds.memberId || "—"}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", display: "block" }}>Phone</span>
+                  <span style={{ fontSize: "13px", color: "white" }}>{savedCreds.phone}</span>
+                </div>
+              </div>
+              <div>
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", display: "block" }}>New Temporary Password</span>
+                <strong style={{ fontFamily: "monospace", fontSize: "15px", color: "#25D366", letterSpacing: "1px" }}>
+                  {savedCreds.initialPassword}
+                </strong>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {(() => {
+                const cleanPhone = (savedCreds.phone || "").replace(/\D/g, "");
+                const gymName = settings?.gymName || "NME GYM";
+                const loginUrl = `${window.location.origin}/auth/login`;
+                
+                const waMessage = `Hi ${savedCreds.firstName}, your login credentials at ${gymName} have been reset.\n\nLogin credentials:\nMember ID: ${savedCreds.memberId}\nNew Temporary Password: ${savedCreds.initialPassword}\n\nYou can sign in at ${loginUrl} and change your password on first login.\n\nLet's grind! 🏋️‍♂️`;
+
+                const encodedMessage = encodeURIComponent(waMessage);
+                const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodedMessage}` : null;
+
+                if (!waLink) return null;
+
+                return (
+                  <a 
+                    href={waLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="admin-btn-sm" 
+                    style={{ 
+                      background: "#25D366", 
+                      borderColor: "#25D366", 
+                      color: "white", 
+                      fontWeight: "bold",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      padding: "12px"
+                    }}
+                  >
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.364a9.92 9.92 0 0 0 4.804 1.232h.006c5.505 0 9.99-4.478 9.99-9.985a9.97 9.97 0 0 0-2.927-7.062A9.92 9.92 0 0 0 12.012 2zm5.772 14.195c-.32.9-1.84 1.76-2.54 1.87-.6.09-1.38.16-3.89-.87-3.21-1.32-5.24-4.57-5.4-4.78-.17-.22-1.35-1.78-1.35-3.4 0-1.62.83-2.42 1.13-2.73.25-.26.66-.38.96-.38.1 0 .21 0 .3.01.27.01.41.03.6.48.24.58.83 2.01.9 2.16.07.15.12.33.02.53-.1.2-.15.33-.3.49-.15.17-.32.38-.45.51-.15.15-.31.32-.13.63.18.3.8 1.32 1.72 2.14 1.19 1.06 2.19 1.39 2.5 1.54.31.15.49.12.68-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.75-.15.31.12 1.96.93 2.3 1.09.34.16.57.24.65.38.09.14.09.81-.23 1.71z"/>
+                    </svg>
+                    SEND VIA WHATSAPP
+                  </a>
+                );
+              })()}
+
+              {savedCreds.email ? (
+                <button
+                  onClick={handleSendEmailCreds}
+                  disabled={emailSending || emailSent}
+                  className="admin-btn-sm"
+                  style={{
+                    background: emailSent ? "rgba(0, 200, 255, 0.2)" : "rgba(232,0,29,0.1)",
+                    border: "1px solid rgba(232,0,29,0.3)",
+                    color: emailSent ? "#00c8ff" : "white",
+                    padding: "12px",
+                    fontWeight: "bold",
+                    cursor: "pointer"
+                  }}
+                >
+                  {emailSending ? "SENDING EMAIL..." : emailSent ? "✓ EMAIL SENT" : "✉ SEND VIA EMAIL"}
+                </button>
+              ) : (
+                <div style={{ padding: "8px", background: "rgba(255,255,255,0.03)", borderRadius: "6px", fontSize: "11px", color: "gray" }}>
+                  No email address available to send credentials.
+                </div>
+              )}
+
+              <button
+                onClick={handleCopyCreds}
+                className="admin-btn-sm"
+                style={{
+                  background: copied ? "rgba(0, 255, 100, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  color: copied ? "#00ff64" : "white",
+                  padding: "12px",
+                  fontWeight: "bold"
+                }}
+              >
+                {copied ? "✓ CREDENTIALS COPIED" : "📋 COPY CREDENTIALS (FOR SMS)"}
+              </button>
+
+              <button 
+                className="admin-btn-sm outline" 
+                style={{ 
+                  borderColor: "rgba(255,255,255,0.2)", 
+                  color: "#fff",
+                  padding: "10px",
+                  marginTop: "12px"
+                }} 
+                onClick={() => {
+                  setShowCredsModal(false);
+                  setEmailSent(false);
+                  setCopied(false);
+                  window.location.reload();
+                }}
+              >
+                CLOSE & REFRESH
               </button>
             </div>
           </div>

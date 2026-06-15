@@ -23,22 +23,31 @@ export async function POST(request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { passwordHash: true },
+      select: { passwordHash: true, mustChangePassword: true },
     });
 
-    if (!user?.passwordHash) {
+    if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
-    if (!isValid) {
-      return NextResponse.json({ error: "Current password is incorrect" }, { status: 403 });
+    // Bypass check if mustChangePassword is true
+    if (!user.mustChangePassword) {
+      if (!currentPassword) {
+        return NextResponse.json({ error: "Current password is required" }, { status: 400 });
+      }
+      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValid) {
+        return NextResponse.json({ error: "Current password is incorrect" }, { status: 403 });
+      }
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { passwordHash: newHash },
+      data: { 
+        passwordHash: newHash,
+        mustChangePassword: false
+      },
     });
 
     return NextResponse.json({ success: true, message: "Password updated successfully" });

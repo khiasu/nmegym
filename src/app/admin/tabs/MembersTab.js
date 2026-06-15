@@ -17,6 +17,45 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
   // Credentials Modal States
   const [showCredsModal, setShowCredsModal] = useState(false);
   const [savedCreds, setSavedCreds] = useState(null);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function handleSendEmailCreds() {
+    if (!savedCreds || !savedCreds.email) return;
+    setEmailSending(true);
+    setEmailSent(false);
+    try {
+      const res = await fetch("/api/admin/send-credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: savedCreds.email,
+          name: `${savedCreds.firstName} ${savedCreds.lastName || ""}`.trim(),
+          memberId: savedCreds.memberId,
+          password: savedCreds.initialPassword
+        })
+      });
+      if (res.ok) {
+        setEmailSent(true);
+      } else {
+        alert("Failed to send email credentials");
+      }
+    } catch (err) {
+      alert("Error sending email credentials");
+    } finally {
+      setEmailSending(false);
+    }
+  }
+
+  function handleCopyCreds() {
+    if (!savedCreds) return;
+    const loginUrl = `${window.location.origin}/auth/login`;
+    const text = `Hi ${savedCreds.firstName}, your account at ${settings?.gymName || "NME GYM"} is active.\n\nLogin URL: ${loginUrl}\nUsername (Member ID/Email/Phone): ${savedCreds.memberId}\nTemporary Password: ${savedCreds.initialPassword || "(already set)"}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
   
   // Form State
   const [formData, setFormData] = useState({
@@ -481,20 +520,59 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.364a9.92 9.92 0 0 0 4.804 1.232h.006c5.505 0 9.99-4.478 9.99-9.985a9.97 9.97 0 0 0-2.927-7.062A9.92 9.92 0 0 0 12.012 2zm5.772 14.195c-.32.9-1.84 1.76-2.54 1.87-.6.09-1.38.16-3.89-.87-3.21-1.32-5.24-4.57-5.4-4.78-.17-.22-1.35-1.78-1.35-3.4 0-1.62.83-2.42 1.13-2.73.25-.26.66-.38.96-.38.1 0 .21 0 .3.01.27.01.41.03.6.48.24.58.83 2.01.9 2.16.07.15.12.33.02.53-.1.2-.15.33-.3.49-.15.17-.32.38-.45.51-.15.15-.31.32-.13.63.18.3.8 1.32 1.72 2.14 1.19 1.06 2.19 1.39 2.5 1.54.31.15.49.12.68-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.75-.15.31.12 1.96.93 2.3 1.09.34.16.57.24.65.38.09.14.09.81-.23 1.71z"/>
                     </svg>
-                    SEND TO MEMBER VIA WHATSAPP
+                    SEND VIA WHATSAPP
                   </a>
                 );
               })()}
+
+              {savedCreds.email ? (
+                <button
+                  onClick={handleSendEmailCreds}
+                  disabled={emailSending || emailSent}
+                  className="admin-btn-sm"
+                  style={{
+                    background: emailSent ? "rgba(0, 200, 255, 0.2)" : "rgba(232,0,29,0.1)",
+                    border: "1px solid rgba(232,0,29,0.3)",
+                    color: emailSent ? "#00c8ff" : "white",
+                    padding: "12px",
+                    fontWeight: "bold",
+                    cursor: "pointer"
+                  }}
+                >
+                  {emailSending ? "SENDING EMAIL..." : emailSent ? "✓ EMAIL SENT" : "✉ SEND VIA EMAIL"}
+                </button>
+              ) : (
+                <div style={{ padding: "8px", background: "rgba(255,255,255,0.03)", borderRadius: "6px", fontSize: "11px", color: "gray" }}>
+                  No email address available to send credentials.
+                </div>
+              )}
+
+              <button
+                onClick={handleCopyCreds}
+                className="admin-btn-sm"
+                style={{
+                  background: copied ? "rgba(0, 255, 100, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  color: copied ? "#00ff64" : "white",
+                  padding: "12px",
+                  fontWeight: "bold"
+                }}
+              >
+                {copied ? "✓ CREDENTIALS COPIED" : "📋 COPY CREDENTIALS (FOR SMS)"}
+              </button>
 
               <button 
                 className="admin-btn-sm outline" 
                 style={{ 
                   borderColor: "rgba(255,255,255,0.2)", 
                   color: "#fff",
-                  padding: "10px" 
+                  padding: "10px",
+                  marginTop: "12px"
                 }} 
                 onClick={() => {
                   setShowCredsModal(false);
+                  setEmailSent(false);
+                  setCopied(false);
                   window.location.reload();
                 }}
               >

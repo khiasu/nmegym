@@ -23,6 +23,47 @@ export default function DashboardClient({ user, plans, settings, offers }) {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMessage, setPwMessage] = useState({ text: "", type: "" });
 
+  // Forced password change (first login) state
+  const [mustChange, setMustChange] = useState(user.mustChangePassword);
+  const [forcedPwForm, setForcedPwForm] = useState({ new: "", confirm: "" });
+  const [forcedPwLoading, setForcedPwLoading] = useState(false);
+  const [forcedPwError, setForcedPwError] = useState("");
+
+  async function handleForcedPasswordChange(e) {
+    e.preventDefault();
+    setForcedPwError("");
+
+    if (forcedPwForm.new !== forcedPwForm.confirm) {
+      setForcedPwError("New passwords do not match.");
+      return;
+    }
+    if (forcedPwForm.new.length < 6) {
+      setForcedPwError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setForcedPwLoading(true);
+    try {
+      const res = await fetch("/api/user/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: "", newPassword: forcedPwForm.new }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMustChange(false);
+        alert("Password updated successfully! Welcome to the portal.");
+        window.location.reload();
+      } else {
+        setForcedPwError(data.error || "Failed to update password.");
+      }
+    } catch {
+      setForcedPwError("Network error. Please try again.");
+    } finally {
+      setForcedPwLoading(false);
+    }
+  }
+
   // Testimonial State
   const [testiContent, setTestiContent] = useState("");
   const [testiRating, setTestiRating] = useState(5);
@@ -177,6 +218,70 @@ export default function DashboardClient({ user, plans, settings, offers }) {
 
   return (
     <div className="db-layout">
+      {mustChange && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(5, 5, 5, 0.98)",
+          backdropFilter: "blur(12px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 999999
+        }}>
+          <div className="elite-card" style={{
+            padding: "40px",
+            width: "90%",
+            maxWidth: "450px",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.8)",
+            border: "1px solid rgba(232, 0, 29, 0.3)",
+            borderRadius: "16px",
+            background: "#111",
+            textAlign: "center"
+          }}>
+            <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "32px", color: "white", marginBottom: "10px", letterSpacing: "1.5px" }}>
+              UPDATE YOUR PASSWORD
+            </h2>
+            <p style={{ fontSize: "14px", color: "#888", marginBottom: "30px", lineHeight: "1.5" }}>
+              This is your first time logging in with a temporary password. For security, please set a new personal password to access your portal.
+            </p>
+            
+            <form onSubmit={handleForcedPasswordChange} style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div>
+                <label style={{ display: "block", color: "#666", fontSize: "11px", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>New Password</label>
+                <input 
+                  type="password" 
+                  required 
+                  value={forcedPwForm.new} 
+                  onChange={e => setForcedPwForm({...forcedPwForm, new: e.target.value})} 
+                  style={{ width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px" }} 
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", color: "#666", fontSize: "11px", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Confirm New Password</label>
+                <input 
+                  type="password" 
+                  required 
+                  value={forcedPwForm.confirm} 
+                  onChange={e => setForcedPwForm({...forcedPwForm, confirm: e.target.value})} 
+                  style={{ width: "100%", background: "#1a1a1a", border: "1px solid #333", color: "white", padding: "12px", borderRadius: "6px" }} 
+                />
+              </div>
+              {forcedPwError && (
+                <p style={{ color: "#ff4444", fontSize: "13px", margin: 0 }}>⚠️ {forcedPwError}</p>
+              )}
+              <button 
+                type="submit" 
+                className="btn-primary" 
+                disabled={forcedPwLoading} 
+                style={{ width: "100%", padding: "14px", fontWeight: "bold", marginTop: "10px" }}
+              >
+                {forcedPwLoading ? "SAVING PASSWORD..." : "SAVE & ENTER PORTAL"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       {/* Legacy sidebar removed — Using toggle menu exclusively */}
 
       {/* Redundant toggle removed — Header toggle is the only one now */}
