@@ -20,10 +20,15 @@ export default function MemberProfileClient({ member, plans, settings }) {
     status: "ACTIVE"
   });
 
-  const latestMembership = member.memberships[0];
+  const [memberData, setMemberData] = useState(member);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const latestMembership = memberData.memberships[0];
   const isActive = latestMembership?.status === "ACTIVE";
-  const joinDate = new Date(member.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const joinYear = new Date(member.createdAt).getFullYear();
+  const joinDate = latestMembership?.startDate
+    ? new Date(latestMembership.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    : "—";
 
   // WhatsApp Link generation
   const cleanPhone = (member.phone || "").replace(/\D/g, "");
@@ -102,6 +107,31 @@ export default function MemberProfileClient({ member, plans, settings }) {
     }
   }
 
+  async function handleDeleteHistory(membershipId) {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/membership-history?id=${membershipId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        // Remove from local state immediately
+        setMemberData(prev => ({
+          ...prev,
+          memberships: prev.memberships.filter(ms => ms.id !== membershipId),
+        }));
+        setDeleteConfirm(null);
+        router.refresh();
+      } else {
+        const txt = await res.text();
+        alert("Error: " + txt);
+      }
+    } catch (err) {
+      alert("Failed to delete history record");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <>
       {/* Header section */}
@@ -149,12 +179,8 @@ export default function MemberProfileClient({ member, plans, settings }) {
                 <span style={{ color: "white", fontSize: "14px" }}>{joinDate}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "gray", fontSize: "12px", textTransform: "uppercase" }}>Year Joined</span>
-                <span style={{ color: "var(--red)", fontSize: "14px", fontWeight: "bold" }}>{joinYear}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "gray", fontSize: "12px", textTransform: "uppercase" }}>Total Renewals</span>
-                <span style={{ color: "white", fontSize: "14px" }}>{member.memberships.length}</span>
+                <span style={{ color: "white", fontSize: "14px" }}>{memberData.memberships.length}</span>
               </div>
             </div>
           </div>
@@ -310,10 +336,10 @@ export default function MemberProfileClient({ member, plans, settings }) {
       <div className="admin-section-card">
         <div className="admin-section-card-header">
           <span className="admin-section-card-title">Complete Membership History</span>
-          <span style={{ fontSize: "12px", color: "gray" }}>{member.memberships.length} Records</span>
+          <span style={{ fontSize: "12px", color: "gray" }}>{memberData.memberships.length} Records</span>
         </div>
 
-        {member.memberships.length > 0 ? (
+        {memberData.memberships.length > 0 ? (
           <div className="elite-table-wrapper">
             <table className="admin-table">
               <thead>
@@ -324,11 +350,13 @@ export default function MemberProfileClient({ member, plans, settings }) {
                   <th>Status</th>
                   <th>Notes</th>
                   <th>Recorded On</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {member.memberships.map((ms, index) => {
+                {memberData.memberships.map((ms, index) => {
                   const isCurrent = index === 0;
+                  const isOnlyActive = isCurrent && ms.status === "ACTIVE" && memberData.memberships.filter(m => m.status === "ACTIVE").length <= 1;
                   return (
                     <tr key={ms.id} style={{ background: isCurrent ? "rgba(232,0,29,0.05)" : "transparent" }}>
                       <td>
@@ -348,6 +376,23 @@ export default function MemberProfileClient({ member, plans, settings }) {
                       <td style={{ color: "gray", fontSize: "12px" }}>
                         {new Date(ms.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
+                      <td>
+                        {isOnlyActive ? (
+                          <span style={{ fontSize: "10px", color: "gray", fontStyle: "italic" }}>Protected</span>
+                        ) : (
+                          <button
+                            className="admin-toggle-btn"
+                            title="Delete this history record"
+                            onClick={() => setDeleteConfirm(ms.id)}
+                            style={{ padding: "4px" }}
+                          >
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -360,6 +405,58 @@ export default function MemberProfileClient({ member, plans, settings }) {
           </div>
         )}
       </div>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteConfirm && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(0,0,0,0.85)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 99999
+        }}>
+          <div className="elite-card" style={{
+            padding: "30px",
+            width: "90%",
+            maxWidth: "420px",
+            textAlign: "center",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "12px",
+            background: "rgba(20,20,20,0.95)",
+            animation: "slideDownFade 0.2s ease-out forwards",
+          }}>
+            <div style={{ fontSize: "36px", marginBottom: "12px" }}>⚠️</div>
+            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "22px", color: "white", marginBottom: "10px", letterSpacing: "1.5px" }}>
+              DELETE HISTORY RECORD
+            </h3>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginBottom: "24px", lineHeight: "1.5" }}>
+              Are you sure you want to delete this membership history record? This action cannot be undone. The member account and other records will not be affected.
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+              <button
+                className="admin-btn-sm outline"
+                style={{ padding: "10px 20px", borderColor: "rgba(255,255,255,0.2)", color: "#fff" }}
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deleting}
+              >
+                CANCEL
+              </button>
+              <button
+                className="admin-btn-sm"
+                style={{ padding: "10px 20px", background: "var(--red)", borderColor: "var(--red)", color: "white", fontWeight: "bold" }}
+                onClick={() => handleDeleteHistory(deleteConfirm)}
+                disabled={deleting}
+              >
+                {deleting ? "DELETING..." : "DELETE RECORD"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
