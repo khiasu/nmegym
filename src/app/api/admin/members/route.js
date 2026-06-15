@@ -128,6 +128,37 @@ export async function POST(req) {
       end.setMonth(end.getMonth() + 1);
     }
 
+    // Check for duplicate history entry with identical plan details and dates
+    const latestMembership = await prisma.membership.findFirst({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" }
+    });
+
+    if (latestMembership) {
+      const isDuplicate =
+        latestMembership.planTier === (finalPlanTier || "STARTER") &&
+        latestMembership.status === (status || "ACTIVE") &&
+        latestMembership.startDate && new Date(latestMembership.startDate).getTime() === start.getTime() &&
+        latestMembership.endDate && new Date(latestMembership.endDate).getTime() === end.getTime();
+
+      if (isDuplicate) {
+        // Update existing record with notes/etc. instead of duplicating
+        await prisma.membership.update({
+          where: { id: latestMembership.id },
+          data: {
+            notes: notes || latestMembership.notes
+          }
+        });
+
+        return NextResponse.json({
+          ...user,
+          initialPassword,
+          memberId,
+          isNewMember: !!initialPassword
+        });
+      }
+    }
+
     // 4. Create new Membership record
     await prisma.membership.create({
       data: {
@@ -148,6 +179,55 @@ export async function POST(req) {
     });
   } catch (error) {
     console.error("MEMBER_CREATE_ERROR", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
+export async function PUT(req) {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { 
+      membershipId,
+      planTier,
+      customPlanName,
+      customPlanPrice,
+      startDate,
+      endDate,
+      notes,
+      status 
+    } = body;
+
+    if (!membershipId) {
+      return new NextResponse("Membership ID is required", { status: 400 });
+    }
+
+    // Custom Plan / Normal Plan tier name
+    const finalPlanTier = customPlanName ? `${customPlanName} (₹${customPlanPrice || 0})` : planTier;
+
+    // Calculate dates
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    // Update the membership record
+    const updatedMembership = await prisma.membership.update({
+      where: { id: membershipId },
+      data: {
+        planTier: finalPlanTier || "STARTER",
+        status: status || "ACTIVE",
+        startDate: start,
+        endDate: end,
+        notes: notes || null
+      }
+    });
+
+    return NextResponse.json(updatedMembership);
+  } catch (error) {
+    console.error("MEMBERSHIP_UPDATE_ERROR", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

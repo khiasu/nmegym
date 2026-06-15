@@ -10,6 +10,7 @@ export default function MemberProfileClient({ member, plans, settings }) {
   const [loading, setLoading] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [isCustomPlan, setIsCustomPlan] = useState(false);
+  const [actionType, setActionType] = useState("correct"); // "correct" or "renew"
   const [formData, setFormData] = useState({
     planTier: plans?.[0]?.name || "STARTER",
     customPlanName: "",
@@ -60,6 +61,41 @@ export default function MemberProfileClient({ member, plans, settings }) {
 
   const waLink = buildWhatsAppLink();
 
+  function toggleEditForm() {
+    if (showEditForm) {
+      setShowEditForm(false);
+      setFormData({
+        planTier: plans?.[0]?.name || "STARTER",
+        customPlanName: "",
+        customPlanPrice: "",
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: "",
+        notes: "",
+        status: "ACTIVE"
+      });
+      setIsCustomPlan(false);
+      setActionType("correct");
+    } else {
+      setShowEditForm(true);
+      if (latestMembership) {
+        const customPlanMatch = latestMembership.planTier?.match(/^(.*)\s\(₹(\d+)\)$/);
+        const isCustom = !!customPlanMatch;
+        setIsCustomPlan(isCustom);
+        
+        setFormData({
+          planTier: isCustom ? (plans?.[0]?.name || "STARTER") : latestMembership.planTier,
+          customPlanName: isCustom ? customPlanMatch[1] : "",
+          customPlanPrice: isCustom ? customPlanMatch[2] : "",
+          startDate: latestMembership.startDate ? new Date(latestMembership.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          endDate: latestMembership.endDate ? new Date(latestMembership.endDate).toISOString().split('T')[0] : "",
+          notes: latestMembership.notes || "",
+          status: latestMembership.status || "ACTIVE"
+        });
+        setActionType("correct");
+      }
+    }
+  }
+
   async function handlePlanUpdate() {
     setLoading(true);
     try {
@@ -77,11 +113,23 @@ export default function MemberProfileClient({ member, plans, settings }) {
         status: formData.status,
       };
 
-      const res = await fetch("/api/admin/members", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      let res;
+      if (actionType === "correct" && latestMembership) {
+        res = await fetch("/api/admin/members", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...payload,
+            membershipId: latestMembership.id
+          })
+        });
+      } else {
+        res = await fetch("/api/admin/members", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      }
 
       if (res.ok) {
         setShowEditForm(false);
@@ -95,7 +143,8 @@ export default function MemberProfileClient({ member, plans, settings }) {
           status: "ACTIVE"
         });
         setIsCustomPlan(false);
-        router.refresh();
+        setActionType("correct");
+        window.location.reload();
       } else {
         const txt = await res.text();
         alert("Error: " + txt);
@@ -219,7 +268,7 @@ export default function MemberProfileClient({ member, plans, settings }) {
             <button
               className="admin-btn-sm"
               style={{ background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.3)", color: "#00c8ff", padding: "12px", flex: 1 }}
-              onClick={() => setShowEditForm(!showEditForm)}
+              onClick={toggleEditForm}
             >
               {showEditForm ? "✕ CANCEL" : "✎ EDIT PLAN"}
             </button>
@@ -268,14 +317,46 @@ export default function MemberProfileClient({ member, plans, settings }) {
       {showEditForm && (
         <div className="admin-section-card" style={{ marginBottom: "30px", borderColor: "rgba(0,200,255,0.2)", background: "linear-gradient(135deg, rgba(0,200,255,0.03) 0%, transparent 100%)" }}>
           <div className="admin-section-card-header">
-            <span className="admin-section-card-title">Manage / Renew Plan</span>
+            <span className="admin-section-card-title">
+              {actionType === "correct" ? "Correct Membership Details" : "Renew / Purchase Plan"}
+            </span>
             <button className="admin-btn-sm" onClick={handlePlanUpdate} disabled={loading} style={{ background: "var(--red)", borderColor: "var(--red)" }}>
-              {loading ? "Saving..." : "Save New Plan Record"}
+              {loading ? "Saving..." : (actionType === "correct" ? "Save Corrections" : "Save New Plan Record")}
             </button>
           </div>
-          <p style={{ fontSize: "12px", color: "#888", marginBottom: "20px" }}>
-            This creates a <strong style={{ color: "white" }}>new membership record</strong> for {member.firstName}. Their previous plan will be automatically marked as expired and preserved in the history below.
-          </p>
+          
+          <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "white", fontSize: "14px" }}>
+                <input 
+                  type="radio" 
+                  name="actionType" 
+                  value="correct" 
+                  checked={actionType === "correct"} 
+                  onChange={() => setActionType("correct")} 
+                />
+                <span>Correct Current Plan (In-place Update)</span>
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "white", fontSize: "14px" }}>
+                <input 
+                  type="radio" 
+                  name="actionType" 
+                  value="renew" 
+                  checked={actionType === "renew"} 
+                  onChange={() => setActionType("renew")} 
+                />
+                <span>Renew / Start New Membership (New History Entry)</span>
+              </label>
+            </div>
+            <p style={{ fontSize: "12px", color: "#888", margin: 0 }}>
+              {actionType === "correct" ? (
+                <>This will <strong style={{ color: "white" }}>update the current membership record</strong> directly. Use this to fix dates, correct typos, or change current plan details without creating duplicate history entries.</>
+              ) : (
+                <>This will create a <strong style={{ color: "white" }}>new membership history record</strong>. The current active plan will be marked as EXPIRED and archived.</>
+              )}
+            </p>
+          </div>
+
           <div className="admin-form-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" }}>
             {/* Toggle Custom Plan */}
             <div className="admin-form-group" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
