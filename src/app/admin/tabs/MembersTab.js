@@ -234,7 +234,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
         <div className="elite-table-wrapper">
           <table className="admin-table" id="membersTable">
             <thead>
-              <tr><th>ID</th><th>Name</th><th>Contact</th><th>Plan</th><th>Joined</th><th>Year</th><th>Expires</th><th>Status</th><th>Notes</th><th>Action</th></tr>
+              <tr><th>ID</th><th>Name</th><th>Contact</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Notes</th><th>Action</th></tr>
             </thead>
             <tbody>
               {filteredMembers.map(m => {
@@ -242,8 +242,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 const plan = membership?.planTier || "N/A";
                 const isActive = membership?.status === "ACTIVE";
                 const joinDate = new Date(m.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                const joinYear = new Date(m.createdAt).getFullYear();
-                const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : "—";
+                const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
                 const hasNotes = !!membership?.notes;
                 const isExpanded = !!expandedNotes[m.id];
                 
@@ -269,7 +268,6 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                       </td>
                       <td>{plan}</td>
                       <td>{joinDate}</td>
-                      <td><span style={{color: 'var(--red)', fontWeight: 'bold', fontSize: '12px'}}>{joinYear}</span></td>
                       <td>{expiresDate}</td>
                       <td>
                         <span className={`status-badge ${membership?.status === "ACTIVE" ? 'status-active' : 'status-expired'}`}>
@@ -302,7 +300,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                     </tr>
                     {isExpanded && hasNotes && (
                       <tr key={`${m.id}-notes`} style={{ background: "rgba(255,255,255,0.02)" }}>
-                        <td colSpan="10" style={{ padding: "12px 24px", fontSize: "13px", color: "#ccc", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td colSpan="9" style={{ padding: "12px 24px", fontSize: "13px", color: "#ccc", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                           <strong>Notes:</strong> {membership.notes}
                         </td>
                       </tr>
