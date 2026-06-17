@@ -66,8 +66,8 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
       },
       revertUI: () => {
         // Optimistic UI
-        if (editing.id) setPlans(plans.map(p => p.id === editing.id ? parsedEditing : p));
-        else setPlans([...plans, { ...parsedEditing, id: 'temp-' + Date.now() }]);
+        if (editing.id) setPlans(prev => prev.map(p => p.id === editing.id ? parsedEditing : p));
+        else setPlans(prev => [...prev, { ...parsedEditing, id: 'temp-' + Date.now() }]);
         setEditing(null);
       }
     });
@@ -86,7 +86,7 @@ export default function PlansTab({ initialPlans, settings, setSettings, requestC
              router.refresh();
           },
           revertUI: () => {
-            setPlans(plans.filter(p => p.id !== id));
+            setPlans(prev => prev.filter(p => p.id !== id));
           }
         });
       }

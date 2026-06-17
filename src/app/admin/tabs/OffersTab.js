@@ -32,8 +32,8 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
         } catch (err) { showToast("Sync failed."); }
       },
       revertUI: () => {
-        if (editing.id) setOffers(offers.map(o => o.id === editing.id ? parsedEditing : o));
-        else setOffers([{...parsedEditing, id: 'temp-' + Date.now()}, ...offers]);
+        if (editing.id) setOffers(prev => prev.map(o => o.id === editing.id ? parsedEditing : o));
+        else setOffers(prev => [{...parsedEditing, id: 'temp-' + Date.now()}, ...prev]);
         setEditing(null);
       }
     });
@@ -52,7 +52,7 @@ export default function OffersTab({ initialOffers, requestConfirmation, executeW
             router.refresh();
           },
           revertUI: () => {
-            setOffers(offers.filter(o => o.id !== id));
+            setOffers(prev => prev.filter(o => o.id !== id));
           }
         });
       }

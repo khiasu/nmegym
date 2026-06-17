@@ -260,15 +260,23 @@ export async function DELETE(req) {
 
     const isValid = await bcrypt.compare(password, adminUser.passwordHash);
     if (!isValid) {
-      return new NextResponse("Invalid admin password", { status: 401 });
+      return NextResponse.json({ error: "Invalid admin password" }, { status: 403 });
     }
 
+    // Disconnect any payments this user verified (verifiedById doesn't cascade)
+    await prisma.payment.updateMany({
+      where: { verifiedById: memberId },
+      data: { verifiedById: null }
+    });
+
+    // Now delete the user (memberships, own payments, accounts, sessions, testimonials cascade automatically)
     await prisma.user.delete({
       where: { id: memberId }
     });
 
     return new NextResponse("Deleted", { status: 200 });
   } catch (error) {
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("DELETE_MEMBER_ERROR", error);
+    return NextResponse.json({ error: "Failed to delete member" }, { status: 500 });
   }
 }

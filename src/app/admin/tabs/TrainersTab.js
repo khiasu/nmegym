@@ -67,22 +67,26 @@ export default function TrainersTab({ initialTrainers, requestConfirmation, exec
 
   async function executeDelete(id, password) {
     try {
-      // In production, the backend /api/admin/trainers DELETE route should verify the password from the body
       const res = await fetch(`/api/admin/trainers?id=${id}`, { 
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }) 
       });
       if (res.ok) {
-        setTrainers(trainers.filter(t => t.id !== id));
+        setTrainers(prev => prev.filter(t => t.id !== id));
         router.refresh();
         showToast("Trainer removed from database");
       } else {
-        showToast("Failed to delete trainer. Incorrect password or server error.");
+        let errorMsg = "Failed to delete trainer.";
+        try {
+          const data = await res.json();
+          if (data.error) errorMsg = data.error;
+        } catch (_) {}
+        showToast(errorMsg);
       }
     } catch (err) { 
       console.error(err);
-      showToast("Error deleting trainer."); 
+      showToast("Network error. Failed to delete trainer."); 
     }
   }
 

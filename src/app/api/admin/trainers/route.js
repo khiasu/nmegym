@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
@@ -43,6 +44,28 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    // Verify admin password
+    let body = {};
+    try { body = await request.json(); } catch (_) {}
+    const { password } = body;
+
+    if (!password) {
+      return NextResponse.json({ error: "Admin password required" }, { status: 401 });
+    }
+
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!adminUser || !adminUser.passwordHash) {
+      return NextResponse.json({ error: "Admin account error" }, { status: 500 });
+    }
+
+    const isValid = await bcrypt.compare(password, adminUser.passwordHash);
+    if (!isValid) {
+      return NextResponse.json({ error: "Invalid admin password" }, { status: 403 });
+    }
 
     await prisma.trainer.delete({ where: { id } });
     return NextResponse.json({ success: true });

@@ -29,8 +29,8 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
         } catch (err) { showToast("Failed to sync facility."); }
       },
       revertUI: () => {
-        if (editing.id) setFacilities(facilities.map(f => f.id === editing.id ? editing : f));
-        else setFacilities([{...editing, id: 'temp-' + Date.now()}, ...facilities]);
+        if (editing.id) setFacilities(prev => prev.map(f => f.id === editing.id ? editing : f));
+        else setFacilities(prev => [{...editing, id: 'temp-' + Date.now()}, ...prev]);
         resetForm();
       }
     });
@@ -67,7 +67,7 @@ export default function FacilitiesTab({ initialFacilities, requestConfirmation, 
         } catch (err) { console.error(err); }
       },
       revertUI: () => {
-        setFacilities(facilities.filter(f => f.id !== id));
+        setFacilities(prev => prev.filter(f => f.id !== id));
       }
     });
   }

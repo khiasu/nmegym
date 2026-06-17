@@ -38,7 +38,7 @@ export default function TestimonialsTab({ requestConfirmation, executeWithUndo, 
         } catch (err) { showToast("Moderation failed."); }
       },
       revertUI: () => {
-        setTestimonials(testimonials.map(t => t.id === id ? { ...t, isPublic: !current } : t));
+        setTestimonials(prev => prev.map(t => t.id === id ? { ...t, isPublic: !current } : t));
       }
     });
   };
@@ -57,7 +57,7 @@ export default function TestimonialsTab({ requestConfirmation, executeWithUndo, 
             fetchTestis();
           },
           revertUI: () => {
-            setTestimonials(testimonials.filter(t => t.id !== id));
+            setTestimonials(prev => prev.filter(t => t.id !== id));
           }
         });
       }

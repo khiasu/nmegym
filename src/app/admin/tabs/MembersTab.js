@@ -163,14 +163,22 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
         body: JSON.stringify({ password }) 
       });
       if (res.ok) {
-        setMembers(members.filter(m => m.id !== id));
+        setMembers(prev => prev.filter(m => m.id !== id));
         router.refresh();
         showToast("Member removed");
       } else {
-        showToast("Failed to delete. Incorrect password or server error.");
+        let errorMsg = "Failed to delete member.";
+        try {
+          const data = await res.json();
+          if (data.error) errorMsg = data.error;
+        } catch (_) {
+          // response wasn't JSON, use status-based message
+          if (res.status === 403) errorMsg = "Invalid admin password.";
+        }
+        showToast(errorMsg);
       }
     } catch (err) {
-      showToast("Failed to delete");
+      showToast("Network error. Failed to delete member.");
     }
   }
 
