@@ -277,6 +277,10 @@ export async function DELETE(req) {
     return new NextResponse("Deleted", { status: 200 });
   } catch (error) {
     console.error("DELETE_MEMBER_ERROR", error);
-    return NextResponse.json({ error: "Failed to delete member" }, { status: 500 });
+    let errorMsg = error.message || "Failed to delete member";
+    if (error.code === "P2003") {
+      errorMsg = "Cannot delete member due to dependent records in the database (foreign key constraint error).";
+    }
+    return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
 }
