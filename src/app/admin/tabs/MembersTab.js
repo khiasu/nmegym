@@ -10,8 +10,8 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState({});
-  const [sortKey, setSortKey] = useState("joined");
-  const [sortDir, setSortDir] = useState("desc");
+  const [sortKey, setSortKey] = useState("id");
+  const [sortDir, setSortDir] = useState("asc");
 
   // Custom Plan Toggle
   const [isCustomPlan, setIsCustomPlan] = useState(false);
@@ -100,8 +100,11 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
     switch (sortKey) {
       case "name":
         return dir * (`${a.firstName} ${a.lastName}`).localeCompare(`${b.firstName} ${b.lastName}`);
-      case "id":
-        return dir * (a.memberId || "").localeCompare(b.memberId || "");
+      case "id": {
+        const numA = a.memberId ? parseInt((a.memberId.match(/NME-(\d+)/) || [])[1] || "0", 10) : 999999;
+        const numB = b.memberId ? parseInt((b.memberId.match(/NME-(\d+)/) || [])[1] || "0", 10) : 999999;
+        return dir * (numA - numB);
+      }
       case "plan":
         return dir * (msA?.planTier || "").localeCompare(msB?.planTier || "");
       case "joined":
@@ -308,16 +311,41 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
       </div>
 
       <div className="admin-section-card">
-        <div className="admin-section-card-header">
+        <div className="admin-section-card-header" style={{ flexWrap: "wrap", gap: "10px" }}>
           <span className="admin-section-card-title">All Members ({filteredMembers.length})</span>
-          <input 
-            className="admin-input" 
-            style={{width: "180px", padding: "6px 10px", fontSize: "12px"}} 
-            placeholder="Search members..." 
-            autoComplete="off"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            {members.some(m => !m.memberId && !m.memberships?.some(ms => ms.planTier?.toLowerCase().includes("session"))) && (
+              <button 
+                className="admin-btn-sm"
+                style={{ fontSize: "10px", padding: "5px 10px", background: "rgba(255,200,0,0.15)", border: "1px solid rgba(255,200,0,0.4)", color: "#ffc800" }}
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/admin/backfill-member-ids", { method: "POST" });
+                    const data = await res.json();
+                    if (res.ok) {
+                      showToast(`✅ ${data.message}`);
+                      router.refresh();
+                      window.location.reload();
+                    } else {
+                      showToast("Failed: " + (data.error || "Unknown error"));
+                    }
+                  } catch (err) {
+                    showToast("Network error while backfilling IDs.");
+                  }
+                }}
+              >
+                ⚠ Fix Missing IDs
+              </button>
+            )}
+            <input 
+              className="admin-input" 
+              style={{width: "180px", padding: "6px 10px", fontSize: "12px"}} 
+              placeholder="Search members..." 
+              autoComplete="off"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
         <div className="elite-table-wrapper">
           <table className="admin-table" id="membersTable">

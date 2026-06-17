@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendAdminNotificationEmail, sendUserPendingNotificationEmail } from "@/lib/mail";
+import { generateMemberId } from "@/lib/member-utils";
 
 export async function POST(request) {
   try {
@@ -15,6 +16,9 @@ export async function POST(request) {
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
+      // Generate member ID for new members
+      const memberId = await generateMemberId();
+
       // Create user with no password yet (PENDING state)
       user = await prisma.user.create({
         data: {
@@ -22,8 +26,16 @@ export async function POST(request) {
           lastName,
           email: email.toLowerCase().trim(),
           phone: phone ? phone.trim() : null,
+          memberId,
           role: "MEMBER",
         },
+      });
+    } else if (!user.memberId) {
+      // Backfill member ID for existing users without one
+      const memberId = await generateMemberId();
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { memberId },
       });
     }
 

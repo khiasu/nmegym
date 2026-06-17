@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendAdminNotificationEmail } from "@/lib/mail";
+import { generateMemberId } from "@/lib/member-utils";
 
 export async function POST(request) {
   try {
@@ -57,15 +58,23 @@ export async function POST(request) {
         // User already exists — just use their ID (they might be re-registering)
         targetUserId = existingUser.id;
         // Update their name/phone if provided
+        const updateData = {
+          firstName: firstName || existingUser.firstName,
+          lastName: lastName || existingUser.lastName,
+          phone: phone || existingUser.phone,
+        };
+        // Backfill member ID if missing (and not a session pass)
+        if (!existingUser.memberId && !isSessionPass) {
+          updateData.memberId = await generateMemberId();
+        }
         await prisma.user.update({
           where: { id: existingUser.id },
-          data: {
-            firstName: firstName || existingUser.firstName,
-            lastName: lastName || existingUser.lastName,
-            phone: phone || existingUser.phone,
-          },
+          data: updateData,
         });
       } else {
+        // Generate member ID for new non-session members
+        const memberId = (!isSessionPass) ? await generateMemberId() : null;
+
         // Create brand new user
         const newUser = await prisma.user.create({
           data: {
@@ -73,6 +82,7 @@ export async function POST(request) {
             lastName,
             email: email.toLowerCase().trim(),
             phone: phone ? phone.trim() : null,
+            memberId,
             role: "MEMBER",
           },
         });
