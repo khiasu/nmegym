@@ -337,6 +337,29 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 ⚠ Fix Missing IDs
               </button>
             )}
+            <button 
+              className="admin-btn-sm"
+              style={{ fontSize: "10px", padding: "5px 10px", background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.4)", color: "#00c8ff" }}
+              onClick={async () => {
+                if (confirm("Are you sure you want to renumber all member IDs sequentially starting from NME-001? This will rewrite all Member IDs to remove gaps.")) {
+                  try {
+                    const res = await fetch("/api/admin/members/renumber", { method: "POST" });
+                    if (res.ok) {
+                      showToast("✅ Member IDs successfully renumbered!");
+                      router.refresh();
+                      window.location.reload();
+                    } else {
+                      const txt = await res.text();
+                      showToast("Failed: " + txt);
+                    }
+                  } catch (err) {
+                    showToast("Network error while renumbering IDs.");
+                  }
+                }
+              }}
+            >
+              🔢 Renumber IDs
+            </button>
             <input 
               className="admin-input" 
               style={{width: "180px", padding: "6px 10px", fontSize: "12px"}} 
