@@ -10,6 +10,8 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState({});
+  const [sortKey, setSortKey] = useState("joined");
+  const [sortDir, setSortDir] = useState("desc");
 
   // Custom Plan Toggle
   const [isCustomPlan, setIsCustomPlan] = useState(false);
@@ -80,6 +82,45 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
     m.phone?.includes(search) || 
     m.email?.toLowerCase().includes(search.toLowerCase())
   );
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      setSortDir(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir(key === "name" || key === "id" ? "asc" : "desc");
+    }
+  }
+
+  const sortedMembers = [...filteredMembers].sort((a, b) => {
+    const dir = sortDir === "asc" ? 1 : -1;
+    const msA = a.memberships?.[0];
+    const msB = b.memberships?.[0];
+
+    switch (sortKey) {
+      case "name":
+        return dir * (`${a.firstName} ${a.lastName}`).localeCompare(`${b.firstName} ${b.lastName}`);
+      case "id":
+        return dir * (a.memberId || "").localeCompare(b.memberId || "");
+      case "plan":
+        return dir * (msA?.planTier || "").localeCompare(msB?.planTier || "");
+      case "joined":
+        return dir * ((msA?.startDate ? new Date(msA.startDate).getTime() : 0) - (msB?.startDate ? new Date(msB.startDate).getTime() : 0));
+      case "expires":
+        return dir * ((msA?.endDate ? new Date(msA.endDate).getTime() : 0) - (msB?.endDate ? new Date(msB.endDate).getTime() : 0));
+      case "status": {
+        const order = { ACTIVE: 0, EXPIRED: 1, CANCELLED: 2, PENDING: 3 };
+        return dir * ((order[msA?.status] ?? 4) - (order[msB?.status] ?? 4));
+      }
+      default:
+        return 0;
+    }
+  });
+
+  const SortArrow = ({ col }) => {
+    if (sortKey !== col) return <span style={{ opacity: 0.25, marginLeft: "4px", fontSize: "10px" }}>⇅</span>;
+    return <span style={{ marginLeft: "4px", fontSize: "10px", color: "var(--red)" }}>{sortDir === "asc" ? "↑" : "↓"}</span>;
+  };
 
   const toggleNotes = (id) => {
     setExpandedNotes(prev => ({ ...prev, [id]: !prev[id] }));
@@ -281,10 +322,20 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
         <div className="elite-table-wrapper">
           <table className="admin-table" id="membersTable">
             <thead>
-              <tr><th>ID</th><th>Name</th><th>Contact</th><th>Plan</th><th>Joined</th><th>Expires</th><th>Status</th><th>Notes</th><th>Action</th></tr>
+              <tr>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("id")}>ID<SortArrow col="id" /></th>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("name")}>Name<SortArrow col="name" /></th>
+                <th>Contact</th>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("plan")}>Plan<SortArrow col="plan" /></th>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("joined")}>Joined<SortArrow col="joined" /></th>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("expires")}>Expires<SortArrow col="expires" /></th>
+                <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => handleSort("status")}>Status<SortArrow col="status" /></th>
+                <th>Notes</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody>
-              {filteredMembers.map(m => {
+              {sortedMembers.map(m => {
                 const membership = m.memberships?.[0];
                 const plan = membership?.planTier || "N/A";
                 const isActive = membership?.status === "ACTIVE";
