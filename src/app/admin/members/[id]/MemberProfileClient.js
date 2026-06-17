@@ -16,6 +16,68 @@ export default function MemberProfileClient({ member, plans, settings }) {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isEditingId, setIsEditingId] = useState(false);
+  const [newIdVal, setNewIdVal] = useState(member?.memberId || "");
+  const [suggesting, setSuggesting] = useState(false);
+  const [savingId, setSavingId] = useState(false);
+  const [idError, setIdError] = useState("");
+
+  async function handleSuggestId() {
+    setSuggesting(true);
+    setIdError("");
+    try {
+      const res = await fetch("/api/admin/members/update-id");
+      if (res.ok) {
+        const data = await res.json();
+        setNewIdVal(data.nextId);
+      } else {
+        setIdError("Failed to fetch suggestion");
+      }
+    } catch (err) {
+      setIdError("Error fetching suggestion");
+    } finally {
+      setSuggesting(false);
+    }
+  }
+
+  async function handleSaveId() {
+    const idRegex = /^NME-\d+$/;
+    if (!idRegex.test(newIdVal)) {
+      setIdError("ID format must be NME-XXX (e.g. NME-001)");
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to change the Member ID to ${newIdVal}? This will update the ID across all records.`)) {
+      return;
+    }
+
+    setSavingId(true);
+    setIdError("");
+    try {
+      const res = await fetch("/api/admin/members/update-id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: member.id, newMemberId: newIdVal })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setMemberData(prev => ({
+          ...prev,
+          memberId: data.memberId
+        }));
+        setIsEditingId(false);
+        router.refresh();
+      } else {
+        const text = await res.text();
+        setIdError(text || "Failed to update Member ID");
+      }
+    } catch (err) {
+      setIdError("Error updating Member ID");
+    } finally {
+      setSavingId(false);
+    }
+  }
 
   async function handleResetCredentials() {
     try {
@@ -266,9 +328,75 @@ export default function MemberProfileClient({ member, plans, settings }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <h2 style={{ color: "white", fontSize: "24px", margin: "0 0 5px 0" }}>{member.firstName} {member.lastName}</h2>
-              <div style={{ color: "var(--red)", fontFamily: "monospace", fontSize: "16px", fontWeight: "bold" }}>
-                {member.memberId || "No ID"}
-              </div>
+              {isEditingId ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "5px" }}>
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    <input 
+                      type="text" 
+                      className="admin-input" 
+                      style={{ fontFamily: "monospace", fontSize: "14px", textTransform: "uppercase", padding: "4px 8px", width: "120px", margin: 0 }} 
+                      value={newIdVal} 
+                      onChange={e => {
+                        setNewIdVal(e.target.value.toUpperCase());
+                        setIdError("");
+                      }}
+                      placeholder="NME-XXX"
+                    />
+                    <button 
+                      type="button" 
+                      className="admin-btn-sm" 
+                      style={{ padding: "6px 10px", fontSize: "11px", background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#aaa" }}
+                      onClick={handleSuggestId}
+                      disabled={suggesting}
+                    >
+                      {suggesting ? "..." : "Suggest"}
+                    </button>
+                  </div>
+                  {idError && <div style={{ color: "var(--red)", fontSize: "11px" }}>{idError}</div>}
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <button 
+                      type="button" 
+                      className="admin-btn-sm" 
+                      style={{ padding: "4px 10px", fontSize: "11px", background: "var(--red)", borderColor: "var(--red)" }}
+                      onClick={handleSaveId}
+                      disabled={savingId}
+                    >
+                      {savingId ? "Saving..." : "Save"}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="admin-btn-sm outline" 
+                      style={{ padding: "4px 10px", fontSize: "11px" }}
+                      onClick={() => {
+                        setIsEditingId(false);
+                        setNewIdVal(memberData.memberId || "");
+                        setIdError("");
+                      }}
+                      disabled={savingId}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "3px" }}>
+                  <div style={{ color: "var(--red)", fontFamily: "monospace", fontSize: "16px", fontWeight: "bold" }}>
+                    {memberData.memberId || "No ID"}
+                  </div>
+                  <button
+                    type="button"
+                    className="admin-toggle-btn"
+                    style={{ padding: "2px 6px", fontSize: "10px", color: "var(--red)", borderColor: "rgba(232,0,29,0.3)" }}
+                    onClick={() => {
+                      setIsEditingId(true);
+                      setNewIdVal(memberData.memberId || "");
+                      setIdError("");
+                    }}
+                  >
+                    Edit ID
+                  </button>
+                </div>
+              )}
             </div>
             <span className={`status-badge ${isActive ? 'status-active' : 'status-expired'}`} style={{ fontSize: "14px", padding: "6px 12px" }}>
               {isActive ? 'ACTIVE' : 'EXPIRED'}
