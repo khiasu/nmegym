@@ -263,12 +263,19 @@ export async function DELETE(req) {
     }
 
     // Verify admin password
-    const adminUser = await prisma.user.findUnique({
+    let adminUser = await prisma.user.findUnique({
       where: { id: session.user.id }
     });
 
+    // Fallback for stale session ID
+    if (!adminUser && session.user.email) {
+      adminUser = await prisma.user.findFirst({
+        where: { email: session.user.email.toLowerCase() }
+      });
+    }
+
     if (!adminUser || !adminUser.passwordHash) {
-      return NextResponse.json({ error: "Admin account has no password set" }, { status: 500 });
+      return NextResponse.json({ error: "Admin account error or password not set. Try logging out and back in." }, { status: 500 });
     }
 
     const isValid = await bcrypt.compare(password, adminUser.passwordHash);

@@ -54,12 +54,18 @@ export async function DELETE(request) {
       return NextResponse.json({ error: "Admin password required" }, { status: 401 });
     }
 
-    const adminUser = await prisma.user.findUnique({
+    let adminUser = await prisma.user.findUnique({
       where: { id: session.user.id }
     });
 
+    if (!adminUser && session.user.email) {
+      adminUser = await prisma.user.findFirst({
+        where: { email: session.user.email.toLowerCase() }
+      });
+    }
+
     if (!adminUser || !adminUser.passwordHash) {
-      return NextResponse.json({ error: "Admin account error" }, { status: 500 });
+      return NextResponse.json({ error: "Admin account error. Try logging out and back in." }, { status: 500 });
     }
 
     const isValid = await bcrypt.compare(password, adminUser.passwordHash);

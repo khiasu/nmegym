@@ -22,12 +22,19 @@ export async function POST(request) {
     }
 
     // 1. Fetch current admin user
-    const admin = await prisma.user.findUnique({
+    let admin = await prisma.user.findUnique({
       where: { id: session.user.id }
     });
 
+    // Fallback: If session ID is stale/invalid (e.g. database was reset/reseeded) but session email is present
+    if (!admin && session.user.email) {
+      admin = await prisma.user.findFirst({
+        where: { email: session.user.email.toLowerCase() }
+      });
+    }
+
     if (!admin) {
-      return NextResponse.json({ error: "Admin account not found" }, { status: 404 });
+      return NextResponse.json({ error: "Admin account not found. Please log out and log back in." }, { status: 404 });
     }
 
     // 2. If admin already has a password, verify the current one
@@ -45,7 +52,7 @@ export async function POST(request) {
     // 3. Hash new password and update
     const newHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: admin.id },
       data: { passwordHash: newHash }
     });
 

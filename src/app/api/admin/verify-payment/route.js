@@ -21,13 +21,23 @@ export async function POST(request) {
       return NextResponse.json({ error: "Payment ID and status are required" }, { status: 400 });
     }
 
+    // Fetch admin user to get the correct database ID (handles stale session.user.id)
+    let adminUser = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+    if (!adminUser && session.user.email) {
+      adminUser = await prisma.user.findFirst({
+        where: { email: session.user.email.toLowerCase() }
+      });
+    }
+    if (!adminUser) {
+      return NextResponse.json({ error: "Admin account not found. Please log out and back in." }, { status: 404 });
+    }
+
     // Verify admin password if provided (for critical actions like Rejection)
     if (password) {
-      const adminUser = await prisma.user.findUnique({
-        where: { id: session.user.id }
-      });
-      if (!adminUser || !adminUser.passwordHash) {
-        return NextResponse.json({ error: "Admin account error" }, { status: 500 });
+      if (!adminUser.passwordHash) {
+        return NextResponse.json({ error: "Admin account has no password set" }, { status: 500 });
       }
       const isValid = await bcrypt.compare(password, adminUser.passwordHash);
       if (!isValid) {
@@ -49,7 +59,7 @@ export async function POST(request) {
       where: { id: paymentId },
       data: {
         status,
-        verifiedById: session.user.id,
+        verifiedById: adminUser.id,
       },
     });
 
