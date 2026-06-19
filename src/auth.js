@@ -23,9 +23,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const user = await prisma.user.findFirst({
             where: {
               OR: [
-                { email: loginInput.toLowerCase() },
-                { memberId: loginInput.toUpperCase() },
-                { memberId: loginInput }
+                { email: { equals: loginInput, mode: "insensitive" } },
+                { memberId: { equals: loginInput, mode: "insensitive" } }
               ]
             }
           });
@@ -36,10 +35,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
  
           console.log(`[AUTH] User found: ${user.email}. Checking password...`);
-          const isPasswordCorrect = await bcrypt.compare(
+          let isPasswordCorrect = await bcrypt.compare(
             credentials.password,
             user.passwordHash
           );
+
+          // Fallback: If password comparison fails, try trimming the password
+          // (very common when users copy-paste temporary credentials with trailing/leading whitespace)
+          if (!isPasswordCorrect) {
+            const trimmedPassword = credentials.password.trim();
+            if (trimmedPassword !== credentials.password) {
+              console.log(`[AUTH] Exact password check failed, attempting with trimmed password`);
+              isPasswordCorrect = await bcrypt.compare(
+                trimmedPassword,
+                user.passwordHash
+              );
+            }
+          }
  
           if (!isPasswordCorrect) {
             console.warn(`[AUTH] Password mismatch for: ${credentials.email}`);
