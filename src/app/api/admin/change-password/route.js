@@ -13,8 +13,12 @@ export async function POST(request) {
 
     const { currentPassword, newPassword } = await request.json();
 
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json({ error: "Both passwords are required" }, { status: 400 });
+    if (!newPassword) {
+      return NextResponse.json({ error: "New password is required" }, { status: 400 });
+    }
+
+    if (newPassword.length < 4) {
+      return NextResponse.json({ error: "Password must be at least 4 characters" }, { status: 400 });
     }
 
     // 1. Fetch current admin user
@@ -22,15 +26,21 @@ export async function POST(request) {
       where: { id: session.user.id }
     });
 
-    if (!admin || !admin.passwordHash) {
-      return NextResponse.json({ error: "Admin account error" }, { status: 404 });
+    if (!admin) {
+      return NextResponse.json({ error: "Admin account not found" }, { status: 404 });
     }
 
-    // 2. Verify current password
-    const isMatch = await bcrypt.compare(currentPassword, admin.passwordHash);
-    if (!isMatch) {
-      return NextResponse.json({ error: "Incorrect current password" }, { status: 403 });
+    // 2. If admin already has a password, verify the current one
+    if (admin.passwordHash) {
+      if (!currentPassword) {
+        return NextResponse.json({ error: "Current password is required" }, { status: 400 });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, admin.passwordHash);
+      if (!isMatch) {
+        return NextResponse.json({ error: "Incorrect current password" }, { status: 403 });
+      }
     }
+    // If no passwordHash exists, allow setting initial password without current password
 
     // 3. Hash new password and update
     const newHash = await bcrypt.hash(newPassword, 10);

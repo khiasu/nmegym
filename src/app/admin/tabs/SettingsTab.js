@@ -47,7 +47,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
   }
 
   async function changeAdminPassword() {
-    if (!passwords.current || !passwords.new) return showToast("Please fill both password fields.");
+    if (!passwords.new) return showToast("Please enter a new password.");
     
     setSaving(true);
     try {
@@ -55,16 +55,16 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          currentPassword: passwords.current, 
+          currentPassword: passwords.current || undefined, 
           newPassword: passwords.new 
         }),
       });
 
+      const data = await res.json();
       if (res.ok) {
         showToast("Admin password updated successfully!");
         setPasswords({ current: "", new: "" });
       } else {
-        const data = await res.json();
         showToast(data.error || "Failed to update password.");
       }
     } catch (err) {
@@ -312,6 +312,7 @@ export default function SettingsTab({ initialSettings: settings, setSettings, re
               onChange={e => setPasswords({...passwords, current: e.target.value})}
               autoComplete="new-password"
             />
+            <p style={{fontSize:"10px", color:"rgba(255,255,255,0.3)", marginTop:"4px"}}>Leave blank if setting password for the first time</p>
           </div>
           <div className="admin-form-group">
             <label className="admin-label">New Password</label>
