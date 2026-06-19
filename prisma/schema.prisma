@@ -104,7 +104,7 @@ model Payment {
   screenshotUrl  String?
   status         String   @default("PENDING_VERIFICATION") // PENDING_VERIFICATION, VERIFIED, REJECTED
   verifiedById   String?
-  verifiedBy     User?    @relation("AdminVerifiedPayments", fields: [verifiedById], references: [id])
+  verifiedBy     User?    @relation("AdminVerifiedPayments", fields: [verifiedById], references: [id], onDelete: SetNull)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

@@ -182,7 +182,6 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
   }
 
   function deleteMember(id) {
-    const memberToRemove = members.find(m => m.id === id);
     requestConfirmation({
       title: "DELETE MEMBER",
       message: "Are you sure you want to permanently remove this member? This cannot be undone.",
@@ -192,7 +191,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
           message: "Member removed. Finalizing deletion in 7s...",
           executeFunction: async () => await executeDelete(id, password),
           revertUI: () => {
-            setMembers(members.filter(m => m.id !== id));
+            setMembers(prev => prev.filter(m => m.id !== id));
           }
         });
       }
@@ -207,22 +206,26 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
         body: JSON.stringify({ password }) 
       });
       if (res.ok) {
-        setMembers(prev => prev.filter(m => m.id !== id));
         router.refresh();
-        showToast("Member removed");
+        showToast("Member permanently deleted.");
       } else {
         let errorMsg = "Failed to delete member.";
         try {
           const data = await res.json();
           if (data.error) errorMsg = data.error;
         } catch (_) {
-          // response wasn't JSON, use status-based message
-          if (res.status === 403) errorMsg = "Invalid admin password.";
+          // response wasn't JSON
+          const text = await res.text().catch(() => "");
+          if (text) errorMsg = text;
         }
         showToast(errorMsg);
+        // Reload to restore the member that was optimistically removed
+        window.location.reload();
       }
     } catch (err) {
       showToast("Network error. Failed to delete member.");
+      // Reload to restore the member that was optimistically removed
+      window.location.reload();
     }
   }
 

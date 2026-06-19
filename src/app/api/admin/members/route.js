@@ -238,16 +238,29 @@ export async function PUT(req) {
 export async function DELETE(req) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse("Unauthorized", { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { searchParams } = new URL(req.url);
     const memberId = searchParams.get("id");
-    const { password } = await req.json();
 
-    if (!memberId) return new NextResponse("Missing ID", { status: 400 });
-    if (!password) return new NextResponse("Authorization required", { status: 401 });
+    if (!memberId) {
+      return NextResponse.json({ error: "Missing member ID" }, { status: 400 });
+    }
+
+    // Parse password from body — wrapped in try/catch in case body is missing/invalid
+    let password;
+    try {
+      const body = await req.json();
+      password = body?.password;
+    } catch (e) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    if (!password) {
+      return NextResponse.json({ error: "Admin password is required" }, { status: 401 });
+    }
 
     // Verify admin password
     const adminUser = await prisma.user.findUnique({
@@ -255,7 +268,7 @@ export async function DELETE(req) {
     });
 
     if (!adminUser || !adminUser.passwordHash) {
-      return new NextResponse("Admin account error", { status: 500 });
+      return NextResponse.json({ error: "Admin account has no password set" }, { status: 500 });
     }
 
     const isValid = await bcrypt.compare(password, adminUser.passwordHash);
@@ -263,23 +276,44 @@ export async function DELETE(req) {
       return NextResponse.json({ error: "Invalid admin password" }, { status: 403 });
     }
 
-    // Disconnect any payments this user verified (verifiedById doesn't cascade)
-    await prisma.payment.updateMany({
-      where: { verifiedById: memberId },
-      data: { verifiedById: null }
-    });
-
-    // Now delete the user (memberships, own payments, accounts, sessions, testimonials cascade automatically)
-    await prisma.user.delete({
+    // Verify the member exists before attempting delete
+    const memberToDelete = await prisma.user.findUnique({
       where: { id: memberId }
     });
 
-    return new NextResponse("Deleted", { status: 200 });
+    if (!memberToDelete) {
+      return NextResponse.json({ error: "Member not found" }, { status: 404 });
+    }
+
+    // Use a transaction to ensure cleanup + delete is atomic
+    await prisma.$transaction(async (tx) => {
+      // Disconnect any payments this user verified (verifiedById doesn't cascade)
+      await tx.payment.updateMany({
+        where: { verifiedById: memberId },
+        data: { verifiedById: null }
+      });
+
+      // Explicitly delete related records that might not cascade properly
+      await tx.testimonial.deleteMany({ where: { userId: memberId } });
+      await tx.payment.deleteMany({ where: { userId: memberId } });
+      await tx.membership.deleteMany({ where: { userId: memberId } });
+      await tx.session.deleteMany({ where: { userId: memberId } });
+      await tx.account.deleteMany({ where: { userId: memberId } });
+
+      // Now delete the user
+      await tx.user.delete({
+        where: { id: memberId }
+      });
+    });
+
+    return NextResponse.json({ success: true, message: "Member deleted" });
   } catch (error) {
     console.error("DELETE_MEMBER_ERROR", error);
     let errorMsg = error.message || "Failed to delete member";
     if (error.code === "P2003") {
       errorMsg = "Cannot delete member due to dependent records in the database (foreign key constraint error).";
+    } else if (error.code === "P2025") {
+      errorMsg = "Member record not found — it may have already been deleted.";
     }
     return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
