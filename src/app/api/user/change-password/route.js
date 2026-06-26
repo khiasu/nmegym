@@ -13,8 +13,8 @@ export async function POST(request) {
 
     const { currentPassword, newPassword } = await request.json();
 
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json({ error: "Both current and new passwords are required" }, { status: 400 });
+    if (!newPassword) {
+      return NextResponse.json({ error: "New password is required" }, { status: 400 });
     }
 
     if (newPassword.length < 6) {

@@ -73,6 +73,10 @@ export default function LoginForm({ settings }) {
             name="email"
             type="text"
             placeholder={isAdmin ? "admin@nmegym.in" : "you@example.com or NME-001"}
+            autoComplete="username"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             required
           />
         </div>
@@ -84,6 +88,10 @@ export default function LoginForm({ settings }) {
             name="password"
             type="password"
             placeholder="••••••••"
+            autoComplete="current-password"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             required
           />
         </div>
