@@ -4,7 +4,7 @@ This is the custom-built web platform for **NME GYM Nagaland**. It’s designed 
 
 ---
 
-## ⚡ What it Does
+##  What it Does
 
 ### 1. The Membership Flow (Automated)
 Instead of paying a 3% fee to Stripe or Razorpay, we use a custom UPI verification system:
@@ -32,7 +32,7 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 
 ---
 
-## 🛠 Tech Stack (The "Free" Engine)
+##  Tech Stack
 - **Framework**: Next.js 16 (App Router)
 - **Database**: Neon PostgreSQL (Free Tier)
 - **Auth**: NextAuth.js (Secure member logins)
@@ -42,7 +42,7 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 
 ---
 
-## 🚀 Quick Start for Developers
+## Quick Start
 
 1. **Setup Env**: Copy `.env.example` to `.env` and fill in your Neon and Cloudinary keys.
 2. **Install**: `npm install`
@@ -52,7 +52,7 @@ The entire admin dashboard and member portal are optimized for mobile. You can m
 
 ---
 
-## 💡 Important Notes
+## Important Notes
 
 - **Zero Cost Policy**: The project is built to stay within the free tiers of Vercel, Neon, Cloudinary, and Resend. Don't add paid plugins unless the client explicitly asks.
 - **Email Delivery (Resend Sandbox)**: In testing, Resend's default onboarding domain (`onboarding@resend.dev`) will only deliver emails to the email address registered to the Resend account. For production handoff, verify the gym's custom domain (e.g., `nmegym.in`) in the Resend dashboard and update `EMAIL_FROM` in `.env` to route emails to any member's address.
