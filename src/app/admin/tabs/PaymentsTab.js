@@ -58,7 +58,10 @@ export default function PaymentsTab({ pendingPayments: initialPending, verifiedP
               ? `Welcome to NME GYM, ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan is verified and your membership is ACTIVE.\n\n*Your Login Credentials:*\nMember ID: ${data.memberId}\nInitial Password: ${data.initialPassword}\n\nPlease login here to access your dashboard: ${loginUrl}`
               : `Hello ${data.userName}! 🎉\n\nYour payment of ₹${data.amount} for the ${data.planName || 'Monthly'} plan has been successfully verified!\n\nYour membership is now ACTIVE. You can check your dashboard here: ${loginUrl}`);
           
-          const waUrl = `https://wa.me/${data.userPhone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+          // Normalize phone for wa.me: auto-prepend 91 for 10-digit Indian numbers
+          const phoneDigits = data.userPhone.replace(/\D/g, '');
+          const normalizedPhone = phoneDigits.length === 10 ? '91' + phoneDigits : phoneDigits;
+          const waUrl = `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(text)}`;
           
           // Add to pending WhatsApp tasks list
           try {

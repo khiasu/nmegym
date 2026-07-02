@@ -156,7 +156,13 @@ export default function MemberProfileClient({ member, plans, settings }) {
     : "—";
 
   // WhatsApp Link generation
-  const cleanPhone = (member.phone || "").replace(/\D/g, "");
+  // Normalize phone for wa.me: strip non-digits, auto-prepend 91 for 10-digit Indian numbers
+  function normalizePhoneForWhatsApp(phone) {
+    const digits = (phone || "").replace(/\D/g, "");
+    if (digits.length === 10) return "91" + digits;
+    return digits;
+  }
+  const cleanPhone = normalizePhoneForWhatsApp(member.phone);
   const gymName = settings?.gymName || "NME GYM";
 
   function buildWhatsAppLink() {
@@ -809,7 +815,7 @@ export default function MemberProfileClient({ member, plans, settings }) {
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {(() => {
-                const cleanPhone = (savedCreds.phone || "").replace(/\D/g, "");
+                const cleanPhone = normalizePhoneForWhatsApp(savedCreds.phone);
                 const gymName = settings?.gymName || "NME GYM";
                 const loginUrl = `${window.location.origin}/auth/login`;
                 

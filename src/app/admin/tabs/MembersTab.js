@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 
 export default function MembersTab({ members: initialMembers, plans: availablePlans, settings, requestConfirmation, executeWithUndo, showToast }) {
   const router = useRouter();
+
+  // Normalize phone for wa.me: strip non-digits, auto-prepend 91 for 10-digit Indian numbers
+  function normalizePhoneForWhatsApp(phone) {
+    const digits = (phone || "").replace(/\D/g, "");
+    if (digits.length === 10) return "91" + digits;
+    return digits;
+  }
   const [members, setMembers] = useState(initialMembers || []);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -399,7 +406,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 const isExpanded = !!expandedNotes[m.id];
                 
                 // WhatsApp pre-filled notification link
-                const cleanPhone = (m.phone || "").replace(/\D/g, "");
+                const cleanPhone = normalizePhoneForWhatsApp(m.phone);
                 const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=Hi%20${m.firstName},%20this%20is%20NME%20Gym.%20We%20wanted%20to%20update%20you%20on%20your%20membership.` : null;
 
                 return (
@@ -482,7 +489,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
                 const joinDate = membership?.startDate ? new Date(membership.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
                 const expiresDate = membership?.endDate ? new Date(membership.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—";
                 
-                const cleanPhone = (m.phone || "").replace(/\D/g, "");
+                const cleanPhone = normalizePhoneForWhatsApp(m.phone);
                 const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=Hi%20${m.firstName},%20this%20is%20NME%20Gym.` : null;
 
                 return (
@@ -598,7 +605,7 @@ export default function MembersTab({ members: initialMembers, plans: availablePl
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {(() => {
-                const cleanPhone = (savedCreds.phone || "").replace(/\D/g, "");
+                const cleanPhone = normalizePhoneForWhatsApp(savedCreds.phone);
                 const gymName = settings?.gymName || "NME GYM";
                 const loginUrl = `${window.location.origin}/auth/login`;
                 
