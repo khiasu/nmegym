@@ -14,6 +14,7 @@ import TrainersTab from "./tabs/TrainersTab";
 import FacilitiesTab from "./tabs/FacilitiesTab";
 import SettingsTab from "./tabs/SettingsTab";
 import TestimonialsTab from "./tabs/TestimonialsTab";
+import ActiveMembersTab from "./tabs/ActiveMembersTab";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import AlertModal from "@/components/ui/AlertModal";
 import ToastNotification from "@/components/ui/ToastNotification";
@@ -23,7 +24,7 @@ export default function AdminClient(props) {
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
       const urlTab = new URLSearchParams(window.location.search).get('tab');
-      if (urlTab && ['dashboard','registrations','members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(urlTab)) {
+      if (urlTab && ['dashboard','registrations','members','active-members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(urlTab)) {
         return urlTab;
       }
     }
@@ -62,7 +63,7 @@ export default function AdminClient(props) {
   // Sync tab with URL query param (e.g. /admin?tab=members)
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['dashboard','registrations','members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(tab)) {
+    if (tab && ['dashboard','registrations','members','active-members','payments','plans','offers','trainers','facilities','settings','testimonials'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -147,6 +148,7 @@ export default function AdminClient(props) {
     { id: "dashboard", label: "Dashboard", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> },
     { id: "registrations", label: "New Registrations", badge: regCount, icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg> },
     { id: "members", label: "Members", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> },
+    { id: "active-members", label: "Active Members", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> },
     { id: "payments", label: "Payments", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> },
     { id: "plans", label: "Membership Plans", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> },
     { id: "offers", label: "Promo Offers", icon: <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> },
@@ -275,6 +277,7 @@ export default function AdminClient(props) {
           {activeTab === "dashboard" && <DashboardTab {...props} setActiveTab={setActiveTab} />}
           {activeTab === "registrations" && <RegistrationsTab newRegistrations={props.newRegistrations} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "members" && <MembersTab members={props.members} plans={props.plans} settings={settings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
+          {activeTab === "active-members" && <ActiveMembersTab members={props.members} />}
           {activeTab === "payments" && <PaymentsTab pendingPayments={props.pendingPayments} verifiedPayments={props.verifiedPayments} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "plans" && <PlansTab initialPlans={props.plans} settings={settings} setSettings={setSettings} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
           {activeTab === "offers" && <OffersTab initialOffers={props.offers} requestConfirmation={requestConfirmation} executeWithUndo={executeWithUndo} showToast={showToast} />}
